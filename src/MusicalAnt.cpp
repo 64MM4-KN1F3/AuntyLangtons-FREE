@@ -159,7 +159,8 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 	bool** cellsHistory = new bool*[HISTORY_AMOUNT];
 
 
-	MusicalAnt() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
+	MusicalAnt() {
+		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		reset();
 	}
 
@@ -978,7 +979,8 @@ struct MusicalAntWidget : ModuleWidget {
 	MusicalAnt *module;
 
 
-	MusicalAntWidget(MusicalAnt *module) : ModuleWidget(module) {
+	MusicalAntWidget(MusicalAnt *module) {
+		setModule(module);
 		setPanel(SVG::load(assetPlugin(pluginInstance, "res/MusicalAnt.svg")));
 
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));

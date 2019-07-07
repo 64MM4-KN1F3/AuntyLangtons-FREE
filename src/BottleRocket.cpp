@@ -28,7 +28,8 @@ struct BottleRocket : Module {
 	float lastInputPitch = -1.0;
 	float pitchStore[TOTAL_CARGO_HOLDS] = {-1.0, -1.0, -1.0, -1.0, -1.0, -1.0};
 
-	BottleRocket() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
+	BottleRocket() {
+		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);}
 	void step() override;
 	bool fillPitchStore(float in) {
 		int i = 0;
@@ -120,7 +121,8 @@ void BottleRocket::step() {
 
 
 struct BottleRocketWidget : ModuleWidget {
-	BottleRocketWidget(BottleRocket *module) : ModuleWidget(module) {
+	BottleRocketWidget(BottleRocket *module) {
+		setModule(module);
 		setPanel(SVG::load(assetPlugin(pluginInstance, "res/BottleRocket.svg")));
 
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
