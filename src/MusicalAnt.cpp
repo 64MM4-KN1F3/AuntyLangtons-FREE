@@ -181,7 +181,7 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 		configParam(MusicalAnt::LOOP_LENGTH, 0.0f, 95.0f, 31.0, "");
 		configParam(MusicalAnt::SIDE_LENGTH_PARAM, 0.0f, 6.0f, 4.0, "");
 		configParam(MusicalAnt::SKIP_PARAM, 0.0f, 9.0f, 0.0f, "");
-		//reset();
+		reset();
 	}
 
 	~MusicalAnt() {
