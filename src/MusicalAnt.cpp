@@ -91,13 +91,13 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 		EFFECT_KNOB_PARAM,
 		SHADOW_ANT_ON,
 		SIDE_LENGTH_PARAM,
-		NUM_PARAMS,
 		STEP_FWD_BTN_PARAM,
 		STEP_BCK_BTN_PARAM,
 		LOOPMODE_SWITCH_PARAM,
 		LOOP_LENGTH,
 		VOCT_INVERT_X,
-		VOCT_INVERT_Y
+		VOCT_INVERT_Y,
+		NUM_PARAMS
 	};
 	enum InputIds {
 		CLOCK_INPUT,
@@ -181,7 +181,7 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 		configParam(MusicalAnt::LOOP_LENGTH, 0.0f, 95.0f, 31.0, "");
 		configParam(MusicalAnt::SIDE_LENGTH_PARAM, 0.0f, 6.0f, 4.0, "");
 		configParam(MusicalAnt::SKIP_PARAM, 0.0f, 9.0f, 0.0f, "");
-		reset();
+		//reset();
 	}
 
 	~MusicalAnt() {
@@ -792,7 +792,7 @@ void MusicalAnt::process(const ProcessArgs &args) {
 
 	
 
-	params[INDEX_PARAM].getValue() = getIndex();
+	params[INDEX_PARAM].setValue(getIndex());
 
 
 	outputs[GATE_OUTPUT].setVoltage(gateOut);
@@ -850,7 +850,7 @@ struct ModuleDisplay : virtual TransparentWidget {
 	}
 	*/
 
-	void draw(const DrawArgs &args) override {
+	void draw(NVGcontext *vg) override {
 
 		int x = 0;
 		int y = 0;
@@ -869,19 +869,19 @@ struct ModuleDisplay : virtual TransparentWidget {
 					y++;
 				}
 				
-				//nvgFillColor(args.vg, (module->cells[i] ? nvgRGBA(0,255,0,255) : nvgRGBA(255,0,0,255)));
+				//nvgFillColor(vg, (module->cells[i] ? nvgRGBA(0,255,0,255) : nvgRGBA(255,0,0,255)));
 				if(module->cells[i]){
-					nvgFillColor(args.vg, ((random::uniform() < 0.5) ? nvgRGBA(0,255,0,PIXEL_BRIGHTNESS) : nvgRGBA(0,255,0,PIXEL_BRIGHTNESS+5)));
-					nvgBeginPath(args.vg);
-					nvgRect(args.vg, x*pixelSize + DISPLAY_OFFSET_X, y*pixelSize + DISPLAY_OFFSET_Y, pixelSize, pixelSize);
-					nvgFill(args.vg);
+					nvgFillColor(vg, ((random::uniform() < 0.5) ? nvgRGBA(0,255,0,PIXEL_BRIGHTNESS) : nvgRGBA(0,255,0,PIXEL_BRIGHTNESS+5)));
+					nvgBeginPath(vg);
+					nvgRect(vg, x*pixelSize + DISPLAY_OFFSET_X, y*pixelSize + DISPLAY_OFFSET_Y, pixelSize, pixelSize);
+					nvgFill(vg);
 				}
 				if(i == shadowAntCell){
 					if(!module->params[MusicalAnt::SHADOW_ANT_ON].getValue()){
-						nvgFillColor(args.vg, nvgRGBA(0,0,255,255));
-						nvgBeginPath(args.vg);
-						nvgRect(args.vg, x*pixelSize + DISPLAY_OFFSET_X, y*pixelSize + DISPLAY_OFFSET_Y, pixelSize, pixelSize);
-						nvgFill(args.vg);
+						nvgFillColor(vg, nvgRGBA(0,0,255,255));
+						nvgBeginPath(vg);
+						nvgRect(vg, x*pixelSize + DISPLAY_OFFSET_X, y*pixelSize + DISPLAY_OFFSET_Y, pixelSize, pixelSize);
+						nvgFill(vg);
 					}
 				}
 				//addChild( new ModuleDisplay(module, Vec((x+1)*(pixelSize + gapSize) + DISPLAY_OFFSET_X, (y+1)*(pixelSize + gapSize) + DISPLAY_OFFSET_Y), pixelSize, i));
@@ -898,36 +898,36 @@ struct ModuleDisplay : virtual TransparentWidget {
 				if((i%55 == 0)&&(i!=0)){ //increment y once x hits positive multiple of COL length
 					y++;
 				}
-				nvgFillColor(args.vg, ((random::uniform() < 0.5) ? nvgRGBA(0,0,0,0) : nvgRGBA(255,255,255,8)));
-				nvgBeginPath(args.vg);
-				nvgRect(args.vg, x*fuzzPixelSize + DISPLAY_OFFSET_X, y*fuzzPixelSize + DISPLAY_OFFSET_Y, fuzzPixelSize, fuzzPixelSize);
-				nvgFill(args.vg);
+				nvgFillColor(vg, ((random::uniform() < 0.5) ? nvgRGBA(0,0,0,0) : nvgRGBA(255,255,255,8)));
+				nvgBeginPath(vg);
+				nvgRect(vg, x*fuzzPixelSize + DISPLAY_OFFSET_X, y*fuzzPixelSize + DISPLAY_OFFSET_Y, fuzzPixelSize, fuzzPixelSize);
+				nvgFill(vg);
 			}
 
 			// Draw screen reflection over display
-			nvgFillColor(args.vg, nvgRGBA(255,255,255,7));
-			nvgBeginPath(args.vg);
-			nvgRect(args.vg, x*pixelSize + DISPLAY_OFFSET_X, y*pixelSize + DISPLAY_OFFSET_Y, pixelSize, pixelSize);
-			nvgCircle(args.vg, 68 + DISPLAY_OFFSET_X, 54 + DISPLAY_OFFSET_Y, 60);
-			nvgFill(args.vg);
+			nvgFillColor(vg, nvgRGBA(255,255,255,7));
+			nvgBeginPath(vg);
+			nvgRect(vg, x*pixelSize + DISPLAY_OFFSET_X, y*pixelSize + DISPLAY_OFFSET_Y, pixelSize, pixelSize);
+			nvgCircle(vg, 68 + DISPLAY_OFFSET_X, 54 + DISPLAY_OFFSET_Y, 60);
+			nvgFill(vg);
 
-			nvgBeginPath(args.vg);
-			nvgRect(args.vg, x*pixelSize + DISPLAY_OFFSET_X, y*pixelSize + DISPLAY_OFFSET_Y, pixelSize, pixelSize);
-			nvgCircle(args.vg, 77 + DISPLAY_OFFSET_X, 48 + DISPLAY_OFFSET_Y, 40);
-			nvgFill(args.vg);
+			nvgBeginPath(vg);
+			nvgRect(vg, x*pixelSize + DISPLAY_OFFSET_X, y*pixelSize + DISPLAY_OFFSET_Y, pixelSize, pixelSize);
+			nvgCircle(vg, 77 + DISPLAY_OFFSET_X, 48 + DISPLAY_OFFSET_Y, 40);
+			nvgFill(vg);
 
-			nvgBeginPath(args.vg);
-			nvgRect(args.vg, x*pixelSize + DISPLAY_OFFSET_X, y*pixelSize + DISPLAY_OFFSET_Y, pixelSize, pixelSize);
-			nvgCircle(args.vg, 82 + DISPLAY_OFFSET_X, 43 + DISPLAY_OFFSET_Y, 20);
-			nvgFill(args.vg);
+			nvgBeginPath(vg);
+			nvgRect(vg, x*pixelSize + DISPLAY_OFFSET_X, y*pixelSize + DISPLAY_OFFSET_Y, pixelSize, pixelSize);
+			nvgCircle(vg, 82 + DISPLAY_OFFSET_X, 43 + DISPLAY_OFFSET_Y, 20);
+			nvgFill(vg);
 
-			nvgFillColor(args.vg, nvgRGBA(255,255,255,5));
-			nvgBeginPath(args.vg);
-			nvgRect(args.vg, x*pixelSize + DISPLAY_OFFSET_X, y*pixelSize + DISPLAY_OFFSET_Y, pixelSize, pixelSize);
-			nvgCircle(args.vg, 87 + DISPLAY_OFFSET_X, 40 + DISPLAY_OFFSET_Y, 8);
-			nvgFill(args.vg);
+			nvgFillColor(vg, nvgRGBA(255,255,255,5));
+			nvgBeginPath(vg);
+			nvgRect(vg, x*pixelSize + DISPLAY_OFFSET_X, y*pixelSize + DISPLAY_OFFSET_Y, pixelSize, pixelSize);
+			nvgCircle(vg, 87 + DISPLAY_OFFSET_X, 40 + DISPLAY_OFFSET_Y, 8);
+			nvgFill(vg);
 
-			nvgFillColor(args.vg, nvgRGBA(0,0,0,0));
+			nvgFillColor(vg, nvgRGBA(0,0,0,0));
 
 		}
 
@@ -953,16 +953,16 @@ struct InternalTextLabel : TransparentWidget
     color = col;
   }
 
-  void draw( NVGcontext *args.vg ) {
+  void draw( NVGcontext *vg ) {
   	if(module) {
 	  	text_label = "Ant: " + std::to_string(module->index) + ", Shadow: " + std::to_string(module->shadowIndex);
 
-	    nvgBeginPath( args.vg );
-	    //nvgFontFaceId( args.vg, memFont );
-	    nvgFontSize( args.vg, pxSize );
-	    nvgFillColor( args.vg, color );
-	    nvgTextAlign( args.vg, align );
-	    nvgText( args.vg, 0, 0, text_label.c_str(), NULL );
+	    nvgBeginPath( vg );
+	    //nvgFontFaceId( vg, memFont );
+	    nvgFontSize( vg, pxSize );
+	    nvgFillColor( vg, color );
+	    nvgTextAlign( vg, align );
+	    nvgText( vg, 0, 0, text_label.c_str(), NULL );
 	}
   }
 };
@@ -985,17 +985,17 @@ struct LoopLengthTextLabel : TransparentWidget
     color = col;
   }
 
-  void draw( NVGcontext *args.vg ) {
+  void draw( NVGcontext *vg ) {
 
   	if(module) {
 	  	text_label = std::to_string(module->loopLength);
 
-	    nvgBeginPath( args.vg );
-	    //nvgFontFaceId( args.vg, memFont );
-	    nvgFontSize( args.vg, pxSize );
-	    nvgFillColor( args.vg, color );
-	    nvgTextAlign( args.vg, align );
-	    nvgText( args.vg, 0, 0, text_label.c_str(), NULL );
+	    nvgBeginPath( vg );
+	    //nvgFontFaceId( vg, memFont );
+	    nvgFontSize( vg, pxSize );
+	    nvgFillColor( vg, color );
+	    nvgTextAlign( vg, align );
+	    nvgText( vg, 0, 0, text_label.c_str(), NULL );
 	}
   }
 };
@@ -1088,9 +1088,9 @@ struct MusicalAntWidget : ModuleWidget {
 		// Trying creating grid in one template class
 		addChild( new ModuleDisplay(module));
 
-		if(module) {
+		/*if(module) {
 			cout << "display - X: " << module->antVector[X_POSITION] << ", Y: " << module->antVector[Y_POSITION] << "\n";
-		}
+		}*/
 		//addChild(createLight<SmallLight<RedLight>>(Vec((module->antX+1)*6 + DISPLAY_OFFSET_X, (module->antY+1)*6 + DISPLAY_OFFSET_Y), module, (true)));
 
 	}
