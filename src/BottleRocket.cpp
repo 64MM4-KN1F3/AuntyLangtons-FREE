@@ -132,15 +132,15 @@ struct BottleRocketWidget : ModuleWidget {
 
 		addParam(createParam<Davies1900hBlackKnob>(Vec(28, 87), module, BottleRocket::PITCH_INPUT_PARAM, -3.0, 3.0, 0.0));
 
-		addInput(createPort<PJ301MPort>(Vec(16, 40), PortWidget::INPUT, module, BottleRocket::PITCH_INPUT));
+		addInput(createInput<PJ301MPort>(Vec(16, 40), module, BottleRocket::PITCH_INPUT));
 
 		// 6 Pitch Outputs
-		addOutput(createPort<PJ301MPort>(Vec(33, 70), PortWidget::OUTPUT, module, BottleRocket::PITCH_OUTPUT));
-		addOutput(createPort<PJ301MPort>(Vec(33, 110), PortWidget::OUTPUT, module, BottleRocket::PITCH_OUTPUT + 1));
-		addOutput(createPort<PJ301MPort>(Vec(33, 150), PortWidget::OUTPUT, module, BottleRocket::PITCH_OUTPUT + 2));
-		addOutput(createPort<PJ301MPort>(Vec(33, 190), PortWidget::OUTPUT, module, BottleRocket::PITCH_OUTPUT + 3));
-		addOutput(createPort<PJ301MPort>(Vec(33, 230), PortWidget::OUTPUT, module, BottleRocket::PITCH_OUTPUT + 4));
-		addOutput(createPort<PJ301MPort>(Vec(33, 270), PortWidget::OUTPUT, module, BottleRocket::PITCH_OUTPUT + 5));
+		addOutput(createOutput<PJ301MPort>(Vec(33, 70), module, BottleRocket::PITCH_OUTPUT));
+		addOutput(createOutput<PJ301MPort>(Vec(33, 110), module, BottleRocket::PITCH_OUTPUT + 1));
+		addOutput(createOutput<PJ301MPort>(Vec(33, 150), module, BottleRocket::PITCH_OUTPUT + 2));
+		addOutput(createOutput<PJ301MPort>(Vec(33, 190), module, BottleRocket::PITCH_OUTPUT + 3));
+		addOutput(createOutput<PJ301MPort>(Vec(33, 230), module, BottleRocket::PITCH_OUTPUT + 4));
+		addOutput(createOutput<PJ301MPort>(Vec(33, 270), module, BottleRocket::PITCH_OUTPUT + 5));
 
 
 		addChild(createLight<MediumLight<RedLight>>(Vec(41, 59), module, BottleRocket::BLINK_LIGHT));
