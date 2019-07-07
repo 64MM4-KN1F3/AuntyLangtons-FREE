@@ -163,7 +163,7 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 		reset();
 	}
 
-	~MusicalAnt(){
+	~MusicalAnt() {
 		delete [] cells;
 		delete [] cellsHistory;
 		delete [] antVector;
@@ -172,7 +172,7 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 		delete [] *shadowAntVectorHistory;
 	}
 
-	void reset() override {
+	void reset() {
 		clearCells();
 		setAntPosition(sideLength/2, sideLength/2, 0);
 		setShadowAntPosition(sideLength/2, sideLength/2, 0);
@@ -546,7 +546,7 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 		setCellOn(currPositionX, currPositionY, !currPositionValue);
 		cout << " and leaving " << (!currPositionValue ? "black\n" : "white\n");
 		bool shadowAntOn = (bool) !params[SHADOW_ANT_ON].value;
-		cout << "shadowAntOn= " << to_string(shadowAntOn);
+		cout << "shadowAntOn= " << std::to_string(shadowAntOn);
 
 		// Mirror Ant
 		if (shadowAntOn) {
@@ -610,8 +610,8 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 		outputs[VOCT_OUTPUT_X].value = !params[VOCT_INVERT_X].value ? closestVoltageForX(tempSideLength - getAntX()) : closestVoltageForX(getAntX());
 		outputs[VOCT_OUTPUT_Y].value = !params[VOCT_INVERT_Y].value ? closestVoltageForY(tempSideLength - getAntY()) : closestVoltageForY(getAntY());
 		//TESTING
-		cout << "\n@nt X VOCT OUTPUT: " << to_string(params[VOCT_INVERT_X].value ? closestVoltageForX(tempSideLength - getAntX()) : closestVoltageForX(getAntX()));
-		cout << "\n@nt Y VOCT OUTPUT: " << to_string(params[VOCT_INVERT_Y].value ? closestVoltageForY(tempSideLength - getAntY()) : closestVoltageForY(getAntY()));
+		cout << "\n@nt X VOCT OUTPUT: " << std::to_string(params[VOCT_INVERT_X].value ? closestVoltageForX(tempSideLength - getAntX()) : closestVoltageForX(getAntX()));
+		cout << "\n@nt Y VOCT OUTPUT: " << std::to_string(params[VOCT_INVERT_Y].value ? closestVoltageForY(tempSideLength - getAntY()) : closestVoltageForY(getAntY()));
 
 
 	}
@@ -635,7 +635,7 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 
 		historyBufferUsage -= stepsBack;
 		cout << "\nHistoryBufferUsage: " << historyBufferUsage;
-		cout << "\nStepSkippingAmount: " << to_string(params[SKIP_PARAM].value) << "\n";
+		cout << "\nStepSkippingAmount: " << std::to_string(params[SKIP_PARAM].value) << "\n";
 		int historyTarget = (abs(currIndex - stepsBack)) % HISTORY_AMOUNT;
 		setAntPosition(antVectorHistory[historyTarget][X_POSITION], antVectorHistory[historyTarget][Y_POSITION], antVectorHistory[historyTarget][DIRECTION]);
 		setShadowAntPosition(shadowAntVectorHistory[historyTarget][X_POSITION], shadowAntVectorHistory[historyTarget][Y_POSITION], shadowAntVectorHistory[historyTarget][DIRECTION]);
@@ -917,7 +917,7 @@ struct InternalTextLabel : TransparentWidget
   MusicalAnt *module;
 
   int memFont = -1;
-  string text_label;
+  std::string text_label;
   int pxSize;
   int align;
   NVGcolor color;
@@ -931,7 +931,7 @@ struct InternalTextLabel : TransparentWidget
 
   void draw( NVGcontext *vg ) {
 
-  	text_label = "Ant: " + to_string(module->index) + ", Shadow: " + to_string(module->shadowIndex);
+  	text_label = "Ant: " + std::to_string(module->index) + ", Shadow: " + std::to_string(module->shadowIndex);
 
     nvgBeginPath( vg );
     //nvgFontFaceId( vg, memFont );
@@ -948,7 +948,7 @@ struct LoopLengthTextLabel : TransparentWidget
   MusicalAnt *module;
 
   int memFont = -1;
-  string text_label;
+  std::string text_label;
   int pxSize;
   int align;
   NVGcolor color;
@@ -962,7 +962,7 @@ struct LoopLengthTextLabel : TransparentWidget
 
   void draw( NVGcontext *vg ) {
 
-  	text_label = to_string(module->loopLength);
+  	text_label = std::to_string(module->loopLength);
 
     nvgBeginPath( vg );
     //nvgFontFaceId( vg, memFont );
