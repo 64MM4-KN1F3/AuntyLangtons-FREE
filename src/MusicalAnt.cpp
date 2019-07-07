@@ -141,9 +141,9 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 	int loopLength = 0;
 	int loopIndex;
 	bool running = true;
-	SchmittTrigger clockTrigger;
-	SchmittTrigger runningTrigger;
-	SchmittTrigger resetTrigger;
+	dsp::SchmittTrigger clockTrigger;
+	dsp::SchmittTrigger runningTrigger;
+	dsp::SchmittTrigger resetTrigger;
 	int* antVector = new int[3]; // Can probably just make this a std::vector?
 	//int* antVectorHistory[HISTORY_AMOUNT];
 	int** antVectorHistory = new int*[HISTORY_AMOUNT];
@@ -160,6 +160,27 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 
 	MusicalAnt() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		configParam(MusicalAnt::CLOCK_PARAM, -2.0f, 8.0f, 1.0f, "");
+		configParam(MusicalAnt::OCTAVE_KNOB_PARAM_X, 0.0, 7.0, 2.0, "");
+		configParam(MusicalAnt::NOTE_KNOB_PARAM_X, 0.0, QuantizeUtils::NUM_NOTES-1, QuantizeUtils::NOTE_C, "");
+		configParam(MusicalAnt::SCALE_KNOB_PARAM_X, 0.0, QuantizeUtils::NUM_SCALES-1, QuantizeUtils::MINOR, "");
+		configParam(MusicalAnt::VOCT_INVERT_X, 0.0f, 1.0f, 1.0f, "");
+		configParam(MusicalAnt::OCTAVE_KNOB_PARAM_Y, -5.0, 7.0, 2.0, "");
+		configParam(MusicalAnt::NOTE_KNOB_PARAM_Y, 0.0, QuantizeUtils::NUM_NOTES-1, QuantizeUtils::NOTE_C, "");
+		configParam(MusicalAnt::SCALE_KNOB_PARAM_Y, 0.0, QuantizeUtils::NUM_SCALES-1, QuantizeUtils::MINOR, "");
+		configParam(MusicalAnt::VOCT_INVERT_Y, 0.0f, 1.0f, 1.0f, "");
+		configParam(MusicalAnt::OCTAVE_KNOB_PARAM_SHADOW_X, -5.0, 7.0, 2.0, "");
+		configParam(MusicalAnt::NOTE_KNOB_PARAM_SHADOW_X, 0.0, QuantizeUtils::NUM_NOTES-1, QuantizeUtils::NOTE_C, "");
+		configParam(MusicalAnt::SCALE_KNOB_PARAM_SHADOW_X, 0.0, QuantizeUtils::NUM_SCALES-1, QuantizeUtils::MINOR, "");
+		configParam(MusicalAnt::OCTAVE_KNOB_PARAM_SHADOW_Y, -5.0, 7.0, 2.0, "");
+		configParam(MusicalAnt::NOTE_KNOB_PARAM_SHADOW_Y, 0.0, QuantizeUtils::NUM_NOTES-1, QuantizeUtils::NOTE_C, "");
+		configParam(MusicalAnt::SCALE_KNOB_PARAM_SHADOW_Y, 0.0, QuantizeUtils::NUM_SCALES-1, QuantizeUtils::MINOR, "");
+		configParam(MusicalAnt::SHADOW_ANT_ON, 0.0f, 1.0f, 1.0f, "");
+		configParam(MusicalAnt::EFFECT_KNOB_PARAM, 0.0f, 5.0f, 0.0, "");
+		configParam(MusicalAnt::LOOPMODE_SWITCH_PARAM, 0.0f, 1.0f, 0.0f, "");
+		configParam(MusicalAnt::LOOP_LENGTH, 0.0f, 95.0f, 31.0, "");
+		configParam(MusicalAnt::SIDE_LENGTH_PARAM, 0.0f, 6.0f, 4.0, "");
+		configParam(MusicalAnt::SKIP_PARAM, 0.0f, 9.0f, 0.0f, "");
 		reset();
 	}
 
@@ -993,34 +1014,34 @@ struct MusicalAntWidget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(createParam<RoundBlackKnob>(Vec(143.9, 177), module, MusicalAnt::CLOCK_PARAM, -2.0f, 8.0f, 1.0f));
+		addParam(createParam<RoundBlackKnob>(Vec(143.9, 177), module, MusicalAnt::CLOCK_PARAM));
 
 		// Ant X panel widgets		
-		addParam(createParam<RoundSmallBlackKnob>(Vec(52.4, 218.5), module, MusicalAnt::OCTAVE_KNOB_PARAM_X, 0.0, 7.0, 2.0));
-		addParam(createParam<RoundSmallBlackKnob>(Vec(76.9, 218.5), module, MusicalAnt::NOTE_KNOB_PARAM_X, 0.0, QuantizeUtils::NUM_NOTES-1, QuantizeUtils::NOTE_C));
-		addParam(createParam<RoundSmallBlackKnob>(Vec(101.4, 218.5), module, MusicalAnt::SCALE_KNOB_PARAM_X, 0.0, QuantizeUtils::NUM_SCALES-1, QuantizeUtils::MINOR));
+		addParam(createParam<RoundSmallBlackKnob>(Vec(52.4, 218.5), module, MusicalAnt::OCTAVE_KNOB_PARAM_X));
+		addParam(createParam<RoundSmallBlackKnob>(Vec(76.9, 218.5), module, MusicalAnt::NOTE_KNOB_PARAM_X));
+		addParam(createParam<RoundSmallBlackKnob>(Vec(101.4, 218.5), module, MusicalAnt::SCALE_KNOB_PARAM_X));
 		addOutput(createOutput<PJ301MPort>(Vec(148.9, 218.5), module, MusicalAnt::VOCT_OUTPUT_X));
 		// Invert X V/Oct output
-		addParam(createParam<CKSS>(Vec(127.5, 219.75), module, MusicalAnt::VOCT_INVERT_X, 0.0f, 1.0f, 1.0f));
+		addParam(createParam<CKSS>(Vec(127.5, 219.75), module, MusicalAnt::VOCT_INVERT_X));
 		
 		// Ant Y panel widgets
-		addParam(createParam<RoundSmallBlackKnob>(Vec(52.4, 254), module, MusicalAnt::OCTAVE_KNOB_PARAM_Y, -5.0, 7.0, 2.0));
-		addParam(createParam<RoundSmallBlackKnob>(Vec(76.9, 254), module, MusicalAnt::NOTE_KNOB_PARAM_Y, 0.0, QuantizeUtils::NUM_NOTES-1, QuantizeUtils::NOTE_C));
-		addParam(createParam<RoundSmallBlackKnob>(Vec(101.4, 254), module, MusicalAnt::SCALE_KNOB_PARAM_Y, 0.0, QuantizeUtils::NUM_SCALES-1, QuantizeUtils::MINOR));
+		addParam(createParam<RoundSmallBlackKnob>(Vec(52.4, 254), module, MusicalAnt::OCTAVE_KNOB_PARAM_Y));
+		addParam(createParam<RoundSmallBlackKnob>(Vec(76.9, 254), module, MusicalAnt::NOTE_KNOB_PARAM_Y));
+		addParam(createParam<RoundSmallBlackKnob>(Vec(101.4, 254), module, MusicalAnt::SCALE_KNOB_PARAM_Y));
 		addOutput(createOutput<PJ301MPort>(Vec(148.9, 254), module, MusicalAnt::VOCT_OUTPUT_Y));
 		// Invert Y V/Oct output
-		addParam(createParam<CKSS>(Vec(127.5, 255.25), module, MusicalAnt::VOCT_INVERT_Y, 0.0f, 1.0f, 1.0f));
+		addParam(createParam<CKSS>(Vec(127.5, 255.25), module, MusicalAnt::VOCT_INVERT_Y));
 
 		// Shadow Ant X panel widgets
-		addParam(createParam<RoundSmallBlackKnob>(Vec(70.9, 289.5), module, MusicalAnt::OCTAVE_KNOB_PARAM_SHADOW_X, -5.0, 7.0, 2.0));
-		addParam(createParam<RoundSmallBlackKnob>(Vec(95.4, 289.5), module, MusicalAnt::NOTE_KNOB_PARAM_SHADOW_X, 0.0, QuantizeUtils::NUM_NOTES-1, QuantizeUtils::NOTE_C));
-		addParam(createParam<RoundSmallBlackKnob>(Vec(119.9, 289.5), module, MusicalAnt::SCALE_KNOB_PARAM_SHADOW_X, 0.0, QuantizeUtils::NUM_SCALES-1, QuantizeUtils::MINOR));
+		addParam(createParam<RoundSmallBlackKnob>(Vec(70.9, 289.5), module, MusicalAnt::OCTAVE_KNOB_PARAM_SHADOW_X));
+		addParam(createParam<RoundSmallBlackKnob>(Vec(95.4, 289.5), module, MusicalAnt::NOTE_KNOB_PARAM_SHADOW_X));
+		addParam(createParam<RoundSmallBlackKnob>(Vec(119.9, 289.5), module, MusicalAnt::SCALE_KNOB_PARAM_SHADOW_X));
 		addOutput(createOutput<PJ301MPort>(Vec(148.9, 289.5), module, MusicalAnt::VOCT_OUTPUT_SHADOW_X));
 
 		// Shadow Ant Y panel widgets
-		addParam(createParam<RoundSmallBlackKnob>(Vec(70.9, 325), module, MusicalAnt::OCTAVE_KNOB_PARAM_SHADOW_Y, -5.0, 7.0, 2.0));
-		addParam(createParam<RoundSmallBlackKnob>(Vec(95.4, 325), module, MusicalAnt::NOTE_KNOB_PARAM_SHADOW_Y, 0.0, QuantizeUtils::NUM_NOTES-1, QuantizeUtils::NOTE_C));
-		addParam(createParam<RoundSmallBlackKnob>(Vec(119.9, 325), module, MusicalAnt::SCALE_KNOB_PARAM_SHADOW_Y, 0.0, QuantizeUtils::NUM_SCALES-1, QuantizeUtils::MINOR));
+		addParam(createParam<RoundSmallBlackKnob>(Vec(70.9, 325), module, MusicalAnt::OCTAVE_KNOB_PARAM_SHADOW_Y));
+		addParam(createParam<RoundSmallBlackKnob>(Vec(95.4, 325), module, MusicalAnt::NOTE_KNOB_PARAM_SHADOW_Y));
+		addParam(createParam<RoundSmallBlackKnob>(Vec(119.9, 325), module, MusicalAnt::SCALE_KNOB_PARAM_SHADOW_Y));
 		addOutput(createOutput<PJ301MPort>(Vec(148.9, 325), module, MusicalAnt::VOCT_OUTPUT_SHADOW_Y));
 
 		
@@ -1035,28 +1056,28 @@ struct MusicalAntWidget : ModuleWidget {
 		addChild(createLight<SmallLight<GreenLight>>(Vec(108.9, 170), module, MusicalAnt::BLINK_LIGHT));
 
 		// Shadow Ant on switch
-		addParam(createParam<CKSS>(Vec(50.80, 305), module, MusicalAnt::SHADOW_ANT_ON, 0.0f, 1.0f, 1.0f));
+		addParam(createParam<CKSS>(Vec(50.80, 305), module, MusicalAnt::SHADOW_ANT_ON));
 
 		// Effect Knob 
-		addParam(createParam<RoundBlackSnapKnob>(Vec(253.9, 250), module, MusicalAnt::EFFECT_KNOB_PARAM, 0.0f, 5.0f, 0.0));
+		addParam(createParam<RoundBlackSnapKnob>(Vec(253.9, 250), module, MusicalAnt::EFFECT_KNOB_PARAM));
 
 		// Loop Mode Switch
 
-		addParam(createParam<CKSS_Horizontal>(Vec(25, 290), module, MusicalAnt::LOOPMODE_SWITCH_PARAM, 0.0f, 1.0f, 0.0f));
+		addParam(createParam<CKSS_Horizontal>(Vec(25, 290), module, MusicalAnt::LOOPMODE_SWITCH_PARAM));
 
 		// Loop length knob
 
-		addParam(createParam<RoundSmallBlackKnob>(Vec(23.65, 305), module, MusicalAnt::LOOP_LENGTH, 0.0f, 95.0f, 31.0));
+		addParam(createParam<RoundSmallBlackKnob>(Vec(23.65, 305), module, MusicalAnt::LOOP_LENGTH));
 
 		// Loop length text
 
 		//addChild( new LoopLengthTextLabel(module, Vec(253.55, 80), 20, 1, nvgRGBA(255,0,0,255) ) );
 
 		// Resolution/SideLength Knob
-		addParam(createParam<RoundSmallBlackKnob>(Vec(23.9, 218.5), module, MusicalAnt::SIDE_LENGTH_PARAM, 0.0f, 6.0f, 4.0));
+		addParam(createParam<RoundSmallBlackKnob>(Vec(23.9, 218.5), module, MusicalAnt::SIDE_LENGTH_PARAM));
 
 		// Skip Knob
-		addParam(createParam<RoundSmallBlackKnob>(Vec(23.9, 254), module, MusicalAnt::SKIP_PARAM, 0.0f, 9.0f, 0.0f));
+		addParam(createParam<RoundSmallBlackKnob>(Vec(23.9, 254), module, MusicalAnt::SKIP_PARAM));
 
 
 

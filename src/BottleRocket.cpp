@@ -29,7 +29,9 @@ struct BottleRocket : Module {
 	float pitchStore[TOTAL_CARGO_HOLDS] = {-1.0, -1.0, -1.0, -1.0, -1.0, -1.0};
 
 	BottleRocket() {
-		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);}
+		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		configParam(BottleRocket::PITCH_INPUT_PARAM, -3.0, 3.0, 0.0, "");
+	}
 	void process(const ProcessArgs &args) override;
 	bool fillPitchStore(float in) {
 		int i = 0;
@@ -130,7 +132,7 @@ struct BottleRocketWidget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(createParam<Davies1900hBlackKnob>(Vec(28, 87), module, BottleRocket::PITCH_INPUT_PARAM, -3.0, 3.0, 0.0));
+		addParam(createParam<Davies1900hBlackKnob>(Vec(28, 87), module, BottleRocket::PITCH_INPUT_PARAM));
 
 		addInput(createInput<PJ301MPort>(Vec(16, 40), module, BottleRocket::PITCH_INPUT));
 
