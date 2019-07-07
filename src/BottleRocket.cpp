@@ -69,7 +69,7 @@ struct BottleRocket : Module {
 
 void BottleRocket::process(const ProcessArgs &args) {
 	// Implement a simple sine oscillator
-	float deltaTime = engineGetSampleTime();
+	float deltaTime = args.sampleTime;
 
 	// Compute the frequency from the pitch parameter and input
 	float pitch = params[PITCH_INPUT_PARAM].value;
