@@ -831,40 +831,41 @@ struct ModuleDisplay : virtual TransparentWidget {
 
 	void draw(NVGcontext *vg) override {
 
-		// Testing box
-		float pixelSize = 0.9f * ((float) DISPLAY_SIZE_XY / (float) module->sideLength);
-		//addChild( new ModuleDisplay(Vec(100, 100), pixelSize, true));
+		if(module) {
+			float pixelSize = 0.9f * ((float) DISPLAY_SIZE_XY / (float) module->sideLength);
+			//addChild( new ModuleDisplay(Vec(100, 100), pixelSize, true));
 
-		//float brightness;
-		int x = 0;
-		int y = 0;
-		int shadowAntCell = module->iFromXY(module->shadowAntVector[X_POSITION], module->shadowAntVector[Y_POSITION]);
-		
-		int numCells = module->sideLength*module->sideLength;
-		for(int i=0; i < numCells; i++){
-			x = i%module->sideLength; //increment x up to COL length then loop
-			if((i%module->sideLength == 0)&&(i!=0)){ //increment y once x hits positive multiple of COL length
-				y++;
-			}
+			//float brightness;
+			int x = 0;
+			int y = 0;
+			int shadowAntCell = module->iFromXY(module->shadowAntVector[X_POSITION], module->shadowAntVector[Y_POSITION]);
 			
-			//nvgFillColor(vg, (module->cells[i] ? nvgRGBA(0,255,0,255) : nvgRGBA(255,0,0,255)));
-			if(module->cells[i]){
-				nvgFillColor(vg, ((randomUniform() < 0.5) ? nvgRGBA(0,255,0,PIXEL_BRIGHTNESS) : nvgRGBA(0,255,0,PIXEL_BRIGHTNESS+5)));
-				nvgBeginPath(vg);
-				nvgRect(vg, x*pixelSize + DISPLAY_OFFSET_X, y*pixelSize + DISPLAY_OFFSET_Y, pixelSize, pixelSize);
-				nvgFill(vg);
-			}
-			if(i == shadowAntCell){
-				if(!module->params[MusicalAnt::SHADOW_ANT_ON].value){
-					nvgFillColor(vg, nvgRGBA(0,0,255,255));
+			int numCells = module->sideLength*module->sideLength;
+			for(int i=0; i < numCells; i++){
+				x = i%module->sideLength; //increment x up to COL length then loop
+				if((i%module->sideLength == 0)&&(i!=0)){ //increment y once x hits positive multiple of COL length
+					y++;
+				}
+				
+				//nvgFillColor(vg, (module->cells[i] ? nvgRGBA(0,255,0,255) : nvgRGBA(255,0,0,255)));
+				if(module->cells[i]){
+					nvgFillColor(vg, ((randomUniform() < 0.5) ? nvgRGBA(0,255,0,PIXEL_BRIGHTNESS) : nvgRGBA(0,255,0,PIXEL_BRIGHTNESS+5)));
 					nvgBeginPath(vg);
 					nvgRect(vg, x*pixelSize + DISPLAY_OFFSET_X, y*pixelSize + DISPLAY_OFFSET_Y, pixelSize, pixelSize);
 					nvgFill(vg);
 				}
+				if(i == shadowAntCell){
+					if(!module->params[MusicalAnt::SHADOW_ANT_ON].value){
+						nvgFillColor(vg, nvgRGBA(0,0,255,255));
+						nvgBeginPath(vg);
+						nvgRect(vg, x*pixelSize + DISPLAY_OFFSET_X, y*pixelSize + DISPLAY_OFFSET_Y, pixelSize, pixelSize);
+						nvgFill(vg);
+					}
+				}
+				//addChild( new ModuleDisplay(module, Vec((x+1)*(pixelSize + gapSize) + DISPLAY_OFFSET_X, (y+1)*(pixelSize + gapSize) + DISPLAY_OFFSET_Y), pixelSize, i));
+				//addChild(createLight<SmallLight<GreenLight>>(Vec((x+1)*6 + DISPLAY_OFFSET_X, (y+1)*6 + DISPLAY_OFFSET_Y), module, MusicalAnt::GRID_LIGHTS + i));
+				//addChild(createLight<TinyLight<GreenLight>>(Vec((x+1)*3 + DISPLAY_OFFSET_X, (y+1)*3 + DISPLAY_OFFSET_Y), module, MusicalAnt::GRID_LIGHTS + i));
 			}
-			//addChild( new ModuleDisplay(module, Vec((x+1)*(pixelSize + gapSize) + DISPLAY_OFFSET_X, (y+1)*(pixelSize + gapSize) + DISPLAY_OFFSET_Y), pixelSize, i));
-			//addChild(createLight<SmallLight<GreenLight>>(Vec((x+1)*6 + DISPLAY_OFFSET_X, (y+1)*6 + DISPLAY_OFFSET_Y), module, MusicalAnt::GRID_LIGHTS + i));
-			//addChild(createLight<TinyLight<GreenLight>>(Vec((x+1)*3 + DISPLAY_OFFSET_X, (y+1)*3 + DISPLAY_OFFSET_Y), module, MusicalAnt::GRID_LIGHTS + i));
 		}
 
 		// Monitor fuzz
@@ -930,15 +931,16 @@ struct InternalTextLabel : TransparentWidget
   }
 
   void draw( NVGcontext *vg ) {
+  	if(module) {
+	  	text_label = "Ant: " + std::to_string(module->index) + ", Shadow: " + std::to_string(module->shadowIndex);
 
-  	text_label = "Ant: " + std::to_string(module->index) + ", Shadow: " + std::to_string(module->shadowIndex);
-
-    nvgBeginPath( vg );
-    //nvgFontFaceId( vg, memFont );
-    nvgFontSize( vg, pxSize );
-    nvgFillColor( vg, color );
-    nvgTextAlign( vg, align );
-    nvgText( vg, 0, 0, text_label.c_str(), NULL );
+	    nvgBeginPath( vg );
+	    //nvgFontFaceId( vg, memFont );
+	    nvgFontSize( vg, pxSize );
+	    nvgFillColor( vg, color );
+	    nvgTextAlign( vg, align );
+	    nvgText( vg, 0, 0, text_label.c_str(), NULL );
+	}
   }
 };
 
@@ -962,14 +964,16 @@ struct LoopLengthTextLabel : TransparentWidget
 
   void draw( NVGcontext *vg ) {
 
-  	text_label = std::to_string(module->loopLength);
+  	if(module) {
+	  	text_label = std::to_string(module->loopLength);
 
-    nvgBeginPath( vg );
-    //nvgFontFaceId( vg, memFont );
-    nvgFontSize( vg, pxSize );
-    nvgFillColor( vg, color );
-    nvgTextAlign( vg, align );
-    nvgText( vg, 0, 0, text_label.c_str(), NULL );
+	    nvgBeginPath( vg );
+	    //nvgFontFaceId( vg, memFont );
+	    nvgFontSize( vg, pxSize );
+	    nvgFillColor( vg, color );
+	    nvgTextAlign( vg, align );
+	    nvgText( vg, 0, 0, text_label.c_str(), NULL );
+	}
   }
 };
 
@@ -1061,8 +1065,9 @@ struct MusicalAntWidget : ModuleWidget {
 		// Trying creating grid in one template class
 		addChild( new ModuleDisplay(module));
 
-
-		cout << "display - X: " << module->antVector[X_POSITION] << ", Y: " << module->antVector[Y_POSITION] << "\n";
+		if(module) {
+			cout << "display - X: " << module->antVector[X_POSITION] << ", Y: " << module->antVector[Y_POSITION] << "\n";
+		}
 		//addChild(createLight<SmallLight<RedLight>>(Vec((module->antX+1)*6 + DISPLAY_OFFSET_X, (module->antY+1)*6 + DISPLAY_OFFSET_Y), module, (true)));
 
 	}
