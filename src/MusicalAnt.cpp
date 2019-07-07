@@ -227,11 +227,11 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
     }
 
 	void setIndex(int index) {
-		//cout << "EffectKnob value: " << pow(10, (int) params[EFFECT_KNOB_PARAM].value);
+		//cout << "EffectKnob value: " << pow(10, (int) params[EFFECT_KNOB_PARAM].getValue());
 		this->index = index;
 		if (this->index >= std::numeric_limits<int>::max())
 			this->index = 0;
-		int shadowDepth = pow(10, (int) params[EFFECT_KNOB_PARAM].value);
+		int shadowDepth = pow(10, (int) params[EFFECT_KNOB_PARAM].getValue());
 		if (this->index > shadowDepth)
 			this->shadowIndex += 1; //this->index - shadowDepth;
 	}
@@ -324,8 +324,8 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 
 	void randomizeCells() {
 		//clearCells();
-		float rndAmt = params[RND_AMT_KNOB_PARAM].value + inputs[RND_AMT_INPUT].value*0.1;
-		switch(int(params[RND_MODE_KNOB_PARAM].value)){
+		float rndAmt = params[RND_AMT_KNOB_PARAM].getValue() + inputs[RND_AMT_INPUT].getVoltage()*0.1;
+		switch(int(params[RND_MODE_KNOB_PARAM].getValue())){
 			case RND_BASIC:{
 				int numCells = sideLength*sideLength;
 				for(int i=0;i<numCells;i++){
@@ -406,31 +406,31 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 	}
 
 	float closestVoltageForX(int cellFromBottom){
-		int octave = params[OCTAVE_KNOB_PARAM_X].value;
-		int rootNote = params[NOTE_KNOB_PARAM_X].value;
-		int scale = params[SCALE_KNOB_PARAM_X].value;
+		int octave = params[OCTAVE_KNOB_PARAM_X].getValue();
+		int rootNote = params[NOTE_KNOB_PARAM_X].getValue();
+		int scale = params[SCALE_KNOB_PARAM_X].getValue();
 		return closestVoltageInScale(octave + (cellFromBottom * 0.0833), rootNote, scale);
 	}
 
 	float closestVoltageForShadowX(int cellFromBottom){
-		int octave = params[OCTAVE_KNOB_PARAM_SHADOW_X].value;
-		int rootNote = params[NOTE_KNOB_PARAM_SHADOW_X].value;
-		int scale = params[SCALE_KNOB_PARAM_SHADOW_X].value;
+		int octave = params[OCTAVE_KNOB_PARAM_SHADOW_X].getValue();
+		int rootNote = params[NOTE_KNOB_PARAM_SHADOW_X].getValue();
+		int scale = params[SCALE_KNOB_PARAM_SHADOW_X].getValue();
 		return closestVoltageInScale(octave + (cellFromBottom * 0.0833), rootNote, scale);
 	}
 
 	float closestVoltageForY(int cellFromBottom){
-		int octave = params[OCTAVE_KNOB_PARAM_Y].value;
-		int rootNote = params[NOTE_KNOB_PARAM_Y].value;
-		int scale = params[SCALE_KNOB_PARAM_Y].value;
+		int octave = params[OCTAVE_KNOB_PARAM_Y].getValue();
+		int rootNote = params[NOTE_KNOB_PARAM_Y].getValue();
+		int scale = params[SCALE_KNOB_PARAM_Y].getValue();
 		return closestVoltageInScale(octave + (cellFromBottom * 0.0833), rootNote, scale);
 	}
 
 
 	float closestVoltageForShadowY(int cellFromBottom){
-		int octave = params[OCTAVE_KNOB_PARAM_SHADOW_Y].value;
-		int rootNote = params[NOTE_KNOB_PARAM_SHADOW_Y].value;
-		int scale = params[SCALE_KNOB_PARAM_SHADOW_Y].value;
+		int octave = params[OCTAVE_KNOB_PARAM_SHADOW_Y].getValue();
+		int rootNote = params[NOTE_KNOB_PARAM_SHADOW_Y].getValue();
+		int scale = params[SCALE_KNOB_PARAM_SHADOW_Y].getValue();
 		return closestVoltageInScale(octave + (cellFromBottom * 0.0833), rootNote, scale);
 	}
  
@@ -545,12 +545,12 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 		// Previous cell position is set to opposite
 		setCellOn(currPositionX, currPositionY, !currPositionValue);
 		cout << " and leaving " << (!currPositionValue ? "black\n" : "white\n");
-		bool shadowAntOn = (bool) !params[SHADOW_ANT_ON].value;
+		bool shadowAntOn = (bool) !params[SHADOW_ANT_ON].getValue();
 		cout << "shadowAntOn= " << std::to_string(shadowAntOn);
 
 		// Mirror Ant
 		if (shadowAntOn) {
-			if (this->index > pow(10, (int) params[EFFECT_KNOB_PARAM].value)) {
+			if (this->index > pow(10, (int) params[EFFECT_KNOB_PARAM].getValue())) {
 				// Get current shadow ant position value and store for later
 				int currShadowAntPositionX = this->shadowAntVector[X_POSITION];
 				int currShadowAntPositionY = this->shadowAntVector[Y_POSITION];
@@ -598,20 +598,20 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 			}
 
 			// TODO - use the commented two lines below if adding VOCT invert switches to shadow ant X and Y
-			//outputs[VOCT_OUTPUT_SHADOW_X].value = params[VOCT_INVERT_SHADOW_X].value ? closestVoltageForShadowX(tempSideLength - getShadowAntX()) : closestVoltageForShadowX(getShadowAntX());
-			//outputs[VOCT_OUTPUT_SHADOW_Y].value = params[VOCT_INVERT_SHADOW_Y].value ? closestVoltageForShadowY(tempSideLength - getShadowAntY()) : closestVoltageForShadowY(getShadowAntY());
-			outputs[VOCT_OUTPUT_SHADOW_X].value = closestVoltageForShadowX(getShadowAntX());
-			outputs[VOCT_OUTPUT_SHADOW_Y].value = closestVoltageForShadowY(getShadowAntY());
+			//outputs[VOCT_OUTPUT_SHADOW_X].setVoltage(params[VOCT_INVERT_SHADOW_X].getValue() ? closestVoltageForShadowX(tempSideLength - getShadowAntX()) : closestVoltageForShadowX(getShadowAntX()));
+			//outputs[VOCT_OUTPUT_SHADOW_Y].setVoltage(params[VOCT_INVERT_SHADOW_Y].getValue() ? closestVoltageForShadowY(tempSideLength - getShadowAntY()) : closestVoltageForShadowY(getShadowAntY()));
+			outputs[VOCT_OUTPUT_SHADOW_X].setVoltage(closestVoltageForShadowX(getShadowAntX()));
+			outputs[VOCT_OUTPUT_SHADOW_Y].setVoltage(closestVoltageForShadowY(getShadowAntY()));
 		}
 		// Outputting voltage based on Ant X and Y position.
-		//outputs[VOCT_OUTPUT_X].value = powf(2.0f, (float)getAntX() / (float) sideLength);
-		//outputs[VOCT_OUTPUT_Y].value = powf(2.0f, (float)getAntY() / (float) sideLength);
-		int tempSideLength = (int) params[SIDE_LENGTH_PARAM].value;
-		outputs[VOCT_OUTPUT_X].value = !params[VOCT_INVERT_X].value ? closestVoltageForX(tempSideLength - getAntX()) : closestVoltageForX(getAntX());
-		outputs[VOCT_OUTPUT_Y].value = !params[VOCT_INVERT_Y].value ? closestVoltageForY(tempSideLength - getAntY()) : closestVoltageForY(getAntY());
+		//outputs[VOCT_OUTPUT_X].setVoltage(powf(2.0f, (float)getAntX() / (float) sideLength));
+		//outputs[VOCT_OUTPUT_Y].setVoltage(powf(2.0f, (float)getAntY() / (float) sideLength));
+		int tempSideLength = (int) params[SIDE_LENGTH_PARAM].getValue();
+		outputs[VOCT_OUTPUT_X].setVoltage(!params[VOCT_INVERT_X].getValue() ? closestVoltageForX(tempSideLength - getAntX()) : closestVoltageForX(getAntX()));
+		outputs[VOCT_OUTPUT_Y].setVoltage(!params[VOCT_INVERT_Y].getValue() ? closestVoltageForY(tempSideLength - getAntY()) : closestVoltageForY(getAntY()));
 		//TESTING
-		cout << "\n@nt X VOCT OUTPUT: " << std::to_string(params[VOCT_INVERT_X].value ? closestVoltageForX(tempSideLength - getAntX()) : closestVoltageForX(getAntX()));
-		cout << "\n@nt Y VOCT OUTPUT: " << std::to_string(params[VOCT_INVERT_Y].value ? closestVoltageForY(tempSideLength - getAntY()) : closestVoltageForY(getAntY()));
+		cout << "\n@nt X VOCT OUTPUT: " << std::to_string(params[VOCT_INVERT_X].getValue() ? closestVoltageForX(tempSideLength - getAntX()) : closestVoltageForX(getAntX()));
+		cout << "\n@nt Y VOCT OUTPUT: " << std::to_string(params[VOCT_INVERT_Y].getValue() ? closestVoltageForY(tempSideLength - getAntY()) : closestVoltageForY(getAntY()));
 
 
 	}
@@ -635,7 +635,7 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 
 		historyBufferUsage -= stepsBack;
 		cout << "\nHistoryBufferUsage: " << historyBufferUsage;
-		cout << "\nStepSkippingAmount: " << std::to_string(params[SKIP_PARAM].value) << "\n";
+		cout << "\nStepSkippingAmount: " << std::to_string(params[SKIP_PARAM].getValue()) << "\n";
 		int historyTarget = (abs(currIndex - stepsBack)) % HISTORY_AMOUNT;
 		setAntPosition(antVectorHistory[historyTarget][X_POSITION], antVectorHistory[historyTarget][Y_POSITION], antVectorHistory[historyTarget][DIRECTION]);
 		setShadowAntPosition(shadowAntVectorHistory[historyTarget][X_POSITION], shadowAntVectorHistory[historyTarget][Y_POSITION], shadowAntVectorHistory[historyTarget][DIRECTION]);
@@ -702,33 +702,33 @@ void MusicalAnt::process(const ProcessArgs &args) {
 	//cout << "Ant - X: " << getAntX() << " Y: " << getAntY() << " Direction: " << getAntDirection() << "\n";
 
 	// Run
-	if (runningTrigger.process(params[RUN_PARAM].value)) {
+	if (runningTrigger.process(params[RUN_PARAM].getValue())) {
 		running = !running;
 	}
 
 	bool gateIn = false;
-	int numberSteps = params[SKIP_PARAM].value + 1;
-	if((params[LOOPMODE_SWITCH_PARAM].value != loopOn) & (params[LOOPMODE_SWITCH_PARAM].value == true)) {
+	int numberSteps = params[SKIP_PARAM].getValue() + 1;
+	if((params[LOOPMODE_SWITCH_PARAM].getValue() != loopOn) & (params[LOOPMODE_SWITCH_PARAM].getValue() == true)) {
 		// ^^ Loop switch has just been turned on.
 		// Store current index value. This is the loop point.
 		loopIndex = index;
 		cout << "\nLoopIndex: " << loopIndex;
 	}
-	loopOn = params[LOOPMODE_SWITCH_PARAM].value;
+	loopOn = params[LOOPMODE_SWITCH_PARAM].getValue();
 
-	setLoopLength(params[LOOP_LENGTH].value + 1);
+	setLoopLength(params[LOOP_LENGTH].getValue() + 1);
 
 	if (running) {
-			if (inputs[EXT_CLOCK_INPUT].active) {
+			if (inputs[EXT_CLOCK_INPUT].isConnected()) {
 				// External clock
-				if (clockTrigger.process(rescale(inputs[EXT_CLOCK_INPUT].value, 0.1f, 2.f, 0.f, 1.f))) {
+				if (clockTrigger.process(rescale(inputs[EXT_CLOCK_INPUT].getVoltage(), 0.1f, 2.f, 0.f, 1.f))) {
 					walkAnt(numberSteps);
 				}
 				gateIn = clockTrigger.isHigh();
 			}
 			else {
 				// Internal clock
-				float clockTime = powf(2.0f, params[CLOCK_PARAM].value);
+				float clockTime = powf(2.0f, params[CLOCK_PARAM].getValue());
 				phase += clockTime * args.sampleTime;
 				if (phase >= 1.0f) {
 					phase -= 1.0f;
@@ -740,15 +740,15 @@ void MusicalAnt::process(const ProcessArgs &args) {
 
 
 			/* Manually step the system forward by one
-			if (clockTrigger.process(params[STEP_FWD_BTN_PARAM].value)) {
+			if (clockTrigger.process(params[STEP_FWD_BTN_PARAM].getValue())) {
 				walkAnt(1);
-				params[STEP_FWD_BTN_PARAM].value = 0.0;
+				params[STEP_FWD_BTN_PARAM].getValue() = 0.0;
 			}
 
 			// Manually step the system backward by one
-			if (clockTrigger.process(params[STEP_BCK_BTN_PARAM].value)) {
+			if (clockTrigger.process(params[STEP_BCK_BTN_PARAM].getValue())) {
 				wayBackMachine(1);
-				params[STEP_BCK_BTN_PARAM].value = 0.0;
+				params[STEP_BCK_BTN_PARAM].getValue() = 0.0;
 			}*/
 
 			// Looping implementation
@@ -760,28 +760,28 @@ void MusicalAnt::process(const ProcessArgs &args) {
 	}
 
 	// TODO Fix up this var below. May not be needed, or at least needs refactoring
-	int tempSideLength = (int) params[SIDE_LENGTH_PARAM].value;
+	int tempSideLength = (int) params[SIDE_LENGTH_PARAM].getValue();
 
 	// Compute the frequency from the pitch parameter and input
-	float pitch = params[PITCH_PARAM].value;
+	float pitch = params[PITCH_PARAM].getValue();
 	setSideLength(tempSideLength);
 	float gateOut = (gateIn ? 10.0f : 0.0f);
-	pitch += inputs[PITCH_INPUT].value;
+	pitch += inputs[PITCH_INPUT].getVoltage();
 	pitch = clamp(pitch, -4.0f, 4.0f);
 
 	
 
-	params[INDEX_PARAM].value = getIndex();
+	params[INDEX_PARAM].getValue() = getIndex();
 
 
-	outputs[GATE_OUTPUT].value = gateOut;
+	outputs[GATE_OUTPUT].setVoltage(gateOut);
 
 	// Separate gate outputs are used for X and Y
 	if (getAntX() != getLastAntX()) {
-				outputs[GATE_OUTPUT_X].value = gateOut;
+				outputs[GATE_OUTPUT_X].setVoltage(gateOut);
 	}
 	if (getAntY() != getLastAntY()) {
-				outputs[GATE_OUTPUT_Y].value = gateOut;
+				outputs[GATE_OUTPUT_Y].setVoltage(gateOut);
 	}
 
 	lights[BLINK_LIGHT].value = gateIn ? 1.0f : 0.0f;
@@ -856,7 +856,7 @@ struct ModuleDisplay : virtual TransparentWidget {
 					nvgFill(args.vg);
 				}
 				if(i == shadowAntCell){
-					if(!module->params[MusicalAnt::SHADOW_ANT_ON].value){
+					if(!module->params[MusicalAnt::SHADOW_ANT_ON].getValue()){
 						nvgFillColor(args.vg, nvgRGBA(0,0,255,255));
 						nvgBeginPath(args.vg);
 						nvgRect(args.vg, x*pixelSize + DISPLAY_OFFSET_X, y*pixelSize + DISPLAY_OFFSET_Y, pixelSize, pixelSize);

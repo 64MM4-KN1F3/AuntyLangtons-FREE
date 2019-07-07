@@ -72,8 +72,8 @@ void BottleRocket::process(const ProcessArgs &args) {
 	float deltaTime = args.sampleTime;
 
 	// Compute the frequency from the pitch parameter and input
-	float pitch = params[PITCH_INPUT_PARAM].value;
-	pitch += inputs[PITCH_INPUT].value;
+	float pitch = params[PITCH_INPUT_PARAM].getValue();
+	pitch += inputs[PITCH_INPUT].getVoltage();
 	pitch = clamp(pitch, -4.0f, 4.0f);
 	// The default pitch is C4
 	float freq = 261.626f * powf(2.0f, pitch);
@@ -85,7 +85,7 @@ void BottleRocket::process(const ProcessArgs &args) {
 
 	// Compute the sine output
 	float sine = sinf(2.0f * M_PI * phase);
-	//outputs[SINE_OUTPUT].value = 5.0f * sine;
+	//outputs[SINE_OUTPUT].setVoltage(5.0f * sine);
 
 	// Blink light at 1Hz
 	blinkPhase += deltaTime;
@@ -95,13 +95,13 @@ void BottleRocket::process(const ProcessArgs &args) {
 
 	// Bottle Rocket Step Code
 	float epsilon = 0.000001;
-	if(abs(inputs[PITCH_INPUT].value - getLastPitch()) > epsilon){
-		setLastPitch(inputs[PITCH_INPUT].value);
+	if(abs(inputs[PITCH_INPUT].getVoltage() - getLastPitch()) > epsilon){
+		setLastPitch(inputs[PITCH_INPUT].getVoltage());
 		cout << "The input Pitch has changed.\n";
 		cout << "H@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@RRRGH!!!!";
-			if(fillPitchStore(inputs[PITCH_INPUT].value)){
+			if(fillPitchStore(inputs[PITCH_INPUT].getVoltage())){
 			for(int i = 0; i < TOTAL_CARGO_HOLDS; i++) {
-				outputs[PITCH_OUTPUT + i].value = pitchStore[i];
+				outputs[PITCH_OUTPUT + i].setVoltage(pitchStore[i]);
 			}
 			clearPitchStore();
 			//cout << "H@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@RRRGH!!!!";
@@ -109,9 +109,9 @@ void BottleRocket::process(const ProcessArgs &args) {
 	}
 	else {/*
 		cout << "The input Pitch has not be detected as changed.\n";
-		cout << "inputs[PITCH_INPUT].value: " << inputs[PITCH_INPUT].value << "\n";
+		cout << "inputs[PITCH_INPUT].getVoltage(): " << inputs[PITCH_INPUT].getVoltage() << "\n";
 		cout << "getLastPitch(): " << getLastPitch() << "\n";
-		cout << "abs(inputs[PITCH_INPUT].value - getLastPitch()): " << abs(inputs[PITCH_INPUT].value - getLastPitch()) << "\n";
+		cout << "abs(inputs[PITCH_INPUT].getVoltage() - getLastPitch()): " << abs(inputs[PITCH_INPUT].getVoltage() - getLastPitch()) << "\n";
 	*/}
 
 
