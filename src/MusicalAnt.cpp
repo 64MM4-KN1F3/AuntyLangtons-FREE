@@ -1078,4 +1078,4 @@ struct MusicalAntWidget : ModuleWidget {
 // change), human-readable module name, and any number of tags
 // (found in `include/tags.hpp`) separated by commas.
 // TODO Fix up tag
-Model *modelMusicalAnt = Model::create<MusicalAnt, MusicalAntWidget>("Aunty Langton's", "MusicalAnt", "Musical Ant", OSCILLATOR_TAG);
+Model *modelMusicalAnt = Model::create<MusicalAnt, MusicalAntWidget>("MusicalAnt");
