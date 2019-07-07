@@ -329,14 +329,14 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 			case RND_BASIC:{
 				int numCells = sideLength*sideLength;
 				for(int i=0;i<numCells;i++){
-					setCellOn(xFromI(i), yFromI(i), randomUniform() < rndAmt);
+					setCellOn(xFromI(i), yFromI(i), random::uniform() < rndAmt);
 				}
 				break;
 			}
 			case RND_EUCLID:{
 				for(int y=0; y < sideLength; y++){
-					if(randomUniform() < rndAmt){
-						int div = int(randomUniform() * sideLength * 0.5) + 1;
+					if(random::uniform() < rndAmt){
+						int div = int(random::uniform() * sideLength * 0.5) + 1;
 						for(int x=0; x < sideLength; x++){
 							setCellOn(x, y, x % div == 0);
 						}
@@ -348,7 +348,7 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 				int sinCount = int(rndAmt * 3) + 1;
 				for(int i=0;i<sinCount;i++){
 					float angle = 0;
-					float angleInc = randomUniform();
+					float angleInc = random::uniform();
 					float offset = sideLength * 0.5;
 					for(int x=0;x<sideLength;x+=1){
 						int y = int(offset + (sinf(angle)*(offset)));
@@ -362,11 +362,11 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 				int gliderCount = int(rndAmt * 20);
 				int size = 3;
 				for(int i=0;i<gliderCount;i++){
-					int x = size + int(randomUniform() * (sideLength-size*2));
-					int y = size + int(randomUniform() * (sideLength-size*2));
-					if(randomUniform() < 0.5){
+					int x = size + int(random::uniform() * (sideLength-size*2));
+					int y = size + int(random::uniform() * (sideLength-size*2));
+					if(random::uniform() < 0.5){
 						//down
-						if(randomUniform() < 0.5){
+						if(random::uniform() < 0.5){
 							//right
 							setCellOn(x, y, true);
 							setCellOn(x+1, y+1, true);
@@ -383,7 +383,7 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 						}
 					} else {
 						//up
-						if(randomUniform() < 0.5){
+						if(random::uniform() < 0.5){
 							//right
 							setCellOn(x, y, true);
 							setCellOn(x+1, y-1, true);
@@ -850,7 +850,7 @@ struct ModuleDisplay : virtual TransparentWidget {
 				
 				//nvgFillColor(args.vg, (module->cells[i] ? nvgRGBA(0,255,0,255) : nvgRGBA(255,0,0,255)));
 				if(module->cells[i]){
-					nvgFillColor(args.vg, ((randomUniform() < 0.5) ? nvgRGBA(0,255,0,PIXEL_BRIGHTNESS) : nvgRGBA(0,255,0,PIXEL_BRIGHTNESS+5)));
+					nvgFillColor(args.vg, ((random::uniform() < 0.5) ? nvgRGBA(0,255,0,PIXEL_BRIGHTNESS) : nvgRGBA(0,255,0,PIXEL_BRIGHTNESS+5)));
 					nvgBeginPath(args.vg);
 					nvgRect(args.vg, x*pixelSize + DISPLAY_OFFSET_X, y*pixelSize + DISPLAY_OFFSET_Y, pixelSize, pixelSize);
 					nvgFill(args.vg);
@@ -877,7 +877,7 @@ struct ModuleDisplay : virtual TransparentWidget {
 				if((i%55 == 0)&&(i!=0)){ //increment y once x hits positive multiple of COL length
 					y++;
 				}
-				nvgFillColor(args.vg, ((randomUniform() < 0.5) ? nvgRGBA(0,0,0,0) : nvgRGBA(255,255,255,8)));
+				nvgFillColor(args.vg, ((random::uniform() < 0.5) ? nvgRGBA(0,0,0,0) : nvgRGBA(255,255,255,8)));
 				nvgBeginPath(args.vg);
 				nvgRect(args.vg, x*fuzzPixelSize + DISPLAY_OFFSET_X, y*fuzzPixelSize + DISPLAY_OFFSET_Y, fuzzPixelSize, fuzzPixelSize);
 				nvgFill(args.vg);
@@ -986,7 +986,7 @@ struct MusicalAntWidget : ModuleWidget {
 
 	MusicalAntWidget(MusicalAnt *module) {
 		setModule(module);
-		setPanel(APP->window->loadSvg(assetPlugin(pluginInstance, "res/MusicalAnt.svg")));
+		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/MusicalAnt.svg")));
 
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));

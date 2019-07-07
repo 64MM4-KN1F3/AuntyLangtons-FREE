@@ -123,7 +123,7 @@ void BottleRocket::process(const ProcessArgs &args) {
 struct BottleRocketWidget : ModuleWidget {
 	BottleRocketWidget(BottleRocket *module) {
 		setModule(module);
-		setPanel(APP->window->loadSvg(assetPlugin(pluginInstance, "res/BottleRocket.svg")));
+		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/BottleRocket.svg")));
 
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
