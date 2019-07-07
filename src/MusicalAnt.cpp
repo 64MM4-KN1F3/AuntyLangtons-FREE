@@ -24,7 +24,7 @@ Jeremy Wentworth http://jeremywentworth.com
 // TODO 1 - 4 way switch: Off, Sparkle, Fade, Mirror - Off - Ant is normal, sparkle is random additive noise, fade is random subtractive noise, mirror is second ant with mirrored left/right moves. Knob controls amount of noise and fading amount on Fade. Fade utilises a second shadowAnt delayed by a power of 10 steps. Second ant has exact same function as normal ant, thereby undoing it's old moves.
 // TODO 2 - uncomment and finish the manual drawing functionality
 // TODO 3 - Try dual outputs for one axis using a shepard tone
-// TODO 4 - Add a splash screen for when the plugin is initialized (done) and then remove it.
+// TODO 4 - Add a splash screen for when the pluginInstance is initialized (done) and then remove it.
 // TODO 5 (done) - X or Y out only fires if ant is changing on that axis?
 //			- Remove bi-directional switches for X and Y out. DONE
 //			- Change "Clock Out" to "Gate" DONE
@@ -979,7 +979,7 @@ struct MusicalAntWidget : ModuleWidget {
 
 
 	MusicalAntWidget(MusicalAnt *module) : ModuleWidget(module) {
-		setPanel(SVG::load(assetPlugin(plugin, "res/MusicalAnt.svg")));
+		setPanel(SVG::load(assetPlugin(pluginInstance, "res/MusicalAnt.svg")));
 
 		addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
 		addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
@@ -1074,7 +1074,7 @@ struct MusicalAntWidget : ModuleWidget {
 
 
 // Specify the Module and ModuleWidget subclass, human-readable
-// author name for categorization per plugin, module slug (should never
+// author name for categorization per pluginInstance, module slug (should never
 // change), human-readable module name, and any number of tags
 // (found in `include/tags.hpp`) separated by commas.
 // TODO Fix up tag

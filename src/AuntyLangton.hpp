@@ -6,7 +6,7 @@
 using namespace rack;
 
 // Forward-declare the Plugin, defined in Template.cpp
-extern Plugin *plugin;
+extern Plugin *pluginInstance;
 
 // Forward-declare each Model, defined in each module source file
 extern Model *modelMusicalAnt;
@@ -38,15 +38,15 @@ extern Model *modelBottleRocket;
 
 struct SmallButton : SVGSwitch, MomentarySwitch {
 	SmallButton() {
-		addFrame(SVG::load(assetPlugin(plugin, "res/SmallButtonUp.svg")));
-		addFrame(SVG::load(assetPlugin(plugin, "res/SmallButtonDown.svg")));
+		addFrame(SVG::load(assetPlugin(pluginInstance, "res/SmallButtonUp.svg")));
+		addFrame(SVG::load(assetPlugin(pluginInstance, "res/SmallButtonDown.svg")));
 	}
 };
 
 struct CKSS_Horizontal : SVGSwitch, ToggleSwitch {
 	CKSS_Horizontal() {
-		addFrame(SVG::load(assetPlugin(plugin, "res/CKSS_Horizontal_0.svg")));
-		addFrame(SVG::load(assetPlugin(plugin, "res/CKSS_Horizontal_1.svg")));
+		addFrame(SVG::load(assetPlugin(pluginInstance, "res/CKSS_Horizontal_0.svg")));
+		addFrame(SVG::load(assetPlugin(pluginInstance, "res/CKSS_Horizontal_1.svg")));
 	}
 };
 
