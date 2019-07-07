@@ -26,11 +26,11 @@ extern Model *modelBottleRocket;
 		fontSize = _fontSize;
 		box.size.y = BND_WIDGET_HEIGHT;
 	}
-	void draw(NVGcontext *vg) override {
-		nvgTextAlign(vg, NVG_ALIGN_CENTER);
-		nvgFillColor(vg, nvgRGB(25, 150, 252));
-		nvgFontSize(vg, fontSize);
-		nvgText(vg, box.pos.x, box.pos.y, text.c_str(), NULL);
+	void draw(const DrawArgs &args) override {
+		nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
+		nvgFillColor(args.vg, nvgRGB(25, 150, 252));
+		nvgFontSize(args.vg, fontSize);
+		nvgText(args.vg, box.pos.x, box.pos.y, text.c_str(), NULL);
 	}
 };*/
 

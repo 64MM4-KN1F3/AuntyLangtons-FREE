@@ -30,7 +30,7 @@ struct BottleRocket : Module {
 
 	BottleRocket() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);}
-	void step() override;
+	void process(const ProcessArgs &args) override;
 	bool fillPitchStore(float in) {
 		int i = 0;
 		for(i = 0; i < TOTAL_CARGO_HOLDS; i++) {
@@ -67,7 +67,7 @@ struct BottleRocket : Module {
 };
 
 
-void BottleRocket::step() {
+void BottleRocket::process(const ProcessArgs &args) {
 	// Implement a simple sine oscillator
 	float deltaTime = engineGetSampleTime();
 
