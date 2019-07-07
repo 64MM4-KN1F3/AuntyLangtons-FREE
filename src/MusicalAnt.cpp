@@ -863,8 +863,8 @@ struct ModuleDisplay : virtual TransparentWidget {
 				}
 			}
 			//addChild( new ModuleDisplay(module, Vec((x+1)*(pixelSize + gapSize) + DISPLAY_OFFSET_X, (y+1)*(pixelSize + gapSize) + DISPLAY_OFFSET_Y), pixelSize, i));
-			//addChild(ModuleLightWidget::create<SmallLight<GreenLight>>(Vec((x+1)*6 + DISPLAY_OFFSET_X, (y+1)*6 + DISPLAY_OFFSET_Y), module, MusicalAnt::GRID_LIGHTS + i));
-			//addChild(ModuleLightWidget::create<TinyLight<GreenLight>>(Vec((x+1)*3 + DISPLAY_OFFSET_X, (y+1)*3 + DISPLAY_OFFSET_Y), module, MusicalAnt::GRID_LIGHTS + i));
+			//addChild(createLight<SmallLight<GreenLight>>(Vec((x+1)*6 + DISPLAY_OFFSET_X, (y+1)*6 + DISPLAY_OFFSET_Y), module, MusicalAnt::GRID_LIGHTS + i));
+			//addChild(createLight<TinyLight<GreenLight>>(Vec((x+1)*3 + DISPLAY_OFFSET_X, (y+1)*3 + DISPLAY_OFFSET_Y), module, MusicalAnt::GRID_LIGHTS + i));
 		}
 
 		// Monitor fuzz
@@ -981,75 +981,75 @@ struct MusicalAntWidget : ModuleWidget {
 	MusicalAntWidget(MusicalAnt *module) : ModuleWidget(module) {
 		setPanel(SVG::load(assetPlugin(pluginInstance, "res/MusicalAnt.svg")));
 
-		addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(ParamWidget::create<RoundBlackKnob>(Vec(143.9, 177), module, MusicalAnt::CLOCK_PARAM, -2.0f, 8.0f, 1.0f));
+		addParam(createParam<RoundBlackKnob>(Vec(143.9, 177), module, MusicalAnt::CLOCK_PARAM, -2.0f, 8.0f, 1.0f));
 
 		// Ant X panel widgets		
-		addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(52.4, 218.5), module, MusicalAnt::OCTAVE_KNOB_PARAM_X, 0.0, 7.0, 2.0));
-		addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(76.9, 218.5), module, MusicalAnt::NOTE_KNOB_PARAM_X, 0.0, QuantizeUtils::NUM_NOTES-1, QuantizeUtils::NOTE_C));
-		addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(101.4, 218.5), module, MusicalAnt::SCALE_KNOB_PARAM_X, 0.0, QuantizeUtils::NUM_SCALES-1, QuantizeUtils::MINOR));
-		addOutput(Port::create<PJ301MPort>(Vec(148.9, 218.5), Port::OUTPUT, module, MusicalAnt::VOCT_OUTPUT_X));
+		addParam(createParam<RoundSmallBlackKnob>(Vec(52.4, 218.5), module, MusicalAnt::OCTAVE_KNOB_PARAM_X, 0.0, 7.0, 2.0));
+		addParam(createParam<RoundSmallBlackKnob>(Vec(76.9, 218.5), module, MusicalAnt::NOTE_KNOB_PARAM_X, 0.0, QuantizeUtils::NUM_NOTES-1, QuantizeUtils::NOTE_C));
+		addParam(createParam<RoundSmallBlackKnob>(Vec(101.4, 218.5), module, MusicalAnt::SCALE_KNOB_PARAM_X, 0.0, QuantizeUtils::NUM_SCALES-1, QuantizeUtils::MINOR));
+		addOutput(createPort<PJ301MPort>(Vec(148.9, 218.5), PortWidget::OUTPUT, module, MusicalAnt::VOCT_OUTPUT_X));
 		// Invert X V/Oct output
-		addParam(ParamWidget::create<CKSS>(Vec(127.5, 219.75), module, MusicalAnt::VOCT_INVERT_X, 0.0f, 1.0f, 1.0f));
+		addParam(createParam<CKSS>(Vec(127.5, 219.75), module, MusicalAnt::VOCT_INVERT_X, 0.0f, 1.0f, 1.0f));
 		
 		// Ant Y panel widgets
-		addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(52.4, 254), module, MusicalAnt::OCTAVE_KNOB_PARAM_Y, -5.0, 7.0, 2.0));
-		addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(76.9, 254), module, MusicalAnt::NOTE_KNOB_PARAM_Y, 0.0, QuantizeUtils::NUM_NOTES-1, QuantizeUtils::NOTE_C));
-		addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(101.4, 254), module, MusicalAnt::SCALE_KNOB_PARAM_Y, 0.0, QuantizeUtils::NUM_SCALES-1, QuantizeUtils::MINOR));
-		addOutput(Port::create<PJ301MPort>(Vec(148.9, 254), Port::OUTPUT, module, MusicalAnt::VOCT_OUTPUT_Y));
+		addParam(createParam<RoundSmallBlackKnob>(Vec(52.4, 254), module, MusicalAnt::OCTAVE_KNOB_PARAM_Y, -5.0, 7.0, 2.0));
+		addParam(createParam<RoundSmallBlackKnob>(Vec(76.9, 254), module, MusicalAnt::NOTE_KNOB_PARAM_Y, 0.0, QuantizeUtils::NUM_NOTES-1, QuantizeUtils::NOTE_C));
+		addParam(createParam<RoundSmallBlackKnob>(Vec(101.4, 254), module, MusicalAnt::SCALE_KNOB_PARAM_Y, 0.0, QuantizeUtils::NUM_SCALES-1, QuantizeUtils::MINOR));
+		addOutput(createPort<PJ301MPort>(Vec(148.9, 254), PortWidget::OUTPUT, module, MusicalAnt::VOCT_OUTPUT_Y));
 		// Invert Y V/Oct output
-		addParam(ParamWidget::create<CKSS>(Vec(127.5, 255.25), module, MusicalAnt::VOCT_INVERT_Y, 0.0f, 1.0f, 1.0f));
+		addParam(createParam<CKSS>(Vec(127.5, 255.25), module, MusicalAnt::VOCT_INVERT_Y, 0.0f, 1.0f, 1.0f));
 
 		// Shadow Ant X panel widgets
-		addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(70.9, 289.5), module, MusicalAnt::OCTAVE_KNOB_PARAM_SHADOW_X, -5.0, 7.0, 2.0));
-		addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(95.4, 289.5), module, MusicalAnt::NOTE_KNOB_PARAM_SHADOW_X, 0.0, QuantizeUtils::NUM_NOTES-1, QuantizeUtils::NOTE_C));
-		addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(119.9, 289.5), module, MusicalAnt::SCALE_KNOB_PARAM_SHADOW_X, 0.0, QuantizeUtils::NUM_SCALES-1, QuantizeUtils::MINOR));
-		addOutput(Port::create<PJ301MPort>(Vec(148.9, 289.5), Port::OUTPUT, module, MusicalAnt::VOCT_OUTPUT_SHADOW_X));
+		addParam(createParam<RoundSmallBlackKnob>(Vec(70.9, 289.5), module, MusicalAnt::OCTAVE_KNOB_PARAM_SHADOW_X, -5.0, 7.0, 2.0));
+		addParam(createParam<RoundSmallBlackKnob>(Vec(95.4, 289.5), module, MusicalAnt::NOTE_KNOB_PARAM_SHADOW_X, 0.0, QuantizeUtils::NUM_NOTES-1, QuantizeUtils::NOTE_C));
+		addParam(createParam<RoundSmallBlackKnob>(Vec(119.9, 289.5), module, MusicalAnt::SCALE_KNOB_PARAM_SHADOW_X, 0.0, QuantizeUtils::NUM_SCALES-1, QuantizeUtils::MINOR));
+		addOutput(createPort<PJ301MPort>(Vec(148.9, 289.5), PortWidget::OUTPUT, module, MusicalAnt::VOCT_OUTPUT_SHADOW_X));
 
 		// Shadow Ant Y panel widgets
-		addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(70.9, 325), module, MusicalAnt::OCTAVE_KNOB_PARAM_SHADOW_Y, -5.0, 7.0, 2.0));
-		addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(95.4, 325), module, MusicalAnt::NOTE_KNOB_PARAM_SHADOW_Y, 0.0, QuantizeUtils::NUM_NOTES-1, QuantizeUtils::NOTE_C));
-		addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(119.9, 325), module, MusicalAnt::SCALE_KNOB_PARAM_SHADOW_Y, 0.0, QuantizeUtils::NUM_SCALES-1, QuantizeUtils::MINOR));
-		addOutput(Port::create<PJ301MPort>(Vec(148.9, 325), Port::OUTPUT, module, MusicalAnt::VOCT_OUTPUT_SHADOW_Y));
+		addParam(createParam<RoundSmallBlackKnob>(Vec(70.9, 325), module, MusicalAnt::OCTAVE_KNOB_PARAM_SHADOW_Y, -5.0, 7.0, 2.0));
+		addParam(createParam<RoundSmallBlackKnob>(Vec(95.4, 325), module, MusicalAnt::NOTE_KNOB_PARAM_SHADOW_Y, 0.0, QuantizeUtils::NUM_NOTES-1, QuantizeUtils::NOTE_C));
+		addParam(createParam<RoundSmallBlackKnob>(Vec(119.9, 325), module, MusicalAnt::SCALE_KNOB_PARAM_SHADOW_Y, 0.0, QuantizeUtils::NUM_SCALES-1, QuantizeUtils::MINOR));
+		addOutput(createPort<PJ301MPort>(Vec(148.9, 325), PortWidget::OUTPUT, module, MusicalAnt::VOCT_OUTPUT_SHADOW_Y));
 
 		
 
-		addInput(Port::create<PJ301MPort>(Vec(115.9, 181), Port::INPUT, module, MusicalAnt::EXT_CLOCK_INPUT));
-		addOutput(Port::create<PJ301MPort>(Vec(23.9, 181), Port::OUTPUT, module, MusicalAnt::GATE_OUTPUT));
+		addInput(createPort<PJ301MPort>(Vec(115.9, 181), PortWidget::INPUT, module, MusicalAnt::EXT_CLOCK_INPUT));
+		addOutput(createPort<PJ301MPort>(Vec(23.9, 181), PortWidget::OUTPUT, module, MusicalAnt::GATE_OUTPUT));
 
-		addOutput(Port::create<PJ301MPort>(Vec(52.9, 181), Port::OUTPUT, module, MusicalAnt::GATE_OUTPUT_X));
-		addOutput(Port::create<PJ301MPort>(Vec(82.9, 181), Port::OUTPUT, module, MusicalAnt::GATE_OUTPUT_Y));
+		addOutput(createPort<PJ301MPort>(Vec(52.9, 181), PortWidget::OUTPUT, module, MusicalAnt::GATE_OUTPUT_X));
+		addOutput(createPort<PJ301MPort>(Vec(82.9, 181), PortWidget::OUTPUT, module, MusicalAnt::GATE_OUTPUT_Y));
 		
 
-		addChild(ModuleLightWidget::create<SmallLight<GreenLight>>(Vec(108.9, 170), module, MusicalAnt::BLINK_LIGHT));
+		addChild(createLight<SmallLight<GreenLight>>(Vec(108.9, 170), module, MusicalAnt::BLINK_LIGHT));
 
 		// Shadow Ant on switch
-		addParam(ParamWidget::create<CKSS>(Vec(50.80, 305), module, MusicalAnt::SHADOW_ANT_ON, 0.0f, 1.0f, 1.0f));
+		addParam(createParam<CKSS>(Vec(50.80, 305), module, MusicalAnt::SHADOW_ANT_ON, 0.0f, 1.0f, 1.0f));
 
 		// Effect Knob 
-		addParam(ParamWidget::create<RoundBlackSnapKnob>(Vec(253.9, 250), module, MusicalAnt::EFFECT_KNOB_PARAM, 0.0f, 5.0f, 0.0));
+		addParam(createParam<RoundBlackSnapKnob>(Vec(253.9, 250), module, MusicalAnt::EFFECT_KNOB_PARAM, 0.0f, 5.0f, 0.0));
 
 		// Loop Mode Switch
 
-		addParam(ParamWidget::create<CKSS_Horizontal>(Vec(25, 290), module, MusicalAnt::LOOPMODE_SWITCH_PARAM, 0.0f, 1.0f, 0.0f));
+		addParam(createParam<CKSS_Horizontal>(Vec(25, 290), module, MusicalAnt::LOOPMODE_SWITCH_PARAM, 0.0f, 1.0f, 0.0f));
 
 		// Loop length knob
 
-		addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(23.65, 305), module, MusicalAnt::LOOP_LENGTH, 0.0f, 95.0f, 31.0));
+		addParam(createParam<RoundSmallBlackKnob>(Vec(23.65, 305), module, MusicalAnt::LOOP_LENGTH, 0.0f, 95.0f, 31.0));
 
 		// Loop length text
 
 		//addChild( new LoopLengthTextLabel(module, Vec(253.55, 80), 20, 1, nvgRGBA(255,0,0,255) ) );
 
 		// Resolution/SideLength Knob
-		addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(23.9, 218.5), module, MusicalAnt::SIDE_LENGTH_PARAM, 0.0f, 6.0f, 4.0));
+		addParam(createParam<RoundSmallBlackKnob>(Vec(23.9, 218.5), module, MusicalAnt::SIDE_LENGTH_PARAM, 0.0f, 6.0f, 4.0));
 
 		// Skip Knob
-		addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(23.9, 254), module, MusicalAnt::SKIP_PARAM, 0.0f, 9.0f, 0.0f));
+		addParam(createParam<RoundSmallBlackKnob>(Vec(23.9, 254), module, MusicalAnt::SKIP_PARAM, 0.0f, 9.0f, 0.0f));
 
 
 
@@ -1061,13 +1061,13 @@ struct MusicalAntWidget : ModuleWidget {
 		addChild( new ModuleDisplay(module));
 
 		// Step forward manually
-		//addParam(ParamWidget::create<SmallButton>(Vec(232, 35), module, MusicalAnt::STEP_BCK_BTN_PARAM, 0.0, 1.0, 0.0));
+		//addParam(createParam<SmallButton>(Vec(232, 35), module, MusicalAnt::STEP_BCK_BTN_PARAM, 0.0, 1.0, 0.0));
 
 		// Step backward manually
-		//addParam(ParamWidget::create<SmallButton>(Vec(252, 35), module, MusicalAnt::STEP_FWD_BTN_PARAM, 0.0, 1.0, 0.0));
+		//addParam(createParam<SmallButton>(Vec(252, 35), module, MusicalAnt::STEP_FWD_BTN_PARAM, 0.0, 1.0, 0.0));
 
 		cout << "display - X: " << module->antVector[X_POSITION] << ", Y: " << module->antVector[Y_POSITION] << "\n";
-		//addChild(ModuleLightWidget::create<SmallLight<RedLight>>(Vec((module->antX+1)*6 + DISPLAY_OFFSET_X, (module->antY+1)*6 + DISPLAY_OFFSET_Y), module, (true)));
+		//addChild(createLight<SmallLight<RedLight>>(Vec((module->antX+1)*6 + DISPLAY_OFFSET_X, (module->antY+1)*6 + DISPLAY_OFFSET_Y), module, (true)));
 
 	}
 };
@@ -1078,4 +1078,4 @@ struct MusicalAntWidget : ModuleWidget {
 // change), human-readable module name, and any number of tags
 // (found in `include/tags.hpp`) separated by commas.
 // TODO Fix up tag
-Model *modelMusicalAnt = Model::create<MusicalAnt, MusicalAntWidget>("MusicalAnt");
+Model *modelMusicalAnt = createModel<MusicalAnt, MusicalAntWidget>("MusicalAnt");

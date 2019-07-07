@@ -123,25 +123,25 @@ struct BottleRocketWidget : ModuleWidget {
 	BottleRocketWidget(BottleRocket *module) : ModuleWidget(module) {
 		setPanel(SVG::load(assetPlugin(pluginInstance, "res/BottleRocket.svg")));
 
-		addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(ParamWidget::create<Davies1900hBlackKnob>(Vec(28, 87), module, BottleRocket::PITCH_INPUT_PARAM, -3.0, 3.0, 0.0));
+		addParam(createParam<Davies1900hBlackKnob>(Vec(28, 87), module, BottleRocket::PITCH_INPUT_PARAM, -3.0, 3.0, 0.0));
 
-		addInput(Port::create<PJ301MPort>(Vec(16, 40), Port::INPUT, module, BottleRocket::PITCH_INPUT));
+		addInput(createPort<PJ301MPort>(Vec(16, 40), PortWidget::INPUT, module, BottleRocket::PITCH_INPUT));
 
 		// 6 Pitch Outputs
-		addOutput(Port::create<PJ301MPort>(Vec(33, 70), Port::OUTPUT, module, BottleRocket::PITCH_OUTPUT));
-		addOutput(Port::create<PJ301MPort>(Vec(33, 110), Port::OUTPUT, module, BottleRocket::PITCH_OUTPUT + 1));
-		addOutput(Port::create<PJ301MPort>(Vec(33, 150), Port::OUTPUT, module, BottleRocket::PITCH_OUTPUT + 2));
-		addOutput(Port::create<PJ301MPort>(Vec(33, 190), Port::OUTPUT, module, BottleRocket::PITCH_OUTPUT + 3));
-		addOutput(Port::create<PJ301MPort>(Vec(33, 230), Port::OUTPUT, module, BottleRocket::PITCH_OUTPUT + 4));
-		addOutput(Port::create<PJ301MPort>(Vec(33, 270), Port::OUTPUT, module, BottleRocket::PITCH_OUTPUT + 5));
+		addOutput(createPort<PJ301MPort>(Vec(33, 70), PortWidget::OUTPUT, module, BottleRocket::PITCH_OUTPUT));
+		addOutput(createPort<PJ301MPort>(Vec(33, 110), PortWidget::OUTPUT, module, BottleRocket::PITCH_OUTPUT + 1));
+		addOutput(createPort<PJ301MPort>(Vec(33, 150), PortWidget::OUTPUT, module, BottleRocket::PITCH_OUTPUT + 2));
+		addOutput(createPort<PJ301MPort>(Vec(33, 190), PortWidget::OUTPUT, module, BottleRocket::PITCH_OUTPUT + 3));
+		addOutput(createPort<PJ301MPort>(Vec(33, 230), PortWidget::OUTPUT, module, BottleRocket::PITCH_OUTPUT + 4));
+		addOutput(createPort<PJ301MPort>(Vec(33, 270), PortWidget::OUTPUT, module, BottleRocket::PITCH_OUTPUT + 5));
 
 
-		addChild(ModuleLightWidget::create<MediumLight<RedLight>>(Vec(41, 59), module, BottleRocket::BLINK_LIGHT));
+		addChild(createLight<MediumLight<RedLight>>(Vec(41, 59), module, BottleRocket::BLINK_LIGHT));
 	}
 };
 
@@ -151,4 +151,4 @@ struct BottleRocketWidget : ModuleWidget {
 // change), human-readable module name, and any number of tags
 // (found in `include/tags.hpp`) separated by commas.
 // TODO Fix up tag
-Model *modelBottleRocket = Model::create<BottleRocket, BottleRocketWidget>("Aunty Langton's", "BottleRocket", "Bottle Rocket", OSCILLATOR_TAG);
+Model *modelBottleRocket = createModel<BottleRocket, BottleRocketWidget>("Aunty Langton's", "BottleRocket", "Bottle Rocket", OSCILLATOR_TAG);
