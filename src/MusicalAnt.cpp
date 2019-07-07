@@ -194,7 +194,7 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 		//cout << "reset(setAntPosition(" << SIDE_LENGTH/2 << "," << SIDE_LENGTH/2 << "," << 0 << "))\n";
 	}
 
-	json_t *toJson() override {
+	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
 		
 		json_t *cellsJ = json_array();
@@ -207,7 +207,7 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 		return rootJ;
 	}
 
-	void fromJson(json_t *rootJ) override {
+	void dataFromJson(json_t *rootJ) override {
 		json_t *cellsJ = json_object_get(rootJ, "cells");
 		if (cellsJ) {
 			for (int i = 0; i < CELLS; i++) {
@@ -690,7 +690,7 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 	}
 
 	// For more advanced Module features, read Rack's engine.hpp header file
-	// - toJson, fromJson: serialization of internal data
+	// - dataToJson, dataFromJson: serialization of internal data
 	// - onSampleRateChange: event triggered by a change of sample rate
 	// - onReset, onRandomize, onCreate, onDelete: implements special behavior when user clicks these from the context menu
 };
