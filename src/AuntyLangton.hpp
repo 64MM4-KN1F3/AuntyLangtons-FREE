@@ -35,19 +35,9 @@ extern Model *modelBottleRocket;
 };*/
 
 ////////////////////////////////////////////// BUTTONS //////////////////////////////////////////////
-
-struct SmallButton : SVGSwitch, MomentarySwitch {
-	SmallButton() {
-		addFrame(SVG::load(assetPlugin(pluginInstance, "res/SmallButtonUp.svg")));
-		addFrame(SVG::load(assetPlugin(pluginInstance, "res/SmallButtonDown.svg")));
-	}
-};
-
-struct CKSS_Horizontal : SVGSwitch, ToggleSwitch {
+struct CKSS_Horizontal : app::SvgSwitch {
 	CKSS_Horizontal() {
-		addFrame(SVG::load(assetPlugin(pluginInstance, "res/CKSS_Horizontal_0.svg")));
-		addFrame(SVG::load(assetPlugin(pluginInstance, "res/CKSS_Horizontal_1.svg")));
+		addFrame(APP->window->loadSvg(asset::system("res/CKSS_Horizontal_0.svg")));
+		addFrame(APP->window->loadSvg(asset::system("res/CKSS_Horizontal_1.svg")));
 	}
 };
-
-

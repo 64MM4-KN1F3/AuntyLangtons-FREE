@@ -153,4 +153,4 @@ struct BottleRocketWidget : ModuleWidget {
 // change), human-readable module name, and any number of tags
 // (found in `include/tags.hpp`) separated by commas.
 // TODO Fix up tag
-Model *modelBottleRocket = createModel<BottleRocket, BottleRocketWidget>("Aunty Langton's", "BottleRocket", "Bottle Rocket", OSCILLATOR_TAG);
+Model *modelBottleRocket = createModel<BottleRocket, BottleRocketWidget>("BottleRocket");

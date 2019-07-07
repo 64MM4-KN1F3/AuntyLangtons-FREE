@@ -1,5 +1,4 @@
 #include "AuntyLangton.hpp"
-#include "dsp/digital.hpp"
 #include <iostream>
 #include <vector>
 #include <math.h>
@@ -918,7 +917,7 @@ struct InternalTextLabel : TransparentWidget
   MusicalAnt *module;
 
   int memFont = -1;
-  string label;
+  string text_label;
   int pxSize;
   int align;
   NVGcolor color;
@@ -932,14 +931,14 @@ struct InternalTextLabel : TransparentWidget
 
   void draw( NVGcontext *vg ) {
 
-  	label = "Ant: " + to_string(module->index) + ", Shadow: " + to_string(module->shadowIndex);
+  	text_label = "Ant: " + to_string(module->index) + ", Shadow: " + to_string(module->shadowIndex);
 
     nvgBeginPath( vg );
     //nvgFontFaceId( vg, memFont );
     nvgFontSize( vg, pxSize );
     nvgFillColor( vg, color );
     nvgTextAlign( vg, align );
-    nvgText( vg, 0, 0, label.c_str(), NULL );
+    nvgText( vg, 0, 0, text_label.c_str(), NULL );
   }
 };
 
@@ -949,7 +948,7 @@ struct LoopLengthTextLabel : TransparentWidget
   MusicalAnt *module;
 
   int memFont = -1;
-  string label;
+  string text_label;
   int pxSize;
   int align;
   NVGcolor color;
@@ -963,14 +962,14 @@ struct LoopLengthTextLabel : TransparentWidget
 
   void draw( NVGcontext *vg ) {
 
-  	label = to_string(module->loopLength);
+  	text_label = to_string(module->loopLength);
 
     nvgBeginPath( vg );
     //nvgFontFaceId( vg, memFont );
     nvgFontSize( vg, pxSize );
     nvgFillColor( vg, color );
     nvgTextAlign( vg, align );
-    nvgText( vg, 0, 0, label.c_str(), NULL );
+    nvgText( vg, 0, 0, text_label.c_str(), NULL );
   }
 };
 
@@ -1062,11 +1061,6 @@ struct MusicalAntWidget : ModuleWidget {
 		// Trying creating grid in one template class
 		addChild( new ModuleDisplay(module));
 
-		// Step forward manually
-		//addParam(createParam<SmallButton>(Vec(232, 35), module, MusicalAnt::STEP_BCK_BTN_PARAM, 0.0, 1.0, 0.0));
-
-		// Step backward manually
-		//addParam(createParam<SmallButton>(Vec(252, 35), module, MusicalAnt::STEP_FWD_BTN_PARAM, 0.0, 1.0, 0.0));
 
 		cout << "display - X: " << module->antVector[X_POSITION] << ", Y: " << module->antVector[Y_POSITION] << "\n";
 		//addChild(createLight<SmallLight<RedLight>>(Vec((module->antX+1)*6 + DISPLAY_OFFSET_X, (module->antY+1)*6 + DISPLAY_OFFSET_Y), module, (true)));
