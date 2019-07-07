@@ -831,13 +831,14 @@ struct ModuleDisplay : virtual TransparentWidget {
 
 	void draw(NVGcontext *vg) override {
 
+		int x = 0;
+		int y = 0;
 		if(module) {
 			float pixelSize = 0.9f * ((float) DISPLAY_SIZE_XY / (float) module->sideLength);
 			//addChild( new ModuleDisplay(Vec(100, 100), pixelSize, true));
 
 			//float brightness;
-			int x = 0;
-			int y = 0;
+
 			int shadowAntCell = module->iFromXY(module->shadowAntVector[X_POSITION], module->shadowAntVector[Y_POSITION]);
 			
 			int numCells = module->sideLength*module->sideLength;
@@ -866,47 +867,48 @@ struct ModuleDisplay : virtual TransparentWidget {
 				//addChild(createLight<SmallLight<GreenLight>>(Vec((x+1)*6 + DISPLAY_OFFSET_X, (y+1)*6 + DISPLAY_OFFSET_Y), module, MusicalAnt::GRID_LIGHTS + i));
 				//addChild(createLight<TinyLight<GreenLight>>(Vec((x+1)*3 + DISPLAY_OFFSET_X, (y+1)*3 + DISPLAY_OFFSET_Y), module, MusicalAnt::GRID_LIGHTS + i));
 			}
-		}
 
-		// Monitor fuzz
-		float fuzzPixelSize = 2.2;
-		x = 0;
-		y = 0;
-		for(int i=0; i < 3025; i++){
-			x = i%55; //increment x up to COL length then loop
-			if((i%55 == 0)&&(i!=0)){ //increment y once x hits positive multiple of COL length
-				y++;
+			// Monitor fuzz
+			float fuzzPixelSize = 2.2;
+			x = 0;
+			y = 0;
+			for(int i=0; i < 3025; i++){
+				x = i%55; //increment x up to COL length then loop
+				if((i%55 == 0)&&(i!=0)){ //increment y once x hits positive multiple of COL length
+					y++;
+				}
+				nvgFillColor(vg, ((randomUniform() < 0.5) ? nvgRGBA(0,0,0,0) : nvgRGBA(255,255,255,8)));
+				nvgBeginPath(vg);
+				nvgRect(vg, x*fuzzPixelSize + DISPLAY_OFFSET_X, y*fuzzPixelSize + DISPLAY_OFFSET_Y, fuzzPixelSize, fuzzPixelSize);
+				nvgFill(vg);
 			}
-			nvgFillColor(vg, ((randomUniform() < 0.5) ? nvgRGBA(0,0,0,0) : nvgRGBA(255,255,255,8)));
+
+			// Draw screen reflection over display
+			nvgFillColor(vg, nvgRGBA(255,255,255,7));
 			nvgBeginPath(vg);
-			nvgRect(vg, x*fuzzPixelSize + DISPLAY_OFFSET_X, y*fuzzPixelSize + DISPLAY_OFFSET_Y, fuzzPixelSize, fuzzPixelSize);
+			nvgRect(vg, x*pixelSize + DISPLAY_OFFSET_X, y*pixelSize + DISPLAY_OFFSET_Y, pixelSize, pixelSize);
+			nvgCircle(vg, 68 + DISPLAY_OFFSET_X, 54 + DISPLAY_OFFSET_Y, 60);
 			nvgFill(vg);
+
+			nvgBeginPath(vg);
+			nvgRect(vg, x*pixelSize + DISPLAY_OFFSET_X, y*pixelSize + DISPLAY_OFFSET_Y, pixelSize, pixelSize);
+			nvgCircle(vg, 77 + DISPLAY_OFFSET_X, 48 + DISPLAY_OFFSET_Y, 40);
+			nvgFill(vg);
+
+			nvgBeginPath(vg);
+			nvgRect(vg, x*pixelSize + DISPLAY_OFFSET_X, y*pixelSize + DISPLAY_OFFSET_Y, pixelSize, pixelSize);
+			nvgCircle(vg, 82 + DISPLAY_OFFSET_X, 43 + DISPLAY_OFFSET_Y, 20);
+			nvgFill(vg);
+
+			nvgFillColor(vg, nvgRGBA(255,255,255,5));
+			nvgBeginPath(vg);
+			nvgRect(vg, x*pixelSize + DISPLAY_OFFSET_X, y*pixelSize + DISPLAY_OFFSET_Y, pixelSize, pixelSize);
+			nvgCircle(vg, 87 + DISPLAY_OFFSET_X, 40 + DISPLAY_OFFSET_Y, 8);
+			nvgFill(vg);
+
+			nvgFillColor(vg, nvgRGBA(0,0,0,0));
+
 		}
-
-		// Draw screen reflection over display
-		nvgFillColor(vg, nvgRGBA(255,255,255,7));
-		nvgBeginPath(vg);
-		nvgRect(vg, x*pixelSize + DISPLAY_OFFSET_X, y*pixelSize + DISPLAY_OFFSET_Y, pixelSize, pixelSize);
-		nvgCircle(vg, 68 + DISPLAY_OFFSET_X, 54 + DISPLAY_OFFSET_Y, 60);
-		nvgFill(vg);
-
-		nvgBeginPath(vg);
-		nvgRect(vg, x*pixelSize + DISPLAY_OFFSET_X, y*pixelSize + DISPLAY_OFFSET_Y, pixelSize, pixelSize);
-		nvgCircle(vg, 77 + DISPLAY_OFFSET_X, 48 + DISPLAY_OFFSET_Y, 40);
-		nvgFill(vg);
-
-		nvgBeginPath(vg);
-		nvgRect(vg, x*pixelSize + DISPLAY_OFFSET_X, y*pixelSize + DISPLAY_OFFSET_Y, pixelSize, pixelSize);
-		nvgCircle(vg, 82 + DISPLAY_OFFSET_X, 43 + DISPLAY_OFFSET_Y, 20);
-		nvgFill(vg);
-
-		nvgFillColor(vg, nvgRGBA(255,255,255,5));
-		nvgBeginPath(vg);
-		nvgRect(vg, x*pixelSize + DISPLAY_OFFSET_X, y*pixelSize + DISPLAY_OFFSET_Y, pixelSize, pixelSize);
-		nvgCircle(vg, 87 + DISPLAY_OFFSET_X, 40 + DISPLAY_OFFSET_Y, 8);
-		nvgFill(vg);
-
-		nvgFillColor(vg, nvgRGBA(0,0,0,0));
 
 	}
 
