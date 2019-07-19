@@ -1062,8 +1062,8 @@ struct MusicalAntWidget : ModuleWidget {
 		addParam(createParam<RoundBlackSnapKnob>(Vec(253.9, 250), module, MusicalAnt::EFFECT_KNOB_PARAM));
 
 		// Loop Mode Switch
-
-		addParam(createParam<CKSS_Horizontal>(Vec(25, 290), module, MusicalAnt::LOOPMODE_SWITCH_PARAM));
+		// TODO - Fix this back up to be a horizontal switch (need to make that properly, it fucked up in the VCV Rack 1.x migraiton)
+		addParam(createParam<CKSS>(Vec(25, 290), module, MusicalAnt::LOOPMODE_SWITCH_PARAM));
 
 		// Loop length knob
 
