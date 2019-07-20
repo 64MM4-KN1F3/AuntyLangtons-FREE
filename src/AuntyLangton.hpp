@@ -35,9 +35,17 @@ extern Model *modelBottleRocket;
 };*/
 
 ////////////////////////////////////////////// BUTTONS //////////////////////////////////////////////
-struct CKSS_Horizontal : app::SvgSwitch {
+struct CKSS_Horizontal : SVGSwitch {
 	CKSS_Horizontal() {
-		addFrame(APP->window->loadSvg(asset::system("res/CKSS_Horizontal_0.svg")));
-		addFrame(APP->window->loadSvg(asset::system("res/CKSS_Horizontal_1.svg")));
+		addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/CKSS_Horizontal_0.svg")));
+		addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/CKSS_Horizontal_1.svg")));
+	}
+};
+
+struct AuntyLangButton : SVGSwitch {
+	AuntyLangButton() {
+		momentary = true;
+		addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/AuntyLangButton_0.svg")));
+		addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/AuntyLangButton_1.svg")));
 	}
 };

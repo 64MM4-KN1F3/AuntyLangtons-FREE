@@ -97,6 +97,7 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 		LOOP_LENGTH,
 		VOCT_INVERT_X,
 		VOCT_INVERT_Y,
+		AUNTYLANGBUTTON_PARAM,
 		NUM_PARAMS
 	};
 	enum InputIds {
@@ -656,7 +657,7 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 
 		historyBufferUsage -= stepsBack;
 		cout << "\nHistoryBufferUsage: " << historyBufferUsage;
-		cout << "\nStepSkippingAmount: " << std::to_string(params[SKIP_PARAM].getValue()) << "\n";
+		cout << "\nStepSkippingAmount: " << std::to_string((int) params[SKIP_PARAM].getValue()) << "\n";
 		int historyTarget = (abs(currIndex - stepsBack)) % HISTORY_AMOUNT;
 		setAntPosition(antVectorHistory[historyTarget][X_POSITION], antVectorHistory[historyTarget][Y_POSITION], antVectorHistory[historyTarget][DIRECTION]);
 		setShadowAntPosition(shadowAntVectorHistory[historyTarget][X_POSITION], shadowAntVectorHistory[historyTarget][Y_POSITION], shadowAntVectorHistory[historyTarget][DIRECTION]);
@@ -728,7 +729,7 @@ void MusicalAnt::process(const ProcessArgs &args) {
 	}
 
 	bool gateIn = false;
-	int numberSteps = params[SKIP_PARAM].getValue() + 1;
+	int numberSteps = (int) params[SKIP_PARAM].getValue() + 1;
 	if((params[LOOPMODE_SWITCH_PARAM].getValue() != loopOn) & (params[LOOPMODE_SWITCH_PARAM].getValue() == true)) {
 		// ^^ Loop switch has just been turned on.
 		// Store current index value. This is the loop point.
@@ -1062,8 +1063,7 @@ struct MusicalAntWidget : ModuleWidget {
 		addParam(createParam<RoundBlackSnapKnob>(Vec(253.9, 250), module, MusicalAnt::EFFECT_KNOB_PARAM));
 
 		// Loop Mode Switch
-		// TODO - Fix this back up to be a horizontal switch (need to make that properly, it fucked up in the VCV Rack 1.x migraiton)
-		addParam(createParam<CKSS>(Vec(25, 290), module, MusicalAnt::LOOPMODE_SWITCH_PARAM));
+		addParam(createParam<CKSS_Horizontal>(Vec(25, 290), module, MusicalAnt::LOOPMODE_SWITCH_PARAM));
 
 		// Loop length knob
 
@@ -1078,6 +1078,9 @@ struct MusicalAntWidget : ModuleWidget {
 
 		// Skip Knob
 		addParam(createParam<RoundSmallBlackKnob>(Vec(23.9, 254), module, MusicalAnt::SKIP_PARAM));
+
+		// AuntyLangButton!
+		addParam(createParam<AuntyLangButton>(Vec(85, 355), module, MusicalAnt::AUNTYLANGBUTTON_PARAM));
 
 
 
