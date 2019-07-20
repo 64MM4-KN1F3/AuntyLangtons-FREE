@@ -467,13 +467,15 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 		return cells[iFromXY(cellX, cellY)];
 	}
 
-	/*void setCellOnByDisplayPos(float displayX, float displayY, bool on){
-		setCellOn(int(displayX / HW), int(displayY / HW), on);
+	void setCellOnByDisplayPos(float displayX, float displayY, bool on){
+		float pixelSize = 0.9f * ((float) DISPLAY_SIZE_XY / (float) sideLength);
+		setCellOn(int(displayX / pixelSize), int(displayY / pixelSize), on);
 	}
 
 	bool isCellOnByDisplayPos(float displayX, float displayY){
-		return isCellOn(int(displayX / HW), int(displayY / HW));
-	}*/
+		float pixelSize = 0.9f * ((float) DISPLAY_SIZE_XY / (float) sideLength);
+		return isCellOn(int(displayX / pixelSize), int(displayY / pixelSize));
+	}
 
 	int iFromXY(int cellX, int cellY){
 		return cellX + cellY * sideLength;
@@ -817,16 +819,20 @@ void MusicalAnt::process(const ProcessArgs &args) {
 
 struct ModuleDisplay : virtual TransparentWidget {
 	MusicalAnt *module;
+	bool currentlyTurningOn = false;
+	float initX = 0;
+	float initY = 0;
+	float dragX = 0;
+	float dragY = 0;
 
 	ModuleDisplay(MusicalAnt *module) {
 		this->module = module;
 	}
 
-	/*
-	void onMouseDown(EventMouseDown &e) override { 
-		if (e.button == 0) {
-			e.consumed = true;
-			e.target = this;
+	void onButton(const event::Button &e) override {
+		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
+			e.consume(this);
+			// e.target = this;
 			initX = e.pos.x;
 			initY = e.pos.y;
 			currentlyTurningOn = !module->isCellOnByDisplayPos(e.pos.x, e.pos.y);
@@ -834,22 +840,16 @@ struct ModuleDisplay : virtual TransparentWidget {
 		}
 	}
 	
-	void onMouseMove(EventMouseMove &e) override {}
-	void onMouseUp(EventMouseUp &e) override {}
-
-	void onDragStart(EventDragStart &e) override {
-		dragX = gRackWidget->lastMousePos.x;
-		dragY = gRackWidget->lastMousePos.y;
+	void onDragStart(const event::DragStart &e) override {
+		dragX = APP->scene->rack->mousePos.x;
+		dragY = APP->scene->rack->mousePos.y;
 	}
 
-	void onDragEnd(EventDragEnd &e) override {}
-
-	void onDragMove(EventDragMove &e) override {
-		float newDragX = gRackWidget->lastMousePos.x;
-		float newDragY = gRackWidget->lastMousePos.y;
+	void onDragMove(const event::DragMove &e) override {
+		float newDragX = APP->scene->rack->mousePos.x;
+		float newDragY = APP->scene->rack->mousePos.y;
 		module->setCellOnByDisplayPos(initX+(newDragX-dragX), initY+(newDragY-dragY), currentlyTurningOn);
 	}
-	*/
 
 	void draw(NVGcontext *vg) override {
 
