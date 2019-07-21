@@ -817,7 +817,7 @@ void MusicalAnt::process(const ProcessArgs &args) {
 	}
 }
 
-struct ModuleDisplay : virtual TransparentWidget {
+struct ModuleDisplay : Widget {
 	MusicalAnt *module;
 	bool currentlyTurningOn = false;
 	float initX = 0;
@@ -825,9 +825,8 @@ struct ModuleDisplay : virtual TransparentWidget {
 	float dragX = 0;
 	float dragY = 0;
 
-	ModuleDisplay(MusicalAnt *module) {
-		this->module = module;
-	}
+	ModuleDisplay(){}
+
 
 	void onButton(const event::Button &e) override {
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
@@ -835,8 +834,10 @@ struct ModuleDisplay : virtual TransparentWidget {
 			// e.target = this;
 			initX = e.pos.x - DISPLAY_OFFSET_X;
 			initY = e.pos.y - DISPLAY_OFFSET_Y;
-			currentlyTurningOn = !module->isCellOnByDisplayPos(e.pos.x, e.pos.y);
-			module->setCellOnByDisplayPos(e.pos.x, e.pos.y, currentlyTurningOn);
+			if((0 < initX) && (initX < DISPLAY_SIZE_XY) && (0 < initY) && (initY < DISPLAY_SIZE_XY)) {
+				currentlyTurningOn = !module->isCellOnByDisplayPos(initX, initY);
+				module->setCellOnByDisplayPos(initX, initY, currentlyTurningOn);
+			}
 		}
 	}
 	
@@ -849,6 +850,10 @@ struct ModuleDisplay : virtual TransparentWidget {
 		float newDragX = APP->scene->rack->mousePos.x;
 		float newDragY = APP->scene->rack->mousePos.y;
 		module->setCellOnByDisplayPos(initX+(newDragX-dragX), initY+(newDragY-dragY), currentlyTurningOn);
+	}
+
+	void onDragEnd(const event::DragEnd &e) override {
+		cout << "onDragEnd called.\n";
 	}
 
 	void draw(NVGcontext *vg) override {
@@ -1088,8 +1093,12 @@ struct MusicalAntWidget : ModuleWidget {
 
 		addChild( new InternalTextLabel(module, Vec(13.5, 345), 10, 1, nvgRGBA(255,0,0,255) ) );
 
-		// Trying creating grid in one template class
-		addChild( new ModuleDisplay(module));
+		// Create display
+		ModuleDisplay *display = new ModuleDisplay();
+		display->module = module;
+		display->box.pos = Vec(DISPLAY_OFFSET_X, DISPLAY_OFFSET_Y);
+		display->box.size = Vec(DISPLAY_SIZE_XY, DISPLAY_SIZE_XY);
+		addChild(display);
 
 		/*if(module) {
 			cout << "display - X: " << module->antVector[X_POSITION] << ", Y: " << module->antVector[Y_POSITION] << "\n";
