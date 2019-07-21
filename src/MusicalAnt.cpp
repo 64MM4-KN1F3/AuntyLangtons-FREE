@@ -829,7 +829,6 @@ struct ModuleDisplay : virtual TransparentWidget {
 		this->module = module;
 	}
 
-	/*
 	void onButton(const event::Button &e) override {
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
 			e.consume(this);
@@ -851,7 +850,6 @@ struct ModuleDisplay : virtual TransparentWidget {
 		float newDragY = APP->scene->rack->mousePos.y;
 		module->setCellOnByDisplayPos(initX+(newDragX-dragX), initY+(newDragY-dragY), currentlyTurningOn);
 	}
-	*/
 
 	void draw(NVGcontext *vg) override {
 
@@ -1082,7 +1080,7 @@ struct MusicalAntWidget : ModuleWidget {
 		addParam(createParam<RoundSmallBlackKnob>(Vec(23.9, 254), module, MusicalAnt::SKIP_PARAM));
 
 		// AuntyLangButton!
-		addParam(createParam<AuntyLangButton>(Vec(85, 350), module, MusicalAnt::AUNTYLANGBUTTON_PARAM));
+		addParam(createParam<AuntyLangButton>(Vec(85, 348), module, MusicalAnt::AUNTYLANGBUTTON_PARAM));
 
 
 

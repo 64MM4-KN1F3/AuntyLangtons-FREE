@@ -17,7 +17,7 @@
    version="1.1"
    id="svg8"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="AuntyLangButton_0.svg"
+   sodipodi:docname="AuntyLangButton_1.svg"
    style="enable-background:new">
   <defs
      id="defs2">
@@ -70,9 +70,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="37.619891"
-     inkscape:cx="16.608684"
-     inkscape:cy="12.313158"
+     inkscape:zoom="6.65032"
+     inkscape:cx="20.060761"
+     inkscape:cy="17.929108"
      inkscape:document-units="mm"
      inkscape:current-layer="layer2"
      showgrid="true"
@@ -117,7 +117,7 @@
      style="display:inline;opacity:1"
      transform="translate(-26.18913,-25.304105)">
     <g
-       id="g5457">
+       id="g4197">
       <path
          transform="matrix(0.9999881,-0.00487778,0.00487778,0.9999881,-0.1467151,0.14880452)"
          inkscape:transform-center-y="-1.1970225"
@@ -134,10 +134,10 @@
          sodipodi:cx="30.433044"
          sodipodi:sides="3"
          id="path4162"
-         style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.21656249;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         style="opacity:1;fill:#cccccc;fill-opacity:1;stroke:#000000;stroke-width:0.21656249;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
          sodipodi:type="star" />
       <path
-         transform="matrix(0.25900767,-8.3185665e-4,8.2999926e-4,0.25842936,23.548415,3.338516)"
+         transform="matrix(0.29785882,-9.5663515e-4,9.5449915e-4,0.29719376,22.515342,-0.67902489)"
          d="m 32.544175,114.70515 -12.652563,-0.0465 -6.286038,-10.98068 6.366524,-10.934203 12.652563,0.04647 6.286038,10.980674 z"
          inkscape:randomized="0"
          inkscape:rounded="0"
@@ -150,7 +150,7 @@
          sodipodi:cx="26.258137"
          sodipodi:sides="6"
          id="path4310"
-         style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.98199916;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.72787358;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
          sodipodi:type="star" />
       <path
          sodipodi:nodetypes="ccccc"
