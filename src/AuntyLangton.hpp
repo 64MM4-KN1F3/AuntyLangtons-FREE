@@ -11,7 +11,11 @@ extern Plugin *pluginInstance;
 // Forward-declare each Model, defined in each module source file
 extern Model *modelMusicalAnt;
 extern Model *modelBottleRocket;
-// TODO extern Model *modelLadyLuck; // Random walk/brownian motion implementation of musical ant
+// TODO extern Model *modelLadyLuck; 
+// TODO Random walk
+// TODO brownian motion implementation of musical ant?? 
+// TODO arp with brownian motion built in and modulation step lenght?
+// TODO Modulo util to wrap V/Oct voltages
 
 ////////////////////////////////////////////// GRID DISPLAY //////////////////////////////////////////////
 
