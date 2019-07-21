@@ -11,13 +11,13 @@
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="32.092609"
-   height="29.508173"
-   viewBox="0 0 8.4911698 7.8073711"
+   width="32.092876"
+   height="29.39492"
+   viewBox="0 0 8.4912405 7.7774063"
    version="1.1"
    id="svg8"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="AuntyLangButton_1.svg"
+   sodipodi:docname="AuntyLangButton_0.svg"
    style="enable-background:new">
   <defs
      id="defs2">
@@ -56,12 +56,12 @@
        inkscape:collect="always"
        xlink:href="#linearGradient4504"
        id="linearGradient4494"
-       x1="22.408211"
-       y1="94.420876"
+       x1="22.385408"
+       y1="94.463936"
        x2="28.490929"
        y2="94.420876"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.60627067,-0.00194716,0.00210719,0.65609674,15.562229,-30.443394)" />
+       gradientTransform="matrix(0.60625156,0.00519235,-0.00561907,0.65607606,16.292115,-30.621481)" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -70,9 +70,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="9.4049727"
-     inkscape:cx="15.99293"
-     inkscape:cy="12.156642"
+     inkscape:zoom="37.619891"
+     inkscape:cx="16.608684"
+     inkscape:cy="12.313158"
      inkscape:document-units="mm"
      inkscape:current-layer="layer2"
      showgrid="true"
@@ -95,8 +95,8 @@
     <inkscape:grid
        type="xygrid"
        id="grid3371"
-       originx="-26.177737"
-       originy="-67.460313" />
+       originx="-26.18913"
+       originy="-67.460159" />
   </sodipodi:namedview>
   <metadata
      id="metadata5">
@@ -115,13 +115,14 @@
      id="layer2"
      inkscape:label="Foreground"
      style="display:inline;opacity:1"
-     transform="translate(-26.177738,-25.273986)">
+     transform="translate(-26.18913,-25.304105)">
     <g
-       id="g4863">
+       id="g5457">
       <path
-         inkscape:transform-center-y="-1.1899111"
-         inkscape:transform-center-x="0.0099462984"
-         d="m 30.452937,25.328515 4.121973,7.208376 -8.303623,-0.03445 z"
+         transform="matrix(0.9999881,-0.00487778,0.00487778,0.9999881,-0.1467151,0.14880452)"
+         inkscape:transform-center-y="-1.1970225"
+         inkscape:transform-center-x="-0.0017458767"
+         d="m 30.452937,25.358353 4.121973,7.208376 -8.303623,-0.03445 z"
          inkscape:randomized="0"
          inkscape:rounded="0"
          inkscape:flatsided="true"
@@ -129,7 +130,7 @@
          sodipodi:arg1="-1.566647"
          sodipodi:r2="2.3970702"
          sodipodi:r1="4.7941403"
-         sodipodi:cy="30.122614"
+         sodipodi:cy="30.152452"
          sodipodi:cx="30.433044"
          sodipodi:sides="3"
          id="path4162"
@@ -149,13 +150,13 @@
          sodipodi:cx="26.258137"
          sodipodi:sides="6"
          id="path4310"
-         style="opacity:1;fill:#dbdbdb;fill-opacity:1;stroke:#000000;stroke-width:0.98080522;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.98199916;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
          sodipodi:type="star" />
       <path
          sodipodi:nodetypes="ccccc"
          inkscape:connector-curvature="0"
          id="rect4485"
-         d="m 30.385285,30.434859 2.546885,-0.02123 -1.169758,2.066539 -2.59529,-8.65e-4 z"
+         d="m 30.397249,30.427106 2.546958,0.0088 -1.194012,2.052621 -2.5951,-0.0033 z"
          style="opacity:0.73699999;fill:url(#linearGradient4494);fill-opacity:1;stroke:#000000;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
       <path
          sodipodi:nodetypes="cccc"
