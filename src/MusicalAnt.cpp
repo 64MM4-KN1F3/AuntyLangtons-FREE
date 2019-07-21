@@ -832,8 +832,8 @@ struct ModuleDisplay : Widget {
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
 			e.consume(this);
 			// e.target = this;
-			initX = e.pos.x - DISPLAY_OFFSET_X;
-			initY = e.pos.y - DISPLAY_OFFSET_Y;
+			initX = e.pos.x;
+			initY = e.pos.y;
 			if((0 < initX) && (initX < DISPLAY_SIZE_XY) && (0 < initY) && (initY < DISPLAY_SIZE_XY)) {
 				currentlyTurningOn = !module->isCellOnByDisplayPos(initX, initY);
 				module->setCellOnByDisplayPos(initX, initY, currentlyTurningOn);
@@ -879,14 +879,14 @@ struct ModuleDisplay : Widget {
 				if(module->cells[i]){
 					nvgFillColor(vg, ((random::uniform() < 0.5) ? nvgRGBA(0,255,0,PIXEL_BRIGHTNESS) : nvgRGBA(0,255,0,PIXEL_BRIGHTNESS+5)));
 					nvgBeginPath(vg);
-					nvgRect(vg, x*pixelSize + DISPLAY_OFFSET_X, y*pixelSize + DISPLAY_OFFSET_Y, pixelSize, pixelSize);
+					nvgRect(vg, x*pixelSize, y*pixelSize, pixelSize, pixelSize);
 					nvgFill(vg);
 				}
 				if(i == shadowAntCell){
 					if(!module->params[MusicalAnt::SHADOW_ANT_ON].getValue()){
 						nvgFillColor(vg, nvgRGBA(0,0,255,255));
 						nvgBeginPath(vg);
-						nvgRect(vg, x*pixelSize + DISPLAY_OFFSET_X, y*pixelSize + DISPLAY_OFFSET_Y, pixelSize, pixelSize);
+						nvgRect(vg, x*pixelSize, y*pixelSize, pixelSize, pixelSize);
 						nvgFill(vg);
 					}
 				}
@@ -906,31 +906,31 @@ struct ModuleDisplay : Widget {
 				}
 				nvgFillColor(vg, ((random::uniform() < 0.5) ? nvgRGBA(0,0,0,0) : nvgRGBA(255,255,255,8)));
 				nvgBeginPath(vg);
-				nvgRect(vg, x*fuzzPixelSize + DISPLAY_OFFSET_X, y*fuzzPixelSize + DISPLAY_OFFSET_Y, fuzzPixelSize, fuzzPixelSize);
+				nvgRect(vg, x*fuzzPixelSize, y*fuzzPixelSize, fuzzPixelSize, fuzzPixelSize);
 				nvgFill(vg);
 			}
 
 			// Draw screen reflection over display
 			nvgFillColor(vg, nvgRGBA(255,255,255,7));
 			nvgBeginPath(vg);
-			nvgRect(vg, x*pixelSize + DISPLAY_OFFSET_X, y*pixelSize + DISPLAY_OFFSET_Y, pixelSize, pixelSize);
-			nvgCircle(vg, 68 + DISPLAY_OFFSET_X, 54 + DISPLAY_OFFSET_Y, 60);
+			nvgRect(vg, x*pixelSize, y*pixelSize, pixelSize, pixelSize);
+			nvgCircle(vg, 68, 54, 60);
 			nvgFill(vg);
 
 			nvgBeginPath(vg);
-			nvgRect(vg, x*pixelSize + DISPLAY_OFFSET_X, y*pixelSize + DISPLAY_OFFSET_Y, pixelSize, pixelSize);
-			nvgCircle(vg, 77 + DISPLAY_OFFSET_X, 48 + DISPLAY_OFFSET_Y, 40);
+			nvgRect(vg, x*pixelSize, y*pixelSize, pixelSize, pixelSize);
+			nvgCircle(vg, 77, 48, 40);
 			nvgFill(vg);
 
 			nvgBeginPath(vg);
-			nvgRect(vg, x*pixelSize + DISPLAY_OFFSET_X, y*pixelSize + DISPLAY_OFFSET_Y, pixelSize, pixelSize);
-			nvgCircle(vg, 82 + DISPLAY_OFFSET_X, 43 + DISPLAY_OFFSET_Y, 20);
+			nvgRect(vg, x*pixelSize, y*pixelSize, pixelSize, pixelSize);
+			nvgCircle(vg, 82, 43, 20);
 			nvgFill(vg);
 
 			nvgFillColor(vg, nvgRGBA(255,255,255,5));
 			nvgBeginPath(vg);
-			nvgRect(vg, x*pixelSize + DISPLAY_OFFSET_X, y*pixelSize + DISPLAY_OFFSET_Y, pixelSize, pixelSize);
-			nvgCircle(vg, 87 + DISPLAY_OFFSET_X, 40 + DISPLAY_OFFSET_Y, 8);
+			nvgRect(vg, x*pixelSize, y*pixelSize, pixelSize, pixelSize);
+			nvgCircle(vg, 87, 40, 8);
 			nvgFill(vg);
 
 			nvgFillColor(vg, nvgRGBA(0,0,0,0));
