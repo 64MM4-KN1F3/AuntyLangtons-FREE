@@ -11,7 +11,7 @@ using namespace std;
 #define X_POSITION 0
 #define Y_POSITION 1
 #define DIRECTION 3
-#define PIXEL_BRIGHTNESS 125
+#define PIXEL_BRIGHTNESS 140
 
 /*
 Big thanks to..
@@ -941,7 +941,7 @@ struct ModuleDisplay : Widget {
 
 };
 
-struct InternalTextLabel : TransparentWidget
+struct ParameterFeedbackDisplay : TransparentWidget
 {
 
   MusicalAnt *module;
@@ -953,7 +953,7 @@ struct InternalTextLabel : TransparentWidget
   NVGcolor color;
   std::shared_ptr<Font> font;
 
-  InternalTextLabel( MusicalAnt *module, Vec pos, int px, int al, NVGcolor col ) : pxSize( px ), align( al ), color( col )
+  ParameterFeedbackDisplay( MusicalAnt *module, Vec pos, int px, int al, NVGcolor col ) : pxSize( px ), align( al ), color( col )
   {
   	this->module = module;
     box.pos = pos;
@@ -1027,31 +1027,31 @@ struct MusicalAntWidget : ModuleWidget {
 		addParam(createParam<RoundBlackKnob>(Vec(143.9, 177), module, MusicalAnt::CLOCK_PARAM));
 
 		// Ant X panel widgets		
-		addParam(createParam<RoundSmallBlackKnob>(Vec(52.4, 218.5), module, MusicalAnt::OCTAVE_KNOB_PARAM_X));
-		addParam(createParam<RoundSmallBlackKnob>(Vec(76.9, 218.5), module, MusicalAnt::NOTE_KNOB_PARAM_X));
-		addParam(createParam<RoundSmallBlackKnob>(Vec(101.4, 218.5), module, MusicalAnt::SCALE_KNOB_PARAM_X));
+		addParam(createParam<RoundSmallBlackKnobSnap>(Vec(52.4, 218.5), module, MusicalAnt::OCTAVE_KNOB_PARAM_X));
+		addParam(createParam<RoundSmallBlackKnobSnap>(Vec(76.9, 218.5), module, MusicalAnt::NOTE_KNOB_PARAM_X));
+		addParam(createParam<RoundSmallBlackKnobSnap>(Vec(101.4, 218.5), module, MusicalAnt::SCALE_KNOB_PARAM_X));
 		addOutput(createOutput<PJ301MPort>(Vec(148.9, 218.5), module, MusicalAnt::VOCT_OUTPUT_X));
 		// Invert X V/Oct output
 		addParam(createParam<CKSS>(Vec(127.5, 219.75), module, MusicalAnt::VOCT_INVERT_X));
 		
 		// Ant Y panel widgets
-		addParam(createParam<RoundSmallBlackKnob>(Vec(52.4, 254), module, MusicalAnt::OCTAVE_KNOB_PARAM_Y));
-		addParam(createParam<RoundSmallBlackKnob>(Vec(76.9, 254), module, MusicalAnt::NOTE_KNOB_PARAM_Y));
-		addParam(createParam<RoundSmallBlackKnob>(Vec(101.4, 254), module, MusicalAnt::SCALE_KNOB_PARAM_Y));
+		addParam(createParam<RoundSmallBlackKnobSnap>(Vec(52.4, 254), module, MusicalAnt::OCTAVE_KNOB_PARAM_Y));
+		addParam(createParam<RoundSmallBlackKnobSnap>(Vec(76.9, 254), module, MusicalAnt::NOTE_KNOB_PARAM_Y));
+		addParam(createParam<RoundSmallBlackKnobSnap>(Vec(101.4, 254), module, MusicalAnt::SCALE_KNOB_PARAM_Y));
 		addOutput(createOutput<PJ301MPort>(Vec(148.9, 254), module, MusicalAnt::VOCT_OUTPUT_Y));
 		// Invert Y V/Oct output
 		addParam(createParam<CKSS>(Vec(127.5, 255.25), module, MusicalAnt::VOCT_INVERT_Y));
 
 		// Shadow Ant X panel widgets
-		addParam(createParam<RoundSmallBlackKnob>(Vec(70.9, 289.5), module, MusicalAnt::OCTAVE_KNOB_PARAM_SHADOW_X));
-		addParam(createParam<RoundSmallBlackKnob>(Vec(95.4, 289.5), module, MusicalAnt::NOTE_KNOB_PARAM_SHADOW_X));
-		addParam(createParam<RoundSmallBlackKnob>(Vec(119.9, 289.5), module, MusicalAnt::SCALE_KNOB_PARAM_SHADOW_X));
+		addParam(createParam<RoundSmallBlackKnobSnap>(Vec(70.9, 289.5), module, MusicalAnt::OCTAVE_KNOB_PARAM_SHADOW_X));
+		addParam(createParam<RoundSmallBlackKnobSnap>(Vec(95.4, 289.5), module, MusicalAnt::NOTE_KNOB_PARAM_SHADOW_X));
+		addParam(createParam<RoundSmallBlackKnobSnap>(Vec(119.9, 289.5), module, MusicalAnt::SCALE_KNOB_PARAM_SHADOW_X));
 		addOutput(createOutput<PJ301MPort>(Vec(148.9, 289.5), module, MusicalAnt::VOCT_OUTPUT_SHADOW_X));
 
 		// Shadow Ant Y panel widgets
-		addParam(createParam<RoundSmallBlackKnob>(Vec(70.9, 325), module, MusicalAnt::OCTAVE_KNOB_PARAM_SHADOW_Y));
-		addParam(createParam<RoundSmallBlackKnob>(Vec(95.4, 325), module, MusicalAnt::NOTE_KNOB_PARAM_SHADOW_Y));
-		addParam(createParam<RoundSmallBlackKnob>(Vec(119.9, 325), module, MusicalAnt::SCALE_KNOB_PARAM_SHADOW_Y));
+		addParam(createParam<RoundSmallBlackKnobSnap>(Vec(70.9, 325), module, MusicalAnt::OCTAVE_KNOB_PARAM_SHADOW_Y));
+		addParam(createParam<RoundSmallBlackKnobSnap>(Vec(95.4, 325), module, MusicalAnt::NOTE_KNOB_PARAM_SHADOW_Y));
+		addParam(createParam<RoundSmallBlackKnobSnap>(Vec(119.9, 325), module, MusicalAnt::SCALE_KNOB_PARAM_SHADOW_Y));
 		addOutput(createOutput<PJ301MPort>(Vec(148.9, 325), module, MusicalAnt::VOCT_OUTPUT_SHADOW_Y));
 
 		
@@ -1076,17 +1076,17 @@ struct MusicalAntWidget : ModuleWidget {
 
 		// Loop length knob
 
-		addParam(createParam<RoundSmallBlackKnob>(Vec(23.65, 306.5), module, MusicalAnt::LOOP_LENGTH));
+		addParam(createParam<RoundSmallBlackKnobSnap>(Vec(23.65, 306.5), module, MusicalAnt::LOOP_LENGTH));
 
 		// Loop length text
 
 		//addChild( new LoopLengthTextLabel(module, Vec(253.55, 80), 20, 1, nvgRGBA(255,0,0,255) ) );
 
 		// Resolution/SideLength Knob
-		addParam(createParam<RoundSmallBlackKnob>(Vec(23.9, 218.5), module, MusicalAnt::SIDE_LENGTH_PARAM));
+		addParam(createParam<RoundSmallBlackKnobSnap>(Vec(23.9, 218.5), module, MusicalAnt::SIDE_LENGTH_PARAM));
 
 		// Skip Knob
-		addParam(createParam<RoundSmallBlackKnob>(Vec(23.9, 254), module, MusicalAnt::SKIP_PARAM));
+		addParam(createParam<RoundSmallBlackKnobSnap>(Vec(23.9, 254), module, MusicalAnt::SKIP_PARAM));
 
 		// AuntyLangButton!
 		addParam(createParam<AuntyLangButton>(Vec(83.5, 352), module, MusicalAnt::AUNTYLANGBUTTON_PARAM));
@@ -1095,7 +1095,8 @@ struct MusicalAntWidget : ModuleWidget {
 
 		// Testing text
 
-		addChild( new InternalTextLabel(module, Vec(13.5, 345), 10, 1, nvgRGBA(255,0,0,255) ) );
+		addChild( new Paramet
+			(module, Vec(13.5, 345), 10, 1, nvgRGBA(255,0,0,255) ) );
 
 		// Create display
 		ModuleDisplay *display = new ModuleDisplay();
