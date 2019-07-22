@@ -983,12 +983,14 @@ struct LoopLengthTextLabel : TransparentWidget
   int pxSize;
   int align;
   NVGcolor color;
+  std::shared_ptr<Font> font;
 
   LoopLengthTextLabel( MusicalAnt *module, Vec pos, int px, int al, NVGcolor col ) : pxSize( px ), align( al ), color( col )
   {
   	this->module = module;
     box.pos = pos;
     color = col;
+    font = APP->window->loadFont(asset::plugin(pluginInstance, "res/DSEG7ClassicMini-Regular.ttf"));
   }
 
   void draw( NVGcontext *vg ) {
@@ -997,7 +999,7 @@ struct LoopLengthTextLabel : TransparentWidget
 	  	text_label = std::to_string(module->loopLength);
 
 	    nvgBeginPath( vg );
-	    //nvgFontFaceId( vg, memFont );
+	    nvgFontFaceId(vg, font->handle);
 	    nvgFontSize( vg, pxSize );
 	    nvgFillColor( vg, color );
 	    nvgTextAlign( vg, align );
@@ -1076,7 +1078,7 @@ struct MusicalAntWidget : ModuleWidget {
 
 		// Loop length text
 
-		//addChild( new LoopLengthTextLabel(module, Vec(253.55, 80), 20, 1, nvgRGBA(255,0,0,255) ) );
+		addChild( new LoopLengthTextLabel(module, Vec(253.55, 80), 20, 1, nvgRGBA(255,0,0,255) ) );
 
 		// Resolution/SideLength Knob
 		addParam(createParam<RoundSmallBlackKnob>(Vec(23.9, 218.5), module, MusicalAnt::SIDE_LENGTH_PARAM));
