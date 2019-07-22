@@ -1089,7 +1089,7 @@ struct MusicalAntWidget : ModuleWidget {
 		addParam(createParam<RoundSmallBlackKnob>(Vec(23.9, 254), module, MusicalAnt::SKIP_PARAM));
 
 		// AuntyLangButton!
-		addParam(createParam<AuntyLangButton>(Vec(82, 348), module, MusicalAnt::AUNTYLANGBUTTON_PARAM));
+		addParam(createParam<AuntyLangButton>(Vec(83.5, 352), module, MusicalAnt::AUNTYLANGBUTTON_PARAM));
 
 
 
