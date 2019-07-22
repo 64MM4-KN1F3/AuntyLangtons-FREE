@@ -951,12 +951,14 @@ struct InternalTextLabel : TransparentWidget
   int pxSize;
   int align;
   NVGcolor color;
+  std::shared_ptr<Font> font;
 
   InternalTextLabel( MusicalAnt *module, Vec pos, int px, int al, NVGcolor col ) : pxSize( px ), align( al ), color( col )
   {
   	this->module = module;
     box.pos = pos;
     color = col;
+    font = APP->window->loadFont(asset::plugin(pluginInstance, "res/DSEG7ClassicMini-Regular.ttf"));
   }
 
   void draw( NVGcontext *vg ) {
@@ -964,7 +966,7 @@ struct InternalTextLabel : TransparentWidget
 	  	text_label = "Ant: " + std::to_string(module->index) + ", Shadow: " + std::to_string(module->shadowIndex);
 
 	    nvgBeginPath( vg );
-	    //nvgFontFaceId( vg, memFont );
+	    nvgFontFaceId(vg, font->handle);
 	    nvgFontSize( vg, pxSize );
 	    nvgFillColor( vg, color );
 	    nvgTextAlign( vg, align );
