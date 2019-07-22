@@ -12,8 +12,8 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="32.092876"
-   height="29.39492"
-   viewBox="0 0 8.4912405 7.7774063"
+   height="30.929958"
+   viewBox="0 0 8.4912405 8.1835518"
    version="1.1"
    id="svg8"
    inkscape:version="0.91 r13725"
@@ -71,8 +71,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="6.65032"
-     inkscape:cx="20.060761"
-     inkscape:cy="17.929108"
+     inkscape:cx="-8.0581885"
+     inkscape:cy="19.464145"
      inkscape:document-units="mm"
      inkscape:current-layer="layer2"
      showgrid="true"
@@ -96,7 +96,7 @@
        type="xygrid"
        id="grid3371"
        originx="-26.18913"
-       originy="-67.460159" />
+       originy="-67.054014" />
   </sodipodi:namedview>
   <metadata
      id="metadata5">
@@ -150,7 +150,7 @@
          sodipodi:cx="26.258137"
          sodipodi:sides="6"
          id="path4310"
-         style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.72787358;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.72787356;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
          sodipodi:type="star" />
       <path
          sodipodi:nodetypes="ccccc"

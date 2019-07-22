@@ -11,7 +11,7 @@ using namespace std;
 #define X_POSITION 0
 #define Y_POSITION 1
 #define DIRECTION 3
-#define PIXEL_BRIGHTNESS 150
+#define PIXEL_BRIGHTNESS 125
 
 /*
 Big thanks to..
@@ -1072,7 +1072,7 @@ struct MusicalAntWidget : ModuleWidget {
 
 		// Loop length knob
 
-		addParam(createParam<RoundSmallBlackKnob>(Vec(23.65, 305), module, MusicalAnt::LOOP_LENGTH));
+		addParam(createParam<RoundSmallBlackKnob>(Vec(23.65, 306.5), module, MusicalAnt::LOOP_LENGTH));
 
 		// Loop length text
 
@@ -1085,13 +1085,13 @@ struct MusicalAntWidget : ModuleWidget {
 		addParam(createParam<RoundSmallBlackKnob>(Vec(23.9, 254), module, MusicalAnt::SKIP_PARAM));
 
 		// AuntyLangButton!
-		addParam(createParam<AuntyLangButton>(Vec(85, 348), module, MusicalAnt::AUNTYLANGBUTTON_PARAM));
+		addParam(createParam<AuntyLangButton>(Vec(82.25, 348), module, MusicalAnt::AUNTYLANGBUTTON_PARAM));
 
 
 
 		// Testing text
 
-		addChild( new InternalTextLabel(module, Vec(13.5, 345), 10, 1, nvgRGBA(255,0,0,255) ) );
+		//addChild( new InternalTextLabel(module, Vec(13.5, 345), 10, 1, nvgRGBA(255,0,0,255) ) );
 
 		// Create display
 		ModuleDisplay *display = new ModuleDisplay();
