@@ -1078,7 +1078,7 @@ struct MusicalAntWidget : ModuleWidget {
 
 		// Loop length text
 
-		addChild( new LoopLengthTextLabel(module, Vec(253.55, 80), 20, 1, nvgRGBA(255,0,0,255) ) );
+		//addChild( new LoopLengthTextLabel(module, Vec(253.55, 80), 20, 1, nvgRGBA(255,0,0,255) ) );
 
 		// Resolution/SideLength Knob
 		addParam(createParam<RoundSmallBlackKnob>(Vec(23.9, 218.5), module, MusicalAnt::SIDE_LENGTH_PARAM));
@@ -1087,13 +1087,13 @@ struct MusicalAntWidget : ModuleWidget {
 		addParam(createParam<RoundSmallBlackKnob>(Vec(23.9, 254), module, MusicalAnt::SKIP_PARAM));
 
 		// AuntyLangButton!
-		addParam(createParam<AuntyLangButton>(Vec(82.25, 348), module, MusicalAnt::AUNTYLANGBUTTON_PARAM));
+		addParam(createParam<AuntyLangButton>(Vec(82, 348), module, MusicalAnt::AUNTYLANGBUTTON_PARAM));
 
 
 
 		// Testing text
 
-		//addChild( new InternalTextLabel(module, Vec(13.5, 345), 10, 1, nvgRGBA(255,0,0,255) ) );
+		addChild( new InternalTextLabel(module, Vec(13.5, 345), 10, 1, nvgRGBA(255,0,0,255) ) );
 
 		// Create display
 		ModuleDisplay *display = new ModuleDisplay();
