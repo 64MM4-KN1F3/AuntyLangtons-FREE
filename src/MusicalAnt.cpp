@@ -1020,12 +1020,21 @@ struct MusicalAntWidget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
+		// Testing text
+
+		//addChild( new ParameterFeedbackDisplay(module, Vec(13.5, 345), 10, 1, nvgRGBA(255,0,0,255) ) );
+		CenteredLabel* const testLabel = new CenteredLabel;
+		testLabel->box.pos = Vec(75, 183);
+		testLabel->text = "120 BPM";
+
 		addParam(createParam<RoundBlackKnob>(Vec(143.9, 177), module, MusicalAnt::CLOCK_PARAM));
 
-		// Ant X panel widgets		
-		addParam(createParam<RoundSmallBlackKnobSnap>(Vec(52.4, 218.5), module, MusicalAnt::OCTAVE_KNOB_PARAM_X));
-		addParam(createParam<RoundSmallBlackKnobSnap>(Vec(76.9, 218.5), module, MusicalAnt::NOTE_KNOB_PARAM_X));
-		addParam(createParam<RoundSmallBlackKnobSnap>(Vec(101.4, 218.5), module, MusicalAnt::SCALE_KNOB_PARAM_X));
+		// Ant X panel widgets
+		//addParam(createParam<RoundSmallBlackKnobSnap>(Vec(52.4, 218.5), module, MusicalAnt::OCTAVE_KNOB_PARAM_X));
+		RoundSmallBlackKnobSnap *octaveKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(52.4, 218.5), module, MusicalAnt::OCTAVE_KNOB_PARAM_X));
+		RoundSmallBlackKnobSnap *noteKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(76.9, 218.5), module, MusicalAnt::NOTE_KNOB_PARAM_X));
+		RoundSmallBlackKnobSnap *scaleKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(101.4, 218.5), module, MusicalAnt::SCALE_KNOB_PARAM_X));
+		//addParam(createParam<RoundSmallBlackKnobSnap>(Vec(101.4, 218.5), module, MusicalAnt::SCALE_KNOB_PARAM_X));
 		addOutput(createOutput<PJ301MPort>(Vec(148.9, 218.5), module, MusicalAnt::VOCT_OUTPUT_X));
 		// Invert X V/Oct output
 		addParam(createParam<CKSS>(Vec(127.5, 219.75), module, MusicalAnt::VOCT_INVERT_X));
@@ -1073,7 +1082,7 @@ struct MusicalAntWidget : ModuleWidget {
 		// Loop length knob
 
 		//addParam(createParam<RoundSmallBlackKnobSnap>(Vec(23.65, 306.5), module, MusicalAnt::LOOP_LENGTH));
-		RoundSmallBlackKnobSnap *loopKnob = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(17, 60), module, MusicalAnt::LOOP_LENGTH));
+		RoundSmallBlackKnobSnap *loopLengthKnob = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(23.65, 306.5), module, MusicalAnt::LOOP_LENGTH));
 		// Loop length text
 
 		//addChild( new LoopLengthTextLabel(module, Vec(253.55, 80), 20, 1, nvgRGBA(255,0,0,255) ) );
@@ -1086,20 +1095,19 @@ struct MusicalAntWidget : ModuleWidget {
 
 		// AuntyLangButton!
 		addParam(createParam<AuntyLangButton>(Vec(83.5, 352), module, MusicalAnt::AUNTYLANGBUTTON_PARAM));
-
-
-
-		// Testing text
-
-		//addChild( new ParameterFeedbackDisplay(module, Vec(13.5, 345), 10, 1, nvgRGBA(255,0,0,255) ) );
-		CenteredLabel* const testLabel = new CenteredLabel;
-		testLabel->box.pos = Vec(15, 50);
-		testLabel->text = "120 BPM";
+		
 		if(module){
-			loopKnob->connectLabel(testLabel, module);
+			octaveKnobX->connectLabel(testLabel, module);
+			loopLengthKnob->connectLabel(testLabel, module);
+			noteKnobX->connectLabel(testLabel, module);
+			scaleKnobX->connectLabel(testLabel, module);
 		}
 		addChild(testLabel);
-		addParam(loopKnob);
+
+		addParam(octaveKnobX);
+		addParam(noteKnobX);
+		addParam(scaleKnobX);
+		addParam(loopLengthKnob);
 
 		// Create display
 		ModuleDisplay *display = new ModuleDisplay();

@@ -27,13 +27,17 @@ extern Model *modelBottleRocket;
 struct CenteredLabel : Widget {
 	std::string text;
 	int fontSize;
-	CenteredLabel(int _fontSize = 12) {
+	std::shared_ptr<Font> font;
+
+	CenteredLabel(int _fontSize = 11) {
+		font = APP->window->loadFont(asset::plugin(pluginInstance, "res/DSEG7ClassicMini-Regular.ttf"));
 		fontSize = _fontSize;
 		box.size.y = BND_WIDGET_HEIGHT;
 	}
 	void draw(const DrawArgs &args) override {
 		nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
-		nvgFillColor(args.vg, nvgRGB(25, 150, 252));
+		nvgFontFaceId(args.vg, font->handle);
+		nvgFillColor(args.vg, nvgRGB(0, 0, 0));
 		nvgFontSize(args.vg, fontSize);
 		nvgText(args.vg, box.pos.x, box.pos.y, text.c_str(), NULL);
 	}
@@ -66,8 +70,8 @@ struct RoundSmallBlackKnobSnap : RoundSmallBlackKnob {
 	}
 
     std::string formatCurrentValue() {
-		if(paramQuantity != NULL){
-			return std::to_string(static_cast<unsigned int>(paramQuantity->getValue()));
+		if(paramQuantity != NULL) {
+			return std::to_string(static_cast<unsigned int>(paramQuantity->getDisplayValue()));
 		}
 		return "";
 	}
