@@ -15,8 +15,8 @@ using namespace std;
 
 /*
 Big thanks to..
-Andrew Belt https://vcvrack.com/
-Jeremy Wentworth http://jeremywentworth.com
+Andrew Belt of VCV Rack - https://vcvrack.com/
+Jeremy Wentworth of JW Modules - http://jeremywentworth.com
 .. for providing the open source structure to build upon.
 */
 
@@ -852,10 +852,6 @@ struct ModuleDisplay : Widget {
 		module->setCellOnByDisplayPos(initX+(newDragX-dragX), initY+(newDragY-dragY), currentlyTurningOn);
 	}
 
-	void onDragEnd(const event::DragEnd &e) override {
-		cout << "onDragEnd called.\n";
-	}
-
 	void draw(NVGcontext *vg) override {
 
 		int x = 0;
@@ -1076,8 +1072,8 @@ struct MusicalAntWidget : ModuleWidget {
 
 		// Loop length knob
 
-		addParam(createParam<RoundSmallBlackKnobSnap>(Vec(23.65, 306.5), module, MusicalAnt::LOOP_LENGTH));
-
+		//addParam(createParam<RoundSmallBlackKnobSnap>(Vec(23.65, 306.5), module, MusicalAnt::LOOP_LENGTH));
+		RoundSmallBlackKnobSnap *loopKnob = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(17, 60), module, MusicalAnt::LOOP_LENGTH));
 		// Loop length text
 
 		//addChild( new LoopLengthTextLabel(module, Vec(253.55, 80), 20, 1, nvgRGBA(255,0,0,255) ) );
@@ -1095,8 +1091,15 @@ struct MusicalAntWidget : ModuleWidget {
 
 		// Testing text
 
-		addChild( new Paramet
-			(module, Vec(13.5, 345), 10, 1, nvgRGBA(255,0,0,255) ) );
+		//addChild( new ParameterFeedbackDisplay(module, Vec(13.5, 345), 10, 1, nvgRGBA(255,0,0,255) ) );
+		CenteredLabel* const testLabel = new CenteredLabel;
+		testLabel->box.pos = Vec(15, 50);
+		testLabel->text = "120 BPM";
+		if(module){
+			loopKnob->connectLabel(testLabel, module);
+		}
+		addChild(testLabel);
+		addParam(loopKnob);
 
 		// Create display
 		ModuleDisplay *display = new ModuleDisplay();

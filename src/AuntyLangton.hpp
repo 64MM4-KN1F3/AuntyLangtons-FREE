@@ -24,7 +24,7 @@ extern Model *modelBottleRocket;
 
 ////////////////////////////////////////////// LABELS //////////////////////////////////////////////
 
-/*struct CenteredLabel : Widget {
+struct CenteredLabel : Widget {
 	std::string text;
 	int fontSize;
 	CenteredLabel(int _fontSize = 12) {
@@ -37,14 +37,41 @@ extern Model *modelBottleRocket;
 		nvgFontSize(args.vg, fontSize);
 		nvgText(args.vg, box.pos.x, box.pos.y, text.c_str(), NULL);
 	}
-};*/
+};
 
 ////////////////////////////////////////////// KNOBS //////////////////////////////////////////////
 
 struct RoundSmallBlackKnobSnap : RoundSmallBlackKnob {
+	CenteredLabel* linkedLabel = NULL;
+	Module* linkedModule = NULL;
+
     RoundSmallBlackKnobSnap() {
+        paramQuantity = NULL;
         snap = true;
     }
+
+    void connectLabel(CenteredLabel* label, Module* module) {
+		linkedLabel = label;
+		linkedModule = module;
+		if (linkedModule && linkedLabel) {
+			linkedLabel->text = formatCurrentValue();
+		}
+	}
+
+	void onChange(const event::Change &e) override {
+		RoundSmallBlackKnob::onChange(e);
+		if (linkedModule && linkedLabel) {
+			linkedLabel->text = formatCurrentValue();
+		}
+	}
+
+    std::string formatCurrentValue() {
+		if(paramQuantity != NULL){
+			return std::to_string(static_cast<unsigned int>(paramQuantity->getValue()));
+		}
+		return "";
+	}
+
 };
 
 ////////////////////////////////////////////// BUTTONS //////////////////////////////////////////////
