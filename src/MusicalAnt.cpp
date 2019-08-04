@@ -637,6 +637,34 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 		cout << "\n@nt X VOCT OUTPUT: " << std::to_string(params[VOCT_INVERT_X].getValue() ? closestVoltageForX(tempSideLength - getAntX()) : closestVoltageForX(getAntX()));
 		cout << "\n@nt Y VOCT OUTPUT: " << std::to_string(params[VOCT_INVERT_Y].getValue() ? closestVoltageForY(tempSideLength - getAntY()) : closestVoltageForY(getAntY()));
 
+		if(index > 1) {
+			int lastAntDirection = antVectorHistory[index - 1][DIRECTION];
+			int currentAntDirection = getAntDirection();
+			//cout << "\n###########################";
+			//cout << "\n@#$@#$ LAST ANT DIR: " << to_string(lastAntDirection);
+			//cout << "\n@#$@#$ CURR ANT DIR: " << to_string(currentAntDirection);
+			//cout << "\n###########################";
+
+			int leftTurn = wrap(currDirection - 90, 0, 359);
+			int rightTurn = wrap(currDirection + 90, 0, 359);
+
+			if(currentAntDirection != lastAntDirection) {
+				if (currentAntDirection == leftTurn) {
+					//Ant is turning left
+					cout << "\nANT TURNING LEFT!";
+					outputs[GATE_OUTPUT_X].setVoltage(outputs[GATE_OUTPUT_X].getVoltage() == 0.0f ? 10.0f : 0.0f);
+				}
+				else if (currentAntDirection == rightTurn) {
+					//Ant is turning right
+					cout << "\nANT TURNING RIGHT!";
+					outputs[GATE_OUTPUT_Y].setVoltage(outputs[GATE_OUTPUT_Y].getVoltage() == 0.0f ? 10.0f : 0.0f);
+				}
+				else {
+					//Ant is off the rails
+					cout << "BIG PROBLEM!: Ant is of the rails!!";
+				}
+			}
+		}
 
 	}
 
@@ -781,21 +809,7 @@ void MusicalAnt::process(const ProcessArgs &args) {
 				wayBackMachine(loopLength);
 			}
 
-			if(index > 1) {
-				int *lastAntDirection = antVectorHistory[index - 1];
-				int currentAntDirection = getAntDirection();
-				cout << "\n###########################";
-				cout << "\n@#$@#$ LAST ANT DIR: " << to_string(lastAntDirection[2]);
-				cout << "\n@#$@#$ CURR ANT DIR: " << to_string(currentAntDirection);
-				cout << "\n###########################";
-
-				/*if (getAntX() != getLastAntX()) {
-							outputs[GATE_OUTPUT_X].setVoltage(gateOut);
-				}
-				if (getAntY() != getLastAntY()) {
-							outputs[GATE_OUTPUT_Y].setVoltage(gateOut);
-				}*/
-			}
+			
 	}
 
 	// TODO Fix up this var below. May not be needed, or at least needs refactoring
