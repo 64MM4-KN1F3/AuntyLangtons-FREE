@@ -1,5 +1,6 @@
 #include "AuntyLangton.hpp"
 #include <iostream>
+#include <vector>
 using namespace std;
 
 #define TOTAL_CARGO_HOLDS 6
@@ -26,18 +27,22 @@ struct BottleRocket : Module {
 	float phase = 0.0;
 	float blinkPhase = 0.0;
 	float lastInputPitch = -1.0;
-	float pitchStore[TOTAL_CARGO_HOLDS] = {-1.0, -1.0, -1.0, -1.0, -1.0, -1.0};
+	//float pitchStore[TOTAL_CARGO_HOLDS] = {-1.0, -1.0, -1.0, -1.0, -1.0, -1.0};
+	//vector<int> *v = new vector<int>(10); (TOTAL_CARGO_HOLDS, -1.0);
+	vector<float> *pitchStore;
 
 	BottleRocket() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		configParam(BottleRocket::PITCH_INPUT_PARAM, -3.0, 3.0, 0.0, "");
+		pitchStore = new vector<float>(TOTAL_CARGO_HOLDS, -1.0);
 	}
 	void process(const ProcessArgs &args) override;
 	bool fillPitchStore(float in) {
 		int i = 0;
 		for(i = 0; i < TOTAL_CARGO_HOLDS; i++) {
-			if ((pitchStore[i] != in) && (pitchStore[i] < 0)) {
-				pitchStore[i] = in;
+			if ((pitchStore->at(i) != in) && (pitchStore->at(i) < 0)) {
+				pitchStore->erase(pitchStore->begin()+i);
+				pitchStore->insert(pitchStore->begin()+i, in);
 				cout << "Just added " << in << " to pitchStore[" << i << "]\n";
 				break;
 			}
@@ -51,9 +56,7 @@ struct BottleRocket : Module {
 	}
 	void clearPitchStore() {
 		cout << "Clearing cargo hold\n";
-		for(int i = 0; i < TOTAL_CARGO_HOLDS; i++) {
-			pitchStore[i] = -1.0;
-		}
+		pitchStore->assign(TOTAL_CARGO_HOLDS, -1.0);
 	}
 	float getLastPitch() {
 		return lastInputPitch;
@@ -103,7 +106,7 @@ void BottleRocket::process(const ProcessArgs &args) {
 		cout << "H@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@RRRGH!!!!";
 			if(fillPitchStore(inputs[PITCH_INPUT].getVoltage())){
 			for(int i = 0; i < TOTAL_CARGO_HOLDS; i++) {
-				outputs[PITCH_OUTPUT + i].setVoltage(pitchStore[i]);
+				outputs[PITCH_OUTPUT + i].setVoltage(pitchStore->at(i));
 			}
 			clearPitchStore();
 			//cout << "H@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@RRRGH!!!!";
