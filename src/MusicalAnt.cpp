@@ -307,14 +307,14 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 	}
 
 	void setShadowAntPosition(int x, int y, int direction) {
-		cout << "To be assigned - setShadowAntPosition(" << x << "," << y << "," << direction << ")\n";
+		//cout << "To be assigned - setShadowAntPosition(" << x << "," << y << "," << direction << ")\n";
 
 		this->shadowAntVector.clear();
 		this->shadowAntVector.push_back(wrap(x, 0, sideLength-1));
-		this->shadowAntVector.push_back(wrap(x, 0, sideLength-1));
+		this->shadowAntVector.push_back(wrap(y, 0, sideLength-1));
 		this->shadowAntVector.push_back(wrap(direction, 0, 359));
 
-		cout << "Assigned value - shadowAntVector: " << this->shadowAntVector.at(X_POSITION) << "," << this->shadowAntVector.at(Y_POSITION) << "," << this->shadowAntVector.at(DIRECTION) << "\n";
+		//cout << "Assigned value - shadowAntVector: " << this->shadowAntVector.at(X_POSITION) << "," << this->shadowAntVector.at(Y_POSITION) << "," << this->shadowAntVector.at(DIRECTION) << "\n";
 
 		/*
 		this->shadowAntVector[X_POSITION] = wrap(x, 0, sideLength-1);
@@ -616,11 +616,6 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 
 				shadowAntVectorHistory.push_back(shadowAntVector);
 
-				cout << "myvector contains:";
-				for (unsigned i=0; i<shadowAntVectorHistory.size(); i++) {
-				    cout << ' ' << shadowAntVectorHistory.at(i);
-				}
-				cout << '\n';
 				/*shadowAntVectorHistory[historyIndex][X_POSITION] = currShadowAntPositionX;
 				shadowAntVectorHistory[historyIndex][Y_POSITION] = currShadowAntPositionY;
 				shadowAntVectorHistory[historyIndex][DIRECTION] = currShadowAntDirection;*/
@@ -658,6 +653,7 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 						}
 					}
 					setCellOn(currShadowAntPositionX, currShadowAntPositionY, !currShadowAntPositionValue);
+					//cout << "SHADOW ANT POOPING: " << (!currShadowAntPositionValue ? "GREEN" : "BLACK");
 			}
 
 			// TODO - use the commented two lines below if adding VOCT invert switches to shadow ant X and Y
