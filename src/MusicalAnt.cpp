@@ -152,7 +152,7 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 	//int* shadowAntVector = new int[3];
 	vector<int> shadowAntVector;
 	vector< vector<int> > shadowAntVectorHistory;
-	int historyBufferUsage = 0;
+	//int historyBufferUsage = 0;
 	int fibo[7] = {8, 13, 21, 34, 55, 89, 144}; // short for Fibonacci (cause I forgot that's why I named it that).
 
 	int lastAntX, lastAntY;
@@ -209,7 +209,7 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 		lastAntY = 0;
 		index = 0;
 		shadowIndex = 0;
-		historyBufferUsage = 0;
+		//historyBufferUsage = 0;
 
 		/*for (int x = 0; x < HISTORY_AMOUNT; x++) {
   			cellsHistory[x] = new bool[CELLS];
@@ -534,8 +534,13 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 		//*cellsHistory[historyIndex] = new bool[CELLS];
 		//cout << "\nCellHistoryIndex: " << historyIndex;
 		// Record current cell state to historical snapshot
-		historyBufferUsage = std::min(historyBufferUsage + 1, HISTORY_AMOUNT - 1);
-		cout << "\nHistoryBufferUsage: " << historyBufferUsage;
+		//historyBufferUsage = std::min(historyBufferUsage + 1, HISTORY_AMOUNT - 1);
+		
+		//TESTING
+		if (antVectorHistory.size() != cellsHistory.size()) {
+			cout << "\nAntVectoryHistory Size: " << antVectorHistory.size();
+			cout << "\nCellsHistory Size: " << cellsHistory.size();
+		}
 		//historyBufferUsage = historyBufferUsage + 1;
 
 		/*for(int t = 0; t < CELLS; t++){
@@ -544,7 +549,7 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 		}*/
 
 		// Add push to back if under history amount, replace using "at.()" if not
-		if (index < HISTORY_AMOUNT) {
+		if (cellsHistory.size() < HISTORY_AMOUNT) {
 			cellsHistory.push_back(cells);
 		}
 		else {
@@ -732,7 +737,8 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 
 	void wayBackMachine(int stepsBack) {
 		int currIndex = index;
-		if(stepsBack > historyBufferUsage){
+		int historyBufferUsage = cellsHistory.size();
+		if(stepsBack > historyBufferUsage) {
 			stepsBack = historyBufferUsage;
 		}
 		if(index < stepsBack) {
