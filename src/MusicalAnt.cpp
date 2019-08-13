@@ -157,8 +157,10 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 
 	int lastAntX, lastAntY;
 
-	bool* cells = new bool[CELLS];
-	bool** cellsHistory = new bool*[HISTORY_AMOUNT];
+	//bool* cells = new bool[CELLS];
+	vector<bool> cells;
+	//bool** cellsHistory = new bool*[HISTORY_AMOUNT];
+	vector< vector<bool> > cellsHistory;
 
 
 	MusicalAnt() {
@@ -188,8 +190,8 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 	}
 
 	~MusicalAnt() {
-		delete [] cells;
-		delete [] cellsHistory;
+		//delete [] cells;
+		//delete [] cellsHistory;
 		//delete [] antVector;
 		//delete [] *antVectorHistory;
 		//delete [] shadowAntVector;
@@ -209,9 +211,10 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 		shadowIndex = 0;
 		historyBufferUsage = 0;
 
-		for (int x = 0; x < HISTORY_AMOUNT; x++) {
+		/*for (int x = 0; x < HISTORY_AMOUNT; x++) {
   			cellsHistory[x] = new bool[CELLS];
-		}
+		}*/
+		cellsHistory.clear();
 		antVectorHistory.clear();
 		shadowAntVectorHistory.clear();
 
@@ -223,7 +226,7 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 		
 		json_t *cellsJ = json_array();
 		for (int i = 0; i < CELLS; i++) {
-			json_t *cellJ = json_integer((int) cells[i]);
+			json_t *cellJ = json_integer((int) cells.at(i));
 			json_array_append_new(cellsJ, cellJ);
 		}
 		json_object_set_new(rootJ, "cells", cellsJ);
@@ -355,8 +358,15 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 	void process(const ProcessArgs &args) override;
 
 	void clearCells() {
-		for(int i=0;i<CELLS;i++){
+		/*for(int i=0;i<CELLS;i++){
 			cells[i] = Logos::AL_logo_144x144[i];//false;
+		}*/
+		//TODO put logo back? ^^^
+		if (cells.size() > 0) {
+			cells.clear();
+		}
+		for(unsigned int i=0;i<CELLS;i++){
+			cells.push_back(Logos::AL_logo_144x144[i]);//false;
 		}
 		// Testing Logo
 		//std::copy(cells, cells+CELLS, Logos::AL_logo_144x144);
@@ -477,12 +487,12 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 	void setCellOn(int cellX, int cellY, bool on){
 		if(cellX >= 0 && cellX < sideLength && 
 		   cellY >=0 && cellY < sideLength){
-			cells[iFromXY(cellX, cellY)] = on;
+			cells.at(iFromXY(cellX, cellY)) = on;
 		}
 	}
 
 	bool isCellOn(int cellX, int cellY){
-		return cells[iFromXY(cellX, cellY)];
+		return cells.at(iFromXY(cellX, cellY));
 	}
 
 	void setCellOnByDisplayPos(float displayX, float displayY, bool on){
@@ -528,18 +538,27 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 		cout << "\nHistoryBufferUsage: " << historyBufferUsage;
 		//historyBufferUsage = historyBufferUsage + 1;
 
-		for(int t = 0; t < CELLS; t++){
+		/*for(int t = 0; t < CELLS; t++){
 				//cout << cellsHistory[20][t];
-				cellsHistory[historyIndex][t] = cells[t];
+				cellsHistory[historyIndex][t] = cells.at(t);
+		}*/
+
+		// Add push to back if under history amount, replace using "at.()" if not
+		if (index < HISTORY_AMOUNT) {
+			cellsHistory.push_back(cells);
+		}
+		else {
+			cellsHistory.at(historyIndex) = cells;
 		}
 
-		if (antVectorHistory.size() > HISTORY_AMOUNT) {
-			antVectorHistory.erase(antVectorHistory.begin());
+		// Add push to back if under history amount, replace using "at.()" if not
+		if (antVectorHistory.size() < HISTORY_AMOUNT) {
+			antVectorHistory.push_back(antVector);
 		}
-
-		// Record current ant vector to historical snapshot
-
-		antVectorHistory.push_back(antVector);
+		else {
+			antVectorHistory.at(historyIndex) = antVector;
+		}
+		
 
 		/*antVectorHistory[historyIndex][X_POSITION] = currPositionX;
 		antVectorHistory[historyIndex][Y_POSITION] = currPositionY;
@@ -749,7 +768,9 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 		}
 		*/
 
-		std::copy(cellsHistory[historyTarget], cellsHistory[historyTarget]+CELLS, cells);
+		//std::copy(cellsHistory[historyTarget], cellsHistory[historyTarget]+CELLS, cells);
+		cells.assign(cellsHistory[historyTarget].begin(), cellsHistory[historyTarget].begin()+CELLS); 
+
 
 		/*
 		cout << "\n---AFTER-WAY-BACK---";
@@ -879,7 +900,7 @@ void MusicalAnt::process(const ProcessArgs &args) {
 	//lights[GRID_LIGHT_OFF].value = 0.0f;
 	int numCells = sideLength*sideLength;
 	for(int i = 0; i < numCells; i++) {
-		lights[GRID_LIGHTS + i].value = (cells[i]);
+		lights[GRID_LIGHTS + i].value = (cells.at(i));
 	}
 }
 
@@ -938,7 +959,7 @@ struct ModuleDisplay : Widget {
 				}
 				
 				//nvgFillColor(vg, (module->cells[i] ? nvgRGBA(0,255,0,255) : nvgRGBA(255,0,0,255)));
-				if(module->cells[i]){
+				if(module->cells.at(i)){
 					nvgFillColor(vg, ((random::uniform() < 0.5) ? nvgRGBA(0,255,0,PIXEL_BRIGHTNESS) : nvgRGBA(0,255,0,PIXEL_BRIGHTNESS+5)));
 					nvgBeginPath(vg);
 					nvgRect(vg, x*pixelSize, y*pixelSize, pixelSize, pixelSize);

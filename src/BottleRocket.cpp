@@ -41,8 +41,7 @@ struct BottleRocket : Module {
 		int i = 0;
 		for(i = 0; i < TOTAL_CARGO_HOLDS; i++) {
 			if ((pitchStore->at(i) != in) && (pitchStore->at(i) < 0)) {
-				pitchStore->erase(pitchStore->begin()+i);
-				pitchStore->insert(pitchStore->begin()+i, in);
+				pitchStore->at(i) = in;
 				cout << "Just added " << in << " to pitchStore[" << i << "]\n";
 				break;
 			}
