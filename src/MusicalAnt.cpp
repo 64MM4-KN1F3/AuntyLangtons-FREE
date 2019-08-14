@@ -532,14 +532,15 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 		// Save last cell state
 		int historyIndex = index % HISTORY_AMOUNT;
 		//*cellsHistory[historyIndex] = new bool[CELLS];
-		//cout << "\nCellHistoryIndex: " << historyIndex;
+		cout << "\nCellHistoryIndex: " << historyIndex;
 		// Record current cell state to historical snapshot
 		//historyBufferUsage = std::min(historyBufferUsage + 1, HISTORY_AMOUNT - 1);
 		
 		//TESTING
+		cout << "\nAntVectoryHistory Size: " << antVectorHistory.size();
+		cout << "\nCellsHistory Size: " << cellsHistory.size();
 		if (antVectorHistory.size() != cellsHistory.size()) {
-			cout << "\nAntVectoryHistory Size: " << antVectorHistory.size();
-			cout << "\nCellsHistory Size: " << cellsHistory.size();
+			cout << "\nAntVectorHistory and cellsHistory are different sizes!!";
 		}
 		//historyBufferUsage = historyBufferUsage + 1;
 
@@ -553,6 +554,9 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 			cellsHistory.push_back(cells);
 		}
 		else {
+			//cellsHistory.at(historyIndex) = cells;
+			cout << "\nPossibly about to crash here on cellhistory erase and insert";
+			cout << "\nHistoryIndex: " << historyIndex << " cellsHistory.size " << cellsHistory.size();
 			cellsHistory.at(historyIndex) = cells;
 		}
 
@@ -561,6 +565,9 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 			antVectorHistory.push_back(antVector);
 		}
 		else {
+			//antVectorHistory.at(historyIndex) = antVector;
+			cout << "\nPossibly about to crash here on antVectorHistory erase and insert";
+			cout << "\nHistoryIndex: " << historyIndex << " antVectorHistory.size " << antVectorHistory.size();
 			antVectorHistory.at(historyIndex) = antVector;
 		}
 		
@@ -693,11 +700,12 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 		outputs[VOCT_OUTPUT_X].setVoltage(!params[VOCT_INVERT_X].getValue() ? closestVoltageForX(tempSideLength - getAntX()) : closestVoltageForX(getAntX()));
 		outputs[VOCT_OUTPUT_Y].setVoltage(!params[VOCT_INVERT_Y].getValue() ? closestVoltageForY(tempSideLength - getAntY()) : closestVoltageForY(getAntY()));
 		//TESTING
-		cout << "\n@nt X VOCT OUTPUT: " << std::to_string(params[VOCT_INVERT_X].getValue() ? closestVoltageForX(tempSideLength - getAntX()) : closestVoltageForX(getAntX()));
-		cout << "\n@nt Y VOCT OUTPUT: " << std::to_string(params[VOCT_INVERT_Y].getValue() ? closestVoltageForY(tempSideLength - getAntY()) : closestVoltageForY(getAntY()));
+		//cout << "\n@nt X VOCT OUTPUT: " << std::to_string(params[VOCT_INVERT_X].getValue() ? closestVoltageForX(tempSideLength - getAntX()) : closestVoltageForX(getAntX()));
+		//cout << "\n@nt Y VOCT OUTPUT: " << std::to_string(params[VOCT_INVERT_Y].getValue() ? closestVoltageForY(tempSideLength - getAntY()) : closestVoltageForY(getAntY()));
 
 		if(index > 1) {
-			int lastAntDirection = antVectorHistory[index - 1][DIRECTION];
+			int lastHistoryIndex = (index - 1) % HISTORY_AMOUNT;
+			int lastAntDirection = antVectorHistory[lastHistoryIndex][DIRECTION];
 			int currentAntDirection = getAntDirection();
 			//cout << "\n###########################";
 			//cout << "\n@#$@#$ LAST ANT DIR: " << to_string(lastAntDirection);
