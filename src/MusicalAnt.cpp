@@ -186,6 +186,13 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 		configParam(MusicalAnt::LOOP_LENGTH, 0.0f, 95.0f, 31.0, "");
 		configParam(MusicalAnt::SIDE_LENGTH_PARAM, 0.0f, 6.0f, 4.0, "");
 		configParam(MusicalAnt::SKIP_PARAM, 0.0f, 9.0f, 0.0f, "");
+		/*antVector.reserve(3);
+		shadowAntVector.reserve(3);
+		antVectorHistory.reserve(HISTORY_AMOUNT);
+		shadowAntVectorHistory.reserve(HISTORY_AMOUNT);
+		cellsHistory.reserve(HISTORY_AMOUNT);*/
+
+
 		reset();
 	}
 
@@ -200,11 +207,11 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 
 	void reset() {
 		clearCells();
-		//cout << "BEFORE SETTING ANT POS";
+		
 		setAntPosition(sideLength/2, sideLength/2, 0);
-		//cout << "AFTER SETTING ANT POS";
+		
 		setShadowAntPosition(sideLength/2, sideLength/2, 0);
-		//cout << "AFTER SETTING SHADOW ANT POS";
+		
 		lastAntX = 0;
 		lastAntY = 0;
 		index = 0;
@@ -214,11 +221,19 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 		/*for (int x = 0; x < HISTORY_AMOUNT; x++) {
   			cellsHistory[x] = new bool[CELLS];
 		}*/
-		cellsHistory.clear();
-		antVectorHistory.clear();
-		shadowAntVectorHistory.clear();
 
-		//cout << "reset(setAntPosition(" << SIDE_LENGTH/2 << "," << SIDE_LENGTH/2 << "," << 0 << "))\n";
+		if(cellsHistory.size() > 0) {
+			cellsHistory.clear();
+		}
+		if(antVectorHistory.size() > 0) {
+			antVectorHistory.clear();
+		}
+		if(shadowAntVectorHistory.size() > 0) {
+			shadowAntVectorHistory.clear();
+		}
+		
+
+		
 	}
 
 	json_t *dataToJson() override {
@@ -254,7 +269,7 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
     }
 
 	void setIndex(int index) {
-		//cout << "EffectKnob value: " << pow(10, (int) params[EFFECT_KNOB_PARAM].getValue());
+		
 		this->index = index;
 		if (this->index >= std::numeric_limits<int>::max())
 			this->index = 0;
@@ -280,7 +295,7 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 	}
 
 	void setAntPosition(int x, int y, int direction) {
-		//cout << "setAntPosition(" << x << "," << y << "," << direction << ")\n";
+		
 		if(lastAntX == 0) {
 			if (getIndex() >= 2 && this->antVector.size() >= X_POSITION) {
 				this->lastAntX = this->antVector.at(X_POSITION);
@@ -310,14 +325,14 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 	}
 
 	void setShadowAntPosition(int x, int y, int direction) {
-		//cout << "To be assigned - setShadowAntPosition(" << x << "," << y << "," << direction << ")\n";
+		
 
 		this->shadowAntVector.clear();
 		this->shadowAntVector.push_back(wrap(x, 0, sideLength-1));
 		this->shadowAntVector.push_back(wrap(y, 0, sideLength-1));
 		this->shadowAntVector.push_back(wrap(direction, 0, 359));
 
-		//cout << "Assigned value - shadowAntVector: " << this->shadowAntVector.at(X_POSITION) << "," << this->shadowAntVector.at(Y_POSITION) << "," << this->shadowAntVector.at(DIRECTION) << "\n";
+		
 
 		/*
 		this->shadowAntVector[X_POSITION] = wrap(x, 0, sideLength-1);
@@ -532,20 +547,20 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 		// Save last cell state
 		int historyIndex = index % HISTORY_AMOUNT;
 		//*cellsHistory[historyIndex] = new bool[CELLS];
-		cout << "\nCellHistoryIndex: " << historyIndex;
+		//cout << "\nCellHistoryIndex: " << historyIndex;
 		// Record current cell state to historical snapshot
 		//historyBufferUsage = std::min(historyBufferUsage + 1, HISTORY_AMOUNT - 1);
 		
 		//TESTING
-		cout << "\nAntVectoryHistory Size: " << antVectorHistory.size();
-		cout << "\nCellsHistory Size: " << cellsHistory.size();
+		//cout << "\nAntVectoryHistory Size: " << antVectorHistory.size();
+		//cout << "\nCellsHistory Size: " << cellsHistory.size();
 		if (antVectorHistory.size() != cellsHistory.size()) {
-			cout << "\nAntVectorHistory and cellsHistory are different sizes!!";
+			//cout << "\nAntVectorHistory and cellsHistory are different sizes!!";
 		}
 		//historyBufferUsage = historyBufferUsage + 1;
 
 		/*for(int t = 0; t < CELLS; t++){
-				//cout << cellsHistory[20][t];
+				
 				cellsHistory[historyIndex][t] = cells.at(t);
 		}*/
 
@@ -555,9 +570,10 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 		}
 		else {
 			//cellsHistory.at(historyIndex) = cells;
-			cout << "\nPossibly about to crash here on cellhistory erase and insert";
-			cout << "\nHistoryIndex: " << historyIndex << " cellsHistory.size " << cellsHistory.size();
-			cellsHistory.at(historyIndex) = cells;
+			//cout << "\nPossibly about to crash here on cellhistory erase and insert";
+			//cout << "\nHistoryIndex: " << historyIndex << " cellsHistory.size " << cellsHistory.size();
+			cellsHistory.erase(cellsHistory.begin() + historyIndex);
+			cellsHistory.insert(cellsHistory.begin() + historyIndex, cells);
 		}
 
 		// Add push to back if under history amount, replace using "at.()" if not
@@ -566,9 +582,10 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 		}
 		else {
 			//antVectorHistory.at(historyIndex) = antVector;
-			cout << "\nPossibly about to crash here on antVectorHistory erase and insert";
-			cout << "\nHistoryIndex: " << historyIndex << " antVectorHistory.size " << antVectorHistory.size();
-			antVectorHistory.at(historyIndex) = antVector;
+			//cout << "\nPossibly about to crash here on antVectorHistory erase and insert";
+			//cout << "\nHistoryIndex: " << historyIndex << " antVectorHistory.size " << antVectorHistory.size();
+			antVectorHistory.erase(antVectorHistory.begin() + historyIndex);
+			antVectorHistory.insert(antVectorHistory.begin() + historyIndex, antVector);
 		}
 		
 
@@ -583,7 +600,7 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 			setAntPosition(antVectorHistory[0][X_POSITION], antVectorHistory[0][Y_POSITION], antVectorHistory[0][DIRECTION]);
 			setShadowAntPosition(shadowAntVectorHistory[0][X_POSITION], shadowAntVectorHistory[0][Y_POSITION], shadowAntVectorHistory[0][DIRECTION]);
 			for(int t = 0; t < CELLS; t++){
-				//cout << cellsHistory[20][t];
+				
 				cells[t] = cellsHistory[0][t];
 				
 			}
@@ -595,7 +612,7 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 
 
 
-		//cout << "Ant position: X" << currPositionX << " Y" << currPositionY << " Direction" << currDirection << "\n";
+		
 
 		newDirection = wrap(currDirection + (currPositionValue ? -90 : 90), 0, 359);
 
@@ -623,9 +640,9 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 		}
 		// Previous cell position is set to opposite
 		setCellOn(currPositionX, currPositionY, !currPositionValue);
-		cout << " and leaving " << (!currPositionValue ? "black\n" : "white\n");
+		//cout << " and leaving " << (!currPositionValue ? "black\n" : "white\n");
 		bool shadowAntOn = (bool) !params[SHADOW_ANT_ON].getValue();
-		cout << "shadowAntOn= " << std::to_string(shadowAntOn);
+		//cout << "shadowAntOn= " << std::to_string(shadowAntOn);
 
 		// Mirror Ant
 		if (shadowAntOn) {
@@ -638,7 +655,7 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 				int newShadowAntDirection;
 
 				// TESTING
-				cout << "CurrShadowAndPos: " << currShadowAntPositionX << "," << currShadowAntPositionY << "," << currShadowAntDirection << "\n";
+				//cout << "CurrShadowAndPos: " << currShadowAntPositionX << "," << currShadowAntPositionY << "," << currShadowAntDirection << "\n";
 
 
 				if (shadowAntVectorHistory.size() > HISTORY_AMOUNT) {
@@ -657,7 +674,7 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 				shadowAntVectorHistory[historyIndex][Y_POSITION] = currShadowAntPositionY;
 				shadowAntVectorHistory[historyIndex][DIRECTION] = currShadowAntDirection;*/
 
-				cout << "Shadow Ant position: X" << currShadowAntPositionX << " Y" << currShadowAntPositionY << " Direction" << currShadowAntDirection << "\n";
+				//cout << "Shadow Ant position: X" << currShadowAntPositionX << " Y" << currShadowAntPositionY << " Direction" << currShadowAntDirection << "\n";
 					
 				newShadowAntDirection = wrap(currShadowAntDirection + (currShadowAntPositionValue ? -90 : 90), 0, 359);
 
@@ -684,7 +701,7 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 						}
 					}
 					setCellOn(currShadowAntPositionX, currShadowAntPositionY, !currShadowAntPositionValue);
-					//cout << "SHADOW ANT POOPING: " << (!currShadowAntPositionValue ? "GREEN" : "BLACK");
+					
 			}
 
 			// TODO - use the commented two lines below if adding VOCT invert switches to shadow ant X and Y
@@ -699,18 +716,16 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 		int tempSideLength = (int) params[SIDE_LENGTH_PARAM].getValue();
 		outputs[VOCT_OUTPUT_X].setVoltage(!params[VOCT_INVERT_X].getValue() ? closestVoltageForX(tempSideLength - getAntX()) : closestVoltageForX(getAntX()));
 		outputs[VOCT_OUTPUT_Y].setVoltage(!params[VOCT_INVERT_Y].getValue() ? closestVoltageForY(tempSideLength - getAntY()) : closestVoltageForY(getAntY()));
-		//TESTING
-		//cout << "\n@nt X VOCT OUTPUT: " << std::to_string(params[VOCT_INVERT_X].getValue() ? closestVoltageForX(tempSideLength - getAntX()) : closestVoltageForX(getAntX()));
-		//cout << "\n@nt Y VOCT OUTPUT: " << std::to_string(params[VOCT_INVERT_Y].getValue() ? closestVoltageForY(tempSideLength - getAntY()) : closestVoltageForY(getAntY()));
+		
 
 		if(index > 1) {
 			int lastHistoryIndex = (index - 1) % HISTORY_AMOUNT;
 			int lastAntDirection = antVectorHistory[lastHistoryIndex][DIRECTION];
 			int currentAntDirection = getAntDirection();
-			//cout << "\n###########################";
-			//cout << "\n@#$@#$ LAST ANT DIR: " << to_string(lastAntDirection);
-			//cout << "\n@#$@#$ CURR ANT DIR: " << to_string(currentAntDirection);
-			//cout << "\n###########################";
+			
+			
+			
+			
 
 			int leftTurn = wrap(currDirection - 90, 0, 359);
 			int rightTurn = wrap(currDirection + 90, 0, 359);
@@ -718,17 +733,17 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 			if(currentAntDirection != lastAntDirection) {
 				if (currentAntDirection == leftTurn) {
 					//Ant is turning left
-					cout << "\nANT TURNING LEFT!";
+					//cout << "\nANT TURNING LEFT!";
 					outputs[GATE_OUTPUT_X].setVoltage(outputs[GATE_OUTPUT_X].getVoltage() == 0.0f ? 10.0f : 0.0f);
 				}
 				else if (currentAntDirection == rightTurn) {
 					//Ant is turning right
-					cout << "\nANT TURNING RIGHT!";
+					//cout << "\nANT TURNING RIGHT!";
 					outputs[GATE_OUTPUT_Y].setVoltage(outputs[GATE_OUTPUT_Y].getVoltage() == 0.0f ? 10.0f : 0.0f);
 				}
 				else {
 					//Ant is off the rails
-					cout << "BIG PROBLEM!: Ant is of the rails!!";
+					//cout << "BIG PROBLEM!: Ant is of the rails!!";
 				}
 			}
 		}
@@ -754,31 +769,31 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 		}
 
 		historyBufferUsage -= stepsBack;
-		cout << "\nHistoryBufferUsage: " << historyBufferUsage;
-		cout << "\nStepSkippingAmount: " << std::to_string((int) params[SKIP_PARAM].getValue()) << "\n";
+		//cout << "\nHistoryBufferUsage: " << historyBufferUsage;
+		//cout << "\nStepSkippingAmount: " << std::to_string((int) params[SKIP_PARAM].getValue()) << "\n";
 		int historyTarget = (abs(currIndex - stepsBack)) % HISTORY_AMOUNT;
 		setAntPosition(antVectorHistory[historyTarget][X_POSITION], antVectorHistory[historyTarget][Y_POSITION], antVectorHistory[historyTarget][DIRECTION]);
 		setShadowAntPosition(shadowAntVectorHistory[historyTarget][X_POSITION], shadowAntVectorHistory[historyTarget][Y_POSITION], shadowAntVectorHistory[historyTarget][DIRECTION]);
-		cout << "Writing cell history for target state: " << historyTarget;
+		//cout << "Writing cell history for target state: " << historyTarget;
 
 		/*
 		//TESTING
 		// Printing out cell state to std out
 		int numCells = sideLength*sideLength;
-		cout << "---HISTORY-TARGET---";
+		//cout << "---HISTORY-TARGET---";
 		for(int i=0; i < numCells; i++){
 			if(i%sideLength == 0){ //increment y once x hits positive multiple of COL length
-				cout << "\n";
+				//cout << "\n";
 			}
-			cout << cellsHistory[historyTarget][i];
+			//cout << cellsHistory[historyTarget][i];
 		}
 
-		cout << "---BEFORE-WAY-BACK---";
+		//cout << "---BEFORE-WAY-BACK---";
 		for(int i=0; i < numCells; i++){
 			if(i%sideLength == 0){ //increment y once x hits positive multiple of COL length
-				cout << "\n";
+				//cout << "\n";
 			}
-			cout << cells[i];
+			//cout << cells[i];
 		}
 		*/
 
@@ -787,12 +802,12 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 
 
 		/*
-		cout << "\n---AFTER-WAY-BACK---";
+		//cout << "\n---AFTER-WAY-BACK---";
 		for(int i=0; i < numCells; i++){
 			if(i%sideLength == 0){ //increment y once x hits positive multiple of COL length
-				cout << "\n";
+				//cout << "\n";
 			}
-			cout << cells[i];
+			//cout << cells[i];
 		}
 		*/
 
@@ -801,10 +816,10 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 			index = 1;
 			lastAntX = 0;
 			lastAntY = 0;
-			cout << "GOES TO: IF";
+			//cout << "GOES TO: IF";
 		}
 		else {
-			cout << "GOES TO: ELSE";
+			//cout << "GOES TO: ELSE";
 			lastAntX = antVectorHistory[historyTarget - 1][X_POSITION];
 			lastAntY = antVectorHistory[historyTarget - 1][Y_POSITION];
 		}
@@ -821,7 +836,7 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 void MusicalAnt::process(const ProcessArgs &args) {
 
 	//Debug
-	//cout << "Ant - X: " << getAntX() << " Y: " << getAntY() << " Direction: " << getAntDirection() << "\n";
+	
 
 	// Run
 	if (runningTrigger.process(params[RUN_PARAM].getValue())) {
@@ -834,7 +849,7 @@ void MusicalAnt::process(const ProcessArgs &args) {
 		// ^^ Loop switch has just been turned on.
 		// Store current index value. This is the loop point.
 		loopIndex = index;
-		cout << "\nLoopIndex: " << loopIndex;
+		//cout << "\nLoopIndex: " << loopIndex;
 	}
 	loopOn = params[LOOPMODE_SWITCH_PARAM].getValue();
 
@@ -1218,7 +1233,7 @@ struct MusicalAntWidget : ModuleWidget {
 		addChild(display);
 
 		/*if(module) {
-			cout << "display - X: " << module->antVector[X_POSITION] << ", Y: " << module->antVector[Y_POSITION] << "\n";
+			//cout << "display - X: " << module->antVector[X_POSITION] << ", Y: " << module->antVector[Y_POSITION] << "\n";
 		}*/
 		//addChild(createLight<SmallLight<RedLight>>(Vec((module->antX+1)*6 + DISPLAY_OFFSET_X, (module->antY+1)*6 + DISPLAY_OFFSET_Y), module, (true)));
 
