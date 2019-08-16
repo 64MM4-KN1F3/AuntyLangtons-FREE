@@ -186,11 +186,18 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 		configParam(MusicalAnt::LOOP_LENGTH, 0.0f, 95.0f, 31.0, "");
 		configParam(MusicalAnt::SIDE_LENGTH_PARAM, 0.0f, 6.0f, 4.0, "");
 		configParam(MusicalAnt::SKIP_PARAM, 0.0f, 9.0f, 0.0f, "");
-		/*antVector.reserve(3);
-		shadowAntVector.reserve(3);
-		antVectorHistory.reserve(HISTORY_AMOUNT);
-		shadowAntVectorHistory.reserve(HISTORY_AMOUNT);
-		cellsHistory.reserve(HISTORY_AMOUNT);*/
+		//antVector.reserve(3);
+		antVector.resize(3, 0);
+		//shadowAntVector.reserve(3);
+		shadowAntVector.resize(3, 0);
+		//antVectorHistory.reserve(HISTORY_AMOUNT);
+		antVectorHistory.resize( HISTORY_AMOUNT , vector<int>( 3 , 0 ) );
+		//shadowAntVectorHistory.reserve(HISTORY_AMOUNT);
+		shadowAntVectorHistory.resize( HISTORY_AMOUNT , vector<int>( 3 , 0 ) );
+		//cellsHistory.reserve(HISTORY_AMOUNT);
+		cellsHistory.resize( HISTORY_AMOUNT , vector<bool>( CELLS , 0 ) );
+		// 2d resize example from: https://stackoverflow.com/questions/15889578/how-can-i-resize-a-2d-vector-of-objects-given-the-width-and-height
+		// matrix.resize( row_count , vector<int>( column_count , initialization_value ) );
 
 
 		reset();
@@ -925,12 +932,6 @@ void MusicalAnt::process(const ProcessArgs &args) {
 
 
 	lights[BLINK_LIGHT].value = gateIn ? 1.0f : 0.0f;
-	//lights[GRID_LIGHT_ON].value = 1.0f;
-	//lights[GRID_LIGHT_OFF].value = 0.0f;
-	int numCells = sideLength*sideLength;
-	for(int i = 0; i < numCells; i++) {
-		lights[GRID_LIGHTS + i].value = (cells.at(i));
-	}
 }
 
 struct ModuleDisplay : Widget {
