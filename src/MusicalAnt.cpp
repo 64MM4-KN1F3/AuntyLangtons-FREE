@@ -622,12 +622,7 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 				// TESTING
 				//cout << "CurrShadowAndPos: " << currShadowAntPositionX << "," << currShadowAntPositionY << "," << currShadowAntDirection << "\n";
 
-
-				if (shadowAntVectorHistory.size() > HISTORY_AMOUNT) {
-					shadowAntVectorHistory.erase(shadowAntVectorHistory.begin());
-				}
-
-				shadowAntVectorHistory.push_back(shadowAntVector);
+				shadowAntVectorHistory.at(historyIndex) = shadowAntVector;
 
 				/*shadowAntVectorHistory[historyIndex][X_POSITION] = currShadowAntPositionX;
 				shadowAntVectorHistory[historyIndex][Y_POSITION] = currShadowAntPositionY;
