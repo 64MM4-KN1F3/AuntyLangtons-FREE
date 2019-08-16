@@ -66,7 +66,7 @@ Segmentation fault: 11
 
 */
 
-struct MusicalAnt : Module, QuantizeUtils, Logos {
+struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 	enum ParamIds {
 		PITCH_PARAM,
 		RUN_PARAM,
@@ -177,35 +177,25 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 		configParam(MusicalAnt::LOOP_LENGTH, 0.0f, 95.0f, 31.0, "");
 		configParam(MusicalAnt::SIDE_LENGTH_PARAM, 0.0f, 6.0f, 4.0, "");
 		configParam(MusicalAnt::SKIP_PARAM, 0.0f, 9.0f, 0.0f, "");
-		//antVector.reserve(3);
+		
+		//Pre-allocating space for vectors
 		antVector.resize(3, 0);
-		//shadowAntVector.reserve(3);
 		shadowAntVector.resize(3, 0);
-		//antVectorHistory.reserve(HISTORY_AMOUNT);
 		antVectorHistory.resize( HISTORY_AMOUNT , vector<int>( 3 , 0 ) );
-		//shadowAntVectorHistory.reserve(HISTORY_AMOUNT);
 		shadowAntVectorHistory.resize( HISTORY_AMOUNT , vector<int>( 3 , 0 ) );
-		//cellsHistory.reserve(HISTORY_AMOUNT);
+		cells.resize(CELLS, false);
 		cellsHistory.resize( HISTORY_AMOUNT , vector<bool>( CELLS , 0 ) );
-		// 2d resize example from: https://stackoverflow.com/questions/15889578/how-can-i-resize-a-2d-vector-of-objects-given-the-width-and-height
-		// matrix.resize( row_count , vector<int>( column_count , initialization_value ) );
 
-
-		reset();
+		onReset();
 	}
 
 	~MusicalAnt() {
-		//delete [] cells;
-		//delete [] cellsHistory;
-		//delete [] antVector;
-		//delete [] *antVectorHistory;
-		//delete [] shadowAntVector;
-		//delete [] *shadowAntVectorHistory;
 	}
 
-	void reset() {
-		clearCells();
+	void onReset() {
 		
+		cout << "Initial cells .size: " << cells.size();
+		clearCells();
 		setAntPosition(sideLength/2, sideLength/2, 0);
 		
 		setShadowAntPosition(sideLength/2, sideLength/2, 0);
@@ -214,13 +204,10 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 		lastAntY = 0;
 		index = 0;
 		shadowIndex = 0;
-		//historyBufferUsage = 0;
+		
 
-		/*for (int x = 0; x < HISTORY_AMOUNT; x++) {
-  			cellsHistory[x] = new bool[CELLS];
-		}*/
 
-		if(cellsHistory.size() > 0) {
+		/*if(cellsHistory.size() > 0) {
 			cellsHistory.clear();
 		}
 		if(antVectorHistory.size() > 0) {
@@ -228,7 +215,7 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 		}
 		if(shadowAntVectorHistory.size() > 0) {
 			shadowAntVectorHistory.clear();
-		}
+		}*/
 		
 
 		
@@ -371,15 +358,14 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 	void process(const ProcessArgs &args) override;
 
 	void clearCells() {
+
+		cout << "Clearing Cells\n";
 		/*for(int i=0;i<CELLS;i++){
 			cells[i] = Logos::AL_logo_144x144[i];//false;
 		}*/
 		//TODO put logo back? ^^^
-		if (cells.size() > 0) {
-			cells.clear();
-		}
 		for(unsigned int i=0;i<CELLS;i++){
-			cells.push_back(Logos::AL_logo_144x144[i]);//false;
+			cells.at(i) = false; //Logos::AL_logo_144x144[i];
 		}
 		// Testing Logo
 		//std::copy(cells, cells+CELLS, Logos::AL_logo_144x144);

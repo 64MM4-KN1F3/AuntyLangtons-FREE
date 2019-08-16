@@ -1,6 +1,6 @@
 #include <rack.hpp>
 #include "QuantizeUtils.cpp"
-#include "Logos.cpp"
+//#include "Logos.cpp"
 
 
 using namespace rack;
