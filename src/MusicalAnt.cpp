@@ -141,25 +141,16 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 	bool loopOn = false;
 	int loopLength = 0;
 	int loopIndex;
-	bool running = true;
 	dsp::SchmittTrigger clockTrigger;
-	dsp::SchmittTrigger runningTrigger;
-	dsp::SchmittTrigger resetTrigger;
-	//int* antVector = new int[3]; // Can probably just make this a std::vector?
 	vector<int> antVector;
-	//int* antVectorHistory[HISTORY_AMOUNT];
 	vector< vector<int> > antVectorHistory;
-	//int* shadowAntVector = new int[3];
 	vector<int> shadowAntVector;
 	vector< vector<int> > shadowAntVectorHistory;
-	//int historyBufferUsage = 0;
 	int fibo[7] = {8, 13, 21, 34, 55, 89, 144}; // short for Fibonacci (cause I forgot that's why I named it that).
-
 	int lastAntX, lastAntY;
 
-	//bool* cells = new bool[CELLS];
+	// Representation of cells
 	vector<bool> cells;
-	//bool** cellsHistory = new bool*[HISTORY_AMOUNT];
 	vector< vector<bool> > cellsHistory;
 
 
@@ -842,14 +833,6 @@ struct MusicalAnt : Module, QuantizeUtils, Logos {
 
 void MusicalAnt::process(const ProcessArgs &args) {
 
-	//Debug
-	
-
-	// Run
-	if (runningTrigger.process(params[RUN_PARAM].getValue())) {
-		running = !running;
-	}
-
 	bool gateIn = false;
 	int numberSteps = (int) params[SKIP_PARAM].getValue() + 1;
 	if((params[LOOPMODE_SWITCH_PARAM].getValue() != loopOn) & (params[LOOPMODE_SWITCH_PARAM].getValue() == true)) {
@@ -862,46 +845,42 @@ void MusicalAnt::process(const ProcessArgs &args) {
 
 	setLoopLength(params[LOOP_LENGTH].getValue() + 1);
 
-	if (running) {
-			if (inputs[EXT_CLOCK_INPUT].isConnected()) {
-				// External clock
-				if (clockTrigger.process(rescale(inputs[EXT_CLOCK_INPUT].getVoltage(), 0.1f, 2.f, 0.f, 1.f))) {
-					walkAnt(numberSteps);
-				}
-				gateIn = clockTrigger.isHigh();
-			}
-			else {
-				// Internal clock
-				float clockTime = powf(2.0f, params[CLOCK_PARAM].getValue());
-				phase += clockTime * args.sampleTime;
-				if (phase >= 1.0f) {
-					phase -= 1.0f;
-					walkAnt(numberSteps);
-				}
+	if (inputs[EXT_CLOCK_INPUT].isConnected()) {
+		// External clock
+		if (clockTrigger.process(rescale(inputs[EXT_CLOCK_INPUT].getVoltage(), 0.1f, 2.f, 0.f, 1.f))) {
+			walkAnt(numberSteps);
+		}
+		gateIn = clockTrigger.isHigh();
+	}
+	else {
+		// Internal clock
+		float clockTime = powf(2.0f, params[CLOCK_PARAM].getValue());
+		phase += clockTime * args.sampleTime;
+		if (phase >= 1.0f) {
+			phase -= 1.0f;
+			walkAnt(numberSteps);
+		}
 
-				gateIn = (phase < 0.5f);
-			}
+		gateIn = (phase < 0.5f);
+	}
 
 
-			/* Manually step the system forward by one
-			if (clockTrigger.process(params[STEP_FWD_BTN_PARAM].getValue())) {
-				walkAnt(1);
-				params[STEP_FWD_BTN_PARAM].getValue() = 0.0;
-			}
+	/* Manually step the system forward by one
+	if (clockTrigger.process(params[STEP_FWD_BTN_PARAM].getValue())) {
+		walkAnt(1);
+		params[STEP_FWD_BTN_PARAM].getValue() = 0.0;
+	}
 
-			// Manually step the system backward by one
-			if (clockTrigger.process(params[STEP_BCK_BTN_PARAM].getValue())) {
-				wayBackMachine(1);
-				params[STEP_BCK_BTN_PARAM].getValue() = 0.0;
-			}*/
+	// Manually step the system backward by one
+	if (clockTrigger.process(params[STEP_BCK_BTN_PARAM].getValue())) {
+		wayBackMachine(1);
+		params[STEP_BCK_BTN_PARAM].getValue() = 0.0;
+	}*/
 
-			// Looping implementation
-			if ((loopOn == true) && (loopLength != 0) && (loopLength < index) && (index > loopIndex)){
-				//^^ Loop must not be default value of zero and must be less than index but equal or more than saved loopIndex
-				wayBackMachine(loopLength);
-			}
-
-			
+	// Looping implementation
+	if ((loopOn == true) && (loopLength != 0) && (loopLength < index) && (index > loopIndex)){
+		//^^ Loop must not be default value of zero and must be less than index but equal or more than saved loopIndex
+		wayBackMachine(loopLength);
 	}
 
 	// TODO Fix up this var below. May not be needed, or at least needs refactoring
