@@ -12,6 +12,7 @@ using namespace std;
 #define Y_POSITION 1
 #define DIRECTION 2
 #define PIXEL_BRIGHTNESS 140
+#define INITIAL_RESOLUTION_KNOB_POSITION 5
 
 /*
 Big thanks to..
@@ -135,7 +136,6 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 
 	float phase = 0.0;
 	float blinkPhase = 0.0;
-	int sideLength = 8;
 	int index = 0;
 	int shadowIndex = 0;
 	bool loopOn = false;
@@ -148,6 +148,7 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 	vector< vector<int> > shadowAntVectorHistory;
 	int fibo[7] = {8, 13, 21, 34, 55, 89, 144}; // short for Fibonacci (cause I forgot that's why I named it that).
 	int lastAntX, lastAntY;
+	int sideLength = fibo[INITIAL_RESOLUTION_KNOB_POSITION];
 
 	// Representation of cells
 	vector<bool> cells;
@@ -175,7 +176,7 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		configParam(MusicalAnt::EFFECT_KNOB_PARAM, 0.0f, 5.0f, 0.0, "");
 		configParam(MusicalAnt::LOOPMODE_SWITCH_PARAM, 0.0f, 1.0f, 0.0f, "");
 		configParam(MusicalAnt::LOOP_LENGTH, 0.0f, 95.0f, 31.0, "");
-		configParam(MusicalAnt::SIDE_LENGTH_PARAM, 0.0f, 6.0f, 4.0, "");
+		configParam(MusicalAnt::SIDE_LENGTH_PARAM, 0.0f, 6.0f, INITIAL_RESOLUTION_KNOB_POSITION, "");
 		configParam(MusicalAnt::SKIP_PARAM, 0.0f, 9.0f, 0.0f, "");
 		
 		//Pre-allocating space for vectors
@@ -194,7 +195,6 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 
 	void onReset() {
 		
-		cout << "Initial cells .size: " << cells.size();
 		clearCells();
 		setAntPosition(sideLength/2, sideLength/2, 0);
 		
@@ -359,7 +359,6 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 
 	void clearCells() {
 
-		cout << "Clearing Cells\n";
 		/*for(int i=0;i<CELLS;i++){
 			cells[i] = Logos::AL_logo_144x144[i];//false;
 		}*/
@@ -539,7 +538,7 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		//cout << "\nAntVectoryHistory Size: " << antVectorHistory.size();
 		//cout << "\nCellsHistory Size: " << cellsHistory.size();
 		if (antVectorHistory.size() != cellsHistory.size()) {
-			//cout << "\nAntVectorHistory and cellsHistory are different sizes!!";
+			cout << "\nAntVectorHistory and cellsHistory are different sizes!!";
 		}
 		//historyBufferUsage = historyBufferUsage + 1;
 
@@ -549,28 +548,10 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		}*/
 
 		// Add push to back if under history amount, replace using "at.()" if not
-		if (cellsHistory.size() < HISTORY_AMOUNT) {
-			cellsHistory.push_back(cells);
-		}
-		else {
-			//cellsHistory.at(historyIndex) = cells;
-			//cout << "\nPossibly about to crash here on cellhistory erase and insert";
-			//cout << "\nHistoryIndex: " << historyIndex << " cellsHistory.size " << cellsHistory.size();
-			cellsHistory.erase(cellsHistory.begin() + historyIndex);
-			cellsHistory.insert(cellsHistory.begin() + historyIndex, cells);
-		}
 
-		// Add push to back if under history amount, replace using "at.()" if not
-		if (antVectorHistory.size() < HISTORY_AMOUNT) {
-			antVectorHistory.push_back(antVector);
-		}
-		else {
-			//antVectorHistory.at(historyIndex) = antVector;
-			//cout << "\nPossibly about to crash here on antVectorHistory erase and insert";
-			//cout << "\nHistoryIndex: " << historyIndex << " antVectorHistory.size " << antVectorHistory.size();
-			antVectorHistory.erase(antVectorHistory.begin() + historyIndex);
-			antVectorHistory.insert(antVectorHistory.begin() + historyIndex, antVector);
-		}
+		cellsHistory.at(historyIndex) = cells;
+
+		antVectorHistory.at(historyIndex) = antVector;
 		
 
 		/*antVectorHistory[historyIndex][X_POSITION] = currPositionX;
