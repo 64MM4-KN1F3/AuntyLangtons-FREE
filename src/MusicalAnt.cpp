@@ -99,6 +99,7 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		VOCT_INVERT_X,
 		VOCT_INVERT_Y,
 		AUNTYLANGBUTTON_PARAM,
+		VOCT_OUTPUT_POLY,
 		NUM_PARAMS
 	};
 	enum InputIds {
@@ -1073,17 +1074,17 @@ struct MusicalAntWidget : ModuleWidget {
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/MusicalAnt.svg")));
 
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
+		/*addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));*/
 
 		// Testing text
 
 		//addChild( new ParameterFeedbackDisplay(module, Vec(13.5, 345), 10, 1, nvgRGBA(255,0,0,255) ) );
-		CenteredLabel* const testLabel = new CenteredLabel;
-		testLabel->box.pos = Vec(75, 183);
-		testLabel->text = "120 BPM";
+		CenteredLabel* const dynamicLabel = new CenteredLabel;
+		dynamicLabel->box.pos = Vec(75, 182.2);
+		dynamicLabel->text = "120 BPM";
 
 		addParam(createParam<RoundBlackKnob>(Vec(143.9, 177), module, MusicalAnt::CLOCK_PARAM));
 
@@ -1152,29 +1153,32 @@ struct MusicalAntWidget : ModuleWidget {
 
 		// AuntyLangButton!
 		addParam(createParam<AuntyLangButton>(Vec(83.5, 352), module, MusicalAnt::AUNTYLANGBUTTON_PARAM));
+
+		// Poly V/Oct out
+		addOutput(createOutput<PJ301MPort>(Vec(23, 341.25), module, MusicalAnt::VOCT_OUTPUT_POLY));
 		
 		if(module){
-			octaveKnobX->connectLabel(testLabel, module);
-			noteKnobX->connectLabel(testLabel, module);
-			scaleKnobX->connectLabel(testLabel, module);
+			octaveKnobX->connectLabel(dynamicLabel, module);
+			noteKnobX->connectLabel(dynamicLabel, module);
+			scaleKnobX->connectLabel(dynamicLabel, module);
 
-			octaveKnobY->connectLabel(testLabel, module);
-			noteKnobY->connectLabel(testLabel, module);
-			scaleKnobY->connectLabel(testLabel, module);
+			octaveKnobY->connectLabel(dynamicLabel, module);
+			noteKnobY->connectLabel(dynamicLabel, module);
+			scaleKnobY->connectLabel(dynamicLabel, module);
 
-			shadowOctaveKnobX->connectLabel(testLabel, module);
-			shadowNoteKnobX->connectLabel(testLabel, module);
-			shadowScaleKnobX->connectLabel(testLabel, module);
+			shadowOctaveKnobX->connectLabel(dynamicLabel, module);
+			shadowNoteKnobX->connectLabel(dynamicLabel, module);
+			shadowScaleKnobX->connectLabel(dynamicLabel, module);
 
-			shadowOctaveKnobY->connectLabel(testLabel, module);
-			shadowNoteKnobY->connectLabel(testLabel, module);
-			shadowScaleKnobY->connectLabel(testLabel, module);
+			shadowOctaveKnobY->connectLabel(dynamicLabel, module);
+			shadowNoteKnobY->connectLabel(dynamicLabel, module);
+			shadowScaleKnobY->connectLabel(dynamicLabel, module);
 
-			loopLengthKnob->connectLabel(testLabel, module);
-			sideLengthKnob->connectLabel(testLabel, module);
-			skipParamKnob->connectLabel(testLabel, module);
+			loopLengthKnob->connectLabel(dynamicLabel, module);
+			sideLengthKnob->connectLabel(dynamicLabel, module);
+			skipParamKnob->connectLabel(dynamicLabel, module);
 		}
-		addChild(testLabel);
+		addChild(dynamicLabel);
 
 		addParam(octaveKnobX);
 		addParam(noteKnobX);

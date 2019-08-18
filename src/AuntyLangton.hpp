@@ -29,7 +29,7 @@ struct CenteredLabel : Widget {
 	int fontSize;
 	std::shared_ptr<Font> font;
 
-	CenteredLabel(int _fontSize = 11) {
+	CenteredLabel(int _fontSize = 10) {
 		font = APP->window->loadFont(asset::plugin(pluginInstance, "res/DSEG7ClassicMini-Regular.ttf"));
 		fontSize = _fontSize;
 		box.size.y = BND_WIDGET_HEIGHT;
