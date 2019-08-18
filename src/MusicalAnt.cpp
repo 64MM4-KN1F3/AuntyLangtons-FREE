@@ -1009,6 +1009,25 @@ struct ModuleDisplay : Widget {
 
 			nvgFillColor(vg, nvgRGBA(0,0,0,0));
 
+			// Clears the current path and sub-paths.
+			nvgFillColor(vg, nvgRGBA(255,255,255,25));
+			nvgBeginPath(vg);
+			nvgMoveTo(vg, 105, 326.7);
+			nvgLineTo(vg, 135, 326.7);
+			nvgLineTo(vg, 125, 336);
+			nvgLineTo(vg, 95, 336);
+			nvgClosePath(vg);
+			nvgFill(vg);
+
+			nvgFillColor(vg, nvgRGBA(255,255,255,25));
+			nvgBeginPath(vg);
+			nvgMoveTo(vg, 115, 326.7);
+			nvgLineTo(vg, 125, 326.7);
+			nvgLineTo(vg, 115, 336);
+			nvgLineTo(vg, 105, 336);
+			nvgClosePath(vg);
+			nvgFill(vg);
+
 		}
 
 	}
