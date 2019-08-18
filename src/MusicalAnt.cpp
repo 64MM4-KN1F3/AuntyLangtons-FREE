@@ -720,7 +720,12 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 	}
 
 	void wayBackMachine(int stepsBack) {
+
+
 		int currIndex = index;
+		//int skippingAmount = (int) params[SKIP_PARAM].getValue() + 1;
+		//stepsBack = stepsBack * skippingAmount;
+		//int currShadowAntIndex = shadowIndex;
 		int historyBufferUsage = cellsHistory.size();
 		if(stepsBack > historyBufferUsage) {
 			stepsBack = historyBufferUsage;
@@ -728,11 +733,25 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		if(index < stepsBack) {
 			stepsBack = 0;
 		}
+		/*if(currShadowAntIndex < stepsBack) {
+			stepsBack = 0;
+		}*/
 
-		historyBufferUsage -= stepsBack;
+		historyBufferUsage = historyBufferUsage - stepsBack;
 		//cout << "\nHistoryBufferUsage: " << historyBufferUsage;
 		//cout << "\nStepSkippingAmount: " << std::to_string((int) params[SKIP_PARAM].getValue()) << "\n";
+
 		int historyTarget = (abs(currIndex - stepsBack)) % HISTORY_AMOUNT;
+		//int shadowHistoryTarget = (abs(currShadowAntIndex - stepsBack)) % HISTORY_AMOUNT;
+
+		cout << "\n\nDEBUGGING WAYBACK MACHINE";
+		cout << "\nCurrent Index: " << currIndex;
+		cout << "\nStepsBack: " << stepsBack;
+		cout << "\nHistoryBufferUsage: " << historyBufferUsage;
+		cout << "\nHistoryTarget: " << historyTarget;
+		//cout << "\nShadowHistoryTarget: " << shadowHistoryTarget;
+		cout << "\n\n";
+
 		setAntPosition(antVectorHistory[historyTarget][X_POSITION], antVectorHistory[historyTarget][Y_POSITION], antVectorHistory[historyTarget][DIRECTION]);
 		setShadowAntPosition(shadowAntVectorHistory[historyTarget][X_POSITION], shadowAntVectorHistory[historyTarget][Y_POSITION], shadowAntVectorHistory[historyTarget][DIRECTION]);
 		//cout << "Writing cell history for target state: " << historyTarget;
