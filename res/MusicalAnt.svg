@@ -241,11 +241,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4142136"
-     inkscape:cx="109.71362"
-     inkscape:cy="209.17101"
+     inkscape:zoom="32"
+     inkscape:cx="73.056662"
+     inkscape:cy="203.7908"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer4"
+     inkscape:current-layer="layer2"
      showgrid="true"
      units="px"
      inkscape:snap-bbox="true"
@@ -419,26 +419,6 @@
       <path
          d="m 17.893278,46.283675 0,0.111161 -0.655946,0 0,0.431786 0.544784,0 0,0.11208 -0.544784,0 0,0.519061 0.655946,0 0,0.134129 -0.97657,0 0,-1.308217 0.97657,0 z"
          id="path4397"
-         inkscape:connector-curvature="0"
-         style="fill:#e8e8e8;fill-opacity:1" />
-    </g>
-    <g
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.65364587px;line-height:125%;font-family:'Bangla MN';-inkscape-font-specification:'Bangla MN, Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#e8e8e8;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       id="text4378"
-       transform="translate(1.1252913,0)">
-      <path
-         d="m 19.125409,47.591896 -0.225079,0 0.555808,-0.645841 -0.500687,-0.662377 0.354615,0 0.331648,0.441891 0.382176,-0.441891 0.225998,0 -0.500687,0.58337 0.544785,0.724848 -0.353697,0 -0.381257,-0.505281 -0.433623,0.505281 z"
-         id="path4400"
-         inkscape:connector-curvature="0"
-         style="fill:#e8e8e8;fill-opacity:1" />
-    </g>
-    <g
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.65364587px;line-height:125%;font-family:'Bangla MN';-inkscape-font-specification:'Bangla MN, Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#e8e8e8;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       id="text4384"
-       transform="translate(1.1252913,0)">
-      <path
-         d="m 23.878398,46.311808 0.430866,0.588882 0.403306,-0.588882 0.216811,0 -0.509874,0.742303 0,0.565915 -0.321542,0 0,-0.546622 -0.555809,-0.761596 0.336242,0 z"
-         id="path4403"
          inkscape:connector-curvature="0"
          style="fill:#e8e8e8;fill-opacity:1" />
     </g>
@@ -901,7 +881,8 @@
          d="m 17.67898,55.706259 0,0.111162 -0.452915,0 0,1.197056 -0.320623,0 0,-1.197056 -0.452916,0 0,-0.111162 1.226454,0 z" />
     </g>
     <g
-       id="g4400">
+       id="g4400"
+       transform="translate(0,-0.04677217)">
       <path
          sodipodi:nodetypes="ccccc"
          inkscape:connector-curvature="0"
@@ -1179,6 +1160,19 @@
          width="12.632527"
          id="rect4307"
          style="opacity:1;fill:#acacac;fill-opacity:0;fill-rule:nonzero;stroke:#3e3e3e;stroke-width:0.16125001;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+    <g
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.65364587px;line-height:125%;font-family:'Bangla MN';-inkscape-font-specification:'Bangla MN, Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#e8e8e8;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       id="text4594"
+       transform="translate(-0.07441407,0.00826823)">
+      <path
+         d="m 20.429654,46.280867 0.320623,0 0,1.174089 0.66789,0 0,0.134129 -0.988513,0 0,-1.308218 z"
+         id="path4599"
+         inkscape:connector-curvature="0" />
+      <path
+         d="m 24.802772,46.280867 0.491501,0 q 0.126779,0 0.222323,0.02664 0.09554,0.02664 0.158934,0.07441 0.06339,0.04777 0.09463,0.112999 0.03215,0.06523 0.03215,0.142398 0,0.05512 -0.02205,0.105649 -0.02113,0.04961 -0.06063,0.09187 -0.0395,0.04134 -0.09463,0.07441 -0.05512,0.03215 -0.122186,0.05328 l 0.465777,0.626548 -0.348185,0 -0.440053,-0.592557 -0.05696,0 0,0.592557 -0.320624,0 0,-1.308218 z m 0.320624,0.602662 0.06982,0 q 0.0588,0 0.108406,-0.01654 0.05053,-0.01654 0.08728,-0.04685 0.03675,-0.03123 0.05788,-0.07533 0.02113,-0.04502 0.02113,-0.101057 0,-0.05145 -0.01654,-0.09463 -0.01562,-0.04318 -0.0441,-0.07441 -0.02848,-0.03215 -0.06798,-0.04961 -0.03859,-0.01746 -0.08544,-0.01746 l -0.130454,0 0,0.475882 z"
+         id="path4601"
+         inkscape:connector-curvature="0" />
     </g>
   </g>
   <g

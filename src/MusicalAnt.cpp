@@ -516,6 +516,12 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		return cellI / sideLength;
 	}
 
+	int mod(int a, int b)
+	{
+	    int r = a % b;
+	    return r < 0 ? r + b : r;
+	}
+
 	void stepAnt(){
 		/*Pseudo:
 		- current cell is set to opposite
@@ -691,16 +697,16 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 			int leftTurn = wrap(currDirection - 90, 0, 359);
 			int rightTurn = wrap(currDirection + 90, 0, 359);
 
-			if(currentAntDirection != lastAntDirection) {
+			if(true) {
 				if (currentAntDirection == leftTurn) {
 					//Ant is turning left
 					//cout << "\nANT TURNING LEFT!";
-					outputs[GATE_OUTPUT_X].setVoltage(outputs[GATE_OUTPUT_X].getVoltage() == 0.0f ? 10.0f : 0.0f);
+					outputs[GATE_OUTPUT_X].setVoltage(clockTrigger.isHigh() ? 10.0f : 0.0f);
 				}
 				else if (currentAntDirection == rightTurn) {
 					//Ant is turning right
 					//cout << "\nANT TURNING RIGHT!";
-					outputs[GATE_OUTPUT_Y].setVoltage(outputs[GATE_OUTPUT_Y].getVoltage() == 0.0f ? 10.0f : 0.0f);
+					outputs[GATE_OUTPUT_Y].setVoltage(clockTrigger.isHigh() ? 10.0f : 0.0f);
 				}
 				else {
 					//Ant is off the rails
@@ -726,10 +732,8 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		//int skippingAmount = (int) params[SKIP_PARAM].getValue() + 1;
 		//stepsBack = stepsBack * skippingAmount;
 		//int currShadowAntIndex = shadowIndex;
-		int historyBufferUsage = cellsHistory.size();
-		if(stepsBack > historyBufferUsage) {
-			stepsBack = historyBufferUsage;
-		}
+		//int historyBufferUsage = cellsHistory.size();
+		
 		if(index < stepsBack) {
 			stepsBack = 0;
 		}
@@ -737,17 +741,18 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 			stepsBack = 0;
 		}*/
 
-		historyBufferUsage = historyBufferUsage - stepsBack;
+		//historyBufferUsage = historyBufferUsage - stepsBack;
 		//cout << "\nHistoryBufferUsage: " << historyBufferUsage;
 		//cout << "\nStepSkippingAmount: " << std::to_string((int) params[SKIP_PARAM].getValue()) << "\n";
 
-		int historyTarget = (abs(currIndex - stepsBack)) % HISTORY_AMOUNT;
+		int historyTarget = mod(currIndex - stepsBack, HISTORY_AMOUNT);
+
 		//int shadowHistoryTarget = (abs(currShadowAntIndex - stepsBack)) % HISTORY_AMOUNT;
 
 		cout << "\n\nDEBUGGING WAYBACK MACHINE";
 		cout << "\nCurrent Index: " << currIndex;
 		cout << "\nStepsBack: " << stepsBack;
-		cout << "\nHistoryBufferUsage: " << historyBufferUsage;
+		//cout << "\nHistoryBufferUsage: " << historyBufferUsage;
 		cout << "\nHistoryTarget: " << historyTarget;
 		//cout << "\nShadowHistoryTarget: " << shadowHistoryTarget;
 		cout << "\n\n";
@@ -791,7 +796,7 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		}
 		*/
 
-		index -= stepsBack;
+		index = index - stepsBack;
 		if (index < 1){
 			index = 1;
 			lastAntX = 0;
@@ -800,8 +805,8 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		}
 		else {
 			//cout << "GOES TO: ELSE";
-			lastAntX = antVectorHistory[historyTarget - 1][X_POSITION];
-			lastAntY = antVectorHistory[historyTarget - 1][Y_POSITION];
+			lastAntX = antVectorHistory[historyTarget][X_POSITION];
+			lastAntY = antVectorHistory[historyTarget][Y_POSITION];
 		}
 
 	}
@@ -817,12 +822,7 @@ void MusicalAnt::process(const ProcessArgs &args) {
 
 	bool gateIn = false;
 	int numberSteps = (int) params[SKIP_PARAM].getValue() + 1;
-	if((params[LOOPMODE_SWITCH_PARAM].getValue() != loopOn) & (params[LOOPMODE_SWITCH_PARAM].getValue() == true)) {
-		// ^^ Loop switch has just been turned on.
-		// Store current index value. This is the loop point.
-		loopIndex = index;
-		//cout << "\nLoopIndex: " << loopIndex;
-	}
+	
 	loopOn = params[LOOPMODE_SWITCH_PARAM].getValue();
 
 	setLoopLength(params[LOOP_LENGTH].getValue() + 1);
@@ -860,7 +860,7 @@ void MusicalAnt::process(const ProcessArgs &args) {
 	}*/
 
 	// Looping implementation
-	if ((loopOn == true) && (loopLength != 0) && (loopLength < index) && (index > loopIndex)){
+	if ((loopOn == true) && (loopLength != 0) && (loopLength < index)){
 		//^^ Loop must not be default value of zero and must be less than index but equal or more than saved loopIndex
 		wayBackMachine(loopLength);
 	}
@@ -881,6 +881,18 @@ void MusicalAnt::process(const ProcessArgs &args) {
 
 
 	outputs[GATE_OUTPUT].setVoltage(gateOut);
+
+	outputs[VOCT_OUTPUT_POLY].setVoltage(!params[VOCT_INVERT_X].getValue() ? closestVoltageForX(tempSideLength - getAntX()) : closestVoltageForX(getAntX()), 0);;
+	outputs[VOCT_OUTPUT_POLY].setVoltage(!params[VOCT_INVERT_Y].getValue() ? closestVoltageForY(tempSideLength - getAntY()) : closestVoltageForY(getAntY()), 1);;
+	if((bool) !params[SHADOW_ANT_ON].getValue()) {
+		outputs[VOCT_OUTPUT_POLY].setVoltage(closestVoltageForShadowX(getShadowAntX()), 2);
+		outputs[VOCT_OUTPUT_POLY].setVoltage(closestVoltageForShadowY(getShadowAntY()), 3);
+		// Don't forget to set the number of output channels
+		outputs[VOCT_OUTPUT_POLY].setChannels(4);
+	}
+	else {
+		outputs[VOCT_OUTPUT_POLY].setChannels(2);
+	}
 
 	// Separate gate outputs are used for X and Y
 	/*if (getAntX() != getLastAntX()) {
@@ -1009,8 +1021,8 @@ struct ModuleDisplay : Widget {
 
 			nvgFillColor(vg, nvgRGBA(0,0,0,0));
 
-			// Clears the current path and sub-paths.
-			nvgFillColor(vg, nvgRGBA(255,255,255,25));
+			// LCD shine
+			nvgFillColor(vg, nvgRGBA(255,255,255,10));
 			nvgBeginPath(vg);
 			nvgMoveTo(vg, 105, 326.7);
 			nvgLineTo(vg, 135, 326.7);
@@ -1019,7 +1031,16 @@ struct ModuleDisplay : Widget {
 			nvgClosePath(vg);
 			nvgFill(vg);
 
-			nvgFillColor(vg, nvgRGBA(255,255,255,25));
+			nvgFillColor(vg, nvgRGBA(255,255,255,15));
+			nvgBeginPath(vg);
+			nvgMoveTo(vg, 110, 326.7);
+			nvgLineTo(vg, 130, 326.7);
+			nvgLineTo(vg, 120, 336);
+			nvgLineTo(vg, 100, 336);
+			nvgClosePath(vg);
+			nvgFill(vg);
+
+			nvgFillColor(vg, nvgRGBA(255,255,255,20));
 			nvgBeginPath(vg);
 			nvgMoveTo(vg, 115, 326.7);
 			nvgLineTo(vg, 125, 326.7);
