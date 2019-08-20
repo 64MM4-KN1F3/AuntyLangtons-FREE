@@ -1,6 +1,7 @@
 #include "AuntyLangton.hpp"
 #include <iostream>
 #include <vector>
+#include <algorithm>
 #include <math.h>
 using namespace std;
 #define CELLS 20736
@@ -150,6 +151,7 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 	int fibo[7] = {8, 13, 21, 34, 55, 89, 144}; // short for Fibonacci (cause I forgot that's why I named it that).
 	int lastAntX, lastAntY;
 	int sideLength = fibo[INITIAL_RESOLUTION_KNOB_POSITION];
+	int historyBufferUsage = 0;
 
 	// Representation of cells
 	vector<bool> cells;
@@ -539,8 +541,8 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		//*cellsHistory[historyIndex] = new bool[CELLS];
 		//cout << "\nCellHistoryIndex: " << historyIndex;
 		// Record current cell state to historical snapshot
-		//historyBufferUsage = std::min(historyBufferUsage + 1, HISTORY_AMOUNT - 1);
-		
+		historyBufferUsage = std::min(historyBufferUsage + 1, HISTORY_AMOUNT - 1);
+		cout << "STEPPING ANT. History buffer is: " << historyBufferUsage;
 		//TESTING
 		//cout << "\nAntVectoryHistory Size: " << antVectorHistory.size();
 		//cout << "\nCellsHistory Size: " << cellsHistory.size();
@@ -555,9 +557,7 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		}*/
 
 		// Add push to back if under history amount, replace using "at.()" if not
-
 		cellsHistory.at(historyIndex) = cells;
-
 		antVectorHistory.at(historyIndex) = antVector;
 		
 
@@ -712,16 +712,15 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		//int skippingAmount = (int) params[SKIP_PARAM].getValue() + 1;
 		//stepsBack = stepsBack * skippingAmount;
 		//int currShadowAntIndex = shadowIndex;
-		//int historyBufferUsage = cellsHistory.size();
 		
-		if(index < stepsBack) {
-			stepsBack = 0;
+		if(currIndex < stepsBack) {
+			stepsBack = currIndex;
 		}
 		/*if(currShadowAntIndex < stepsBack) {
 			stepsBack = 0;
 		}*/
 
-		//historyBufferUsage = historyBufferUsage - stepsBack;
+		historyBufferUsage = historyBufferUsage - stepsBack;
 		//cout << "\nHistoryBufferUsage: " << historyBufferUsage;
 		//cout << "\nStepSkippingAmount: " << std::to_string((int) params[SKIP_PARAM].getValue()) << "\n";
 
@@ -732,7 +731,7 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		cout << "\n\nDEBUGGING WAYBACK MACHINE";
 		cout << "\nCurrent Index: " << currIndex;
 		cout << "\nStepsBack: " << stepsBack;
-		//cout << "\nHistoryBufferUsage: " << historyBufferUsage;
+		cout << "\nHistoryBufferUsage: " << historyBufferUsage;
 		cout << "\nHistoryTarget: " << historyTarget;
 		//cout << "\nShadowHistoryTarget: " << shadowHistoryTarget;
 		cout << "\n\n";
@@ -840,7 +839,10 @@ void MusicalAnt::process(const ProcessArgs &args) {
 	}*/
 
 	// Looping implementation
-	if ((loopOn == true) && (loopLength != 0) && (loopLength < index)){
+	if ((loopOn == true) &&
+		(loopLength != 0) && 
+		(loopLength < index) &&
+		(historyBufferUsage > loopLength)) {
 		//^^ Loop must not be default value of zero and must be less than index but equal or more than saved loopIndex
 		index = wayBackMachine(loopLength);
 	}
