@@ -178,7 +178,7 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		configParam(MusicalAnt::SHADOW_ANT_ON, 0.0f, 1.0f, 1.0f, "");
 		configParam(MusicalAnt::EFFECT_KNOB_PARAM, 0.0f, 5.0f, 0.0, "");
 		configParam(MusicalAnt::LOOPMODE_SWITCH_PARAM, 0.0f, 1.0f, 0.0f, "");
-		configParam(MusicalAnt::LOOP_LENGTH, 0.0f, 95.0f, 31.0, "");
+		configParam(MusicalAnt::LOOP_LENGTH, 1.0f, 95.0f, 31.0, "");
 		configParam(MusicalAnt::SIDE_LENGTH_PARAM, 0.0f, 6.0f, INITIAL_RESOLUTION_KNOB_POSITION, "");
 		configParam(MusicalAnt::SKIP_PARAM, 0.0f, 9.0f, 0.0f, "");
 		
@@ -207,6 +207,7 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		lastAntY = 0;
 		index = 0;
 		shadowIndex = 0;
+		loopIndex = 0;
 		
 
 
@@ -259,11 +260,18 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 	void setIndex(int index) {
 		
 		this->index = index;
+		this->loopIndex = std::max(this->loopIndex, index);
+		//cout << "\nIndex: " << index;
+		//cout << "\nLoopIndex: " << this->loopIndex;
 		if (this->index >= std::numeric_limits<int>::max())
 			this->index = 0;
 		int shadowDepth = pow(10, (int) params[EFFECT_KNOB_PARAM].getValue());
 		if (this->index > shadowDepth)
 			this->shadowIndex += 1; //this->index - shadowDepth;
+	}
+
+	int getLoopIndex() {
+		return this->loopIndex;
 	}
 
 	void setLoopLength(int length) {
@@ -542,10 +550,8 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		//cout << "\nCellHistoryIndex: " << historyIndex;
 		// Record current cell state to historical snapshot
 		historyBufferUsage = std::min(historyBufferUsage + 1, HISTORY_AMOUNT - 1);
-		cout << "STEPPING ANT. History buffer is: " << historyBufferUsage;
-		//TESTING
-		//cout << "\nAntVectoryHistory Size: " << antVectorHistory.size();
-		//cout << "\nCellsHistory Size: " << cellsHistory.size();
+		//cout << "STEPPING ANT. History buffer is: " << historyBufferUsage;
+
 		if (antVectorHistory.size() != cellsHistory.size()) {
 			cout << "\nAntVectorHistory and cellsHistory are different sizes!!";
 		}
@@ -708,7 +714,7 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 	int wayBackMachine(int stepsBack) {
 
 
-		int currIndex = index;
+		int currIndex = getIndex();
 		//int skippingAmount = (int) params[SKIP_PARAM].getValue() + 1;
 		//stepsBack = stepsBack * skippingAmount;
 		//int currShadowAntIndex = shadowIndex;
@@ -730,6 +736,7 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 
 		cout << "\n\nDEBUGGING WAYBACK MACHINE";
 		cout << "\nCurrent Index: " << currIndex;
+		cout << "\nLoopIndex: " << getLoopIndex();
 		cout << "\nStepsBack: " << stepsBack;
 		cout << "\nHistoryBufferUsage: " << historyBufferUsage;
 		cout << "\nHistoryTarget: " << historyTarget;
@@ -840,11 +847,12 @@ void MusicalAnt::process(const ProcessArgs &args) {
 
 	// Looping implementation
 	if ((loopOn == true) &&
-		(loopLength != 0) && 
+		(loopLength > 1) && 
 		(loopLength < index) &&
-		(historyBufferUsage > loopLength)) {
+		(historyBufferUsage > loopLength) &&
+		(index == getLoopIndex())) {
 		//^^ Loop must not be default value of zero and must be less than index but equal or more than saved loopIndex
-		index = wayBackMachine(loopLength);
+		setIndex(wayBackMachine(loopLength));
 	}
 
 	// TODO Fix up this var below. May not be needed, or at least needs refactoring
