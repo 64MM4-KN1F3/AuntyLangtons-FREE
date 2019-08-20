@@ -160,8 +160,8 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 
 	MusicalAnt() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-		configParam(MusicalAnt::CLOCK_PARAM, -2.0f, 8.0f, 1.0f, "");
-		configParam(MusicalAnt::OCTAVE_KNOB_PARAM_X, 0.0, 7.0, 2.0, "");
+		configParam(MusicalAnt::CLOCK_PARAM, -2.0f, 5.0f, 1.0f, "");
+		configParam(MusicalAnt::OCTAVE_KNOB_PARAM_X, 0.0, 7.5, 2.0, "");
 		configParam(MusicalAnt::NOTE_KNOB_PARAM_X, 0.0, QuantizeUtils::NUM_NOTES-1, QuantizeUtils::NOTE_C, "");
 		configParam(MusicalAnt::SCALE_KNOB_PARAM_X, 0.0, QuantizeUtils::NUM_SCALES-1, QuantizeUtils::MINOR, "");
 		configParam(MusicalAnt::VOCT_INVERT_X, 0.0f, 1.0f, 1.0f, "");
@@ -178,7 +178,7 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		configParam(MusicalAnt::SHADOW_ANT_ON, 0.0f, 1.0f, 1.0f, "");
 		configParam(MusicalAnt::EFFECT_KNOB_PARAM, 0.0f, 5.0f, 0.0, "");
 		configParam(MusicalAnt::LOOPMODE_SWITCH_PARAM, 0.0f, 1.0f, 0.0f, "");
-		configParam(MusicalAnt::LOOP_LENGTH, 1.0f, 95.0f, 31.0, "");
+		configParam(MusicalAnt::LOOP_LENGTH, 3.0f, 95.0f, 15.0, "");
 		configParam(MusicalAnt::SIDE_LENGTH_PARAM, 0.0f, 6.0f, INITIAL_RESOLUTION_KNOB_POSITION, "");
 		configParam(MusicalAnt::SKIP_PARAM, 0.0f, 9.0f, 0.0f, "");
 		
@@ -261,8 +261,8 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		
 		this->index = index;
 		this->loopIndex = std::max(this->loopIndex, index);
-		//cout << "\nIndex: " << index;
-		//cout << "\nLoopIndex: " << this->loopIndex;
+		cout << "\nIndex: " << index;
+		cout << "\nLoopIndex: " << this->loopIndex;
 		if (this->index >= std::numeric_limits<int>::max())
 			this->index = 0;
 		int shadowDepth = pow(10, (int) params[EFFECT_KNOB_PARAM].getValue());
@@ -272,10 +272,6 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 
 	int getLoopIndex() {
 		return this->loopIndex;
-	}
-
-	void setLoopLength(int length) {
-		loopLength = length;
 	}
 
 	int getIndex() {
@@ -310,10 +306,10 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 			//this->lastAntY = this->antVector.at(Y_POSITION);
 		}
 
-		this->antVector.clear();
-		this->antVector.push_back(wrap(x, 0, sideLength-1));
-		this->antVector.push_back(wrap(y, 0, sideLength-1));
-		this->antVector.push_back(wrap(direction, 0, 359));
+		//this->antVector.clear();
+		this->antVector.at(X_POSITION) = wrap(x, 0, sideLength-1);
+		this->antVector.at(Y_POSITION) = wrap(y, 0, sideLength-1);
+		this->antVector.at(DIRECTION) = wrap(direction, 0, 359);
 		/*this->antVector[X_POSITION] = wrap(x, 0, sideLength-1);
 		this->antVector[Y_POSITION] = wrap(y, 0, sideLength-1);
 		this->antVector[DIRECTION] = wrap(direction, 0, 359);
@@ -323,10 +319,10 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 	void setShadowAntPosition(int x, int y, int direction) {
 		
 
-		this->shadowAntVector.clear();
-		this->shadowAntVector.push_back(wrap(x, 0, sideLength-1));
-		this->shadowAntVector.push_back(wrap(y, 0, sideLength-1));
-		this->shadowAntVector.push_back(wrap(direction, 0, 359));
+		//this->shadowAntVector.clear();
+		this->shadowAntVector.at(X_POSITION) = wrap(x, 0, sideLength-1);
+		this->shadowAntVector.at(Y_POSITION) = wrap(y, 0, sideLength-1);
+		this->shadowAntVector.at(DIRECTION) = wrap(direction, 0, 359);
 
 		
 
@@ -704,7 +700,12 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 	}
 
 	void walkAnt(int steps) {
-		for(int i = 0; i < steps; i++) {
+		if(loopOn) {
+			if(index + steps > loopIndex) {
+				steps = loopIndex - index;
+			}
+		}
+ 		for(int i = 0; i < steps; i++) {
 			setIndex(index + 1);
 			stepAnt();
 		}
@@ -811,7 +812,17 @@ void MusicalAnt::process(const ProcessArgs &args) {
 	
 	loopOn = params[LOOPMODE_SWITCH_PARAM].getValue();
 
-	setLoopLength(params[LOOP_LENGTH].getValue() + 1);
+	loopLength = params[LOOP_LENGTH].getValue() + 1;
+
+	// Looping implementation
+	if ((loopOn == true) &&
+		(loopLength > 1) && 
+		(loopLength < index) &&
+		(historyBufferUsage > loopLength) &&
+		(index = getLoopIndex())) {
+		//^^ Loop must not be default value of zero and must be less than index but equal or more than saved loopIndex
+		setIndex(wayBackMachine(loopLength));
+	}
 
 	if (inputs[EXT_CLOCK_INPUT].isConnected()) {
 		// External clock
@@ -845,15 +856,7 @@ void MusicalAnt::process(const ProcessArgs &args) {
 		params[STEP_BCK_BTN_PARAM].getValue() = 0.0;
 	}*/
 
-	// Looping implementation
-	if ((loopOn == true) &&
-		(loopLength > 1) && 
-		(loopLength < index) &&
-		(historyBufferUsage > loopLength) &&
-		(index == getLoopIndex())) {
-		//^^ Loop must not be default value of zero and must be less than index but equal or more than saved loopIndex
-		setIndex(wayBackMachine(loopLength));
-	}
+
 
 	// TODO Fix up this var below. May not be needed, or at least needs refactoring
 	int tempSideLength = (int) params[SIDE_LENGTH_PARAM].getValue();
@@ -1052,7 +1055,7 @@ struct ModuleDisplay : Widget {
 
 };
 
-struct ParameterFeedbackDisplay : TransparentWidget
+/*struct ParameterFeedbackDisplay : TransparentWidget
 {
 
   MusicalAnt *module;
@@ -1084,9 +1087,9 @@ struct ParameterFeedbackDisplay : TransparentWidget
 	    nvgText( vg, 0, 0, text_label.c_str(), NULL );
 	}
   }
-};
+};*/
 
-struct LoopLengthTextLabel : TransparentWidget
+/*struct LoopLengthTextLabel : TransparentWidget
 {
 
   MusicalAnt *module;
@@ -1119,7 +1122,7 @@ struct LoopLengthTextLabel : TransparentWidget
 	    nvgText( vg, 0, 0, text_label.c_str(), NULL );
 	}
   }
-};
+};*/
 
 
 struct MusicalAntWidget : ModuleWidget {
@@ -1140,7 +1143,7 @@ struct MusicalAntWidget : ModuleWidget {
 		//addChild( new ParameterFeedbackDisplay(module, Vec(13.5, 345), 10, 1, nvgRGBA(255,0,0,255) ) );
 		CenteredLabel* const dynamicLabel = new CenteredLabel;
 		dynamicLabel->box.pos = Vec(75, 182.2);
-		dynamicLabel->text = "120 BPM";
+		//dynamicLabel->text = "120 BPM";
 
 		addParam(createParam<RoundBlackKnob>(Vec(143.9, 177), module, MusicalAnt::CLOCK_PARAM));
 
