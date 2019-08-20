@@ -112,8 +112,8 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 	};
 	enum OutputIds {
 		GATE_OUTPUT,
-		GATE_OUTPUT_X,
-		GATE_OUTPUT_Y,
+		GATE_OUTPUT_LEFT,
+		GATE_OUTPUT_RIGHT,
 		VOCT_OUTPUT_X,
 		VOCT_OUTPUT_Y,
 		VOCT_OUTPUT_SHADOW_X,
@@ -684,35 +684,15 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		outputs[VOCT_OUTPUT_X].setVoltage(!params[VOCT_INVERT_X].getValue() ? closestVoltageForX(tempSideLength - getAntX()) : closestVoltageForX(getAntX()));
 		outputs[VOCT_OUTPUT_Y].setVoltage(!params[VOCT_INVERT_Y].getValue() ? closestVoltageForY(tempSideLength - getAntY()) : closestVoltageForY(getAntY()));
 		
-
-		if(index > 1) {
-			int lastHistoryIndex = (index - 1) % HISTORY_AMOUNT;
-			int lastAntDirection = antVectorHistory[lastHistoryIndex][DIRECTION];
-			int currentAntDirection = getAntDirection();
-			
-			
-			
-			
-
-			int leftTurn = wrap(currDirection - 90, 0, 359);
-			int rightTurn = wrap(currDirection + 90, 0, 359);
-
-			if(true) {
-				if (currentAntDirection == leftTurn) {
-					//Ant is turning left
-					//cout << "\nANT TURNING LEFT!";
-					outputs[GATE_OUTPUT_X].setVoltage(clockTrigger.isHigh() ? 10.0f : 0.0f);
-				}
-				else if (currentAntDirection == rightTurn) {
-					//Ant is turning right
-					//cout << "\nANT TURNING RIGHT!";
-					outputs[GATE_OUTPUT_Y].setVoltage(clockTrigger.isHigh() ? 10.0f : 0.0f);
-				}
-				else {
-					//Ant is off the rails
-					//cout << "BIG PROBLEM!: Ant is of the rails!!";
-				}
-			}
+		//Left turn
+		if(currPositionValue) {
+			outputs[GATE_OUTPUT_LEFT].setVoltage(10.0f);
+			outputs[GATE_OUTPUT_RIGHT].setVoltage(0.0f);
+		}
+		//Right turn 
+		else {
+			outputs[GATE_OUTPUT_RIGHT].setVoltage(10.0f);
+			outputs[GATE_OUTPUT_LEFT].setVoltage(0.0f);
 		}
 
 	}
@@ -725,7 +705,7 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 
 	}
 
-	void wayBackMachine(int stepsBack) {
+	int wayBackMachine(int stepsBack) {
 
 
 		int currIndex = index;
@@ -796,17 +776,17 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		}
 		*/
 
-		index = index - stepsBack;
-		if (index < 1){
-			index = 1;
+		if (currIndex < 1){
 			lastAntX = 0;
 			lastAntY = 0;
+			return 1;
 			//cout << "GOES TO: IF";
 		}
 		else {
 			//cout << "GOES TO: ELSE";
 			lastAntX = antVectorHistory[historyTarget][X_POSITION];
 			lastAntY = antVectorHistory[historyTarget][Y_POSITION];
+			return currIndex - stepsBack;
 		}
 
 	}
@@ -862,7 +842,7 @@ void MusicalAnt::process(const ProcessArgs &args) {
 	// Looping implementation
 	if ((loopOn == true) && (loopLength != 0) && (loopLength < index)){
 		//^^ Loop must not be default value of zero and must be less than index but equal or more than saved loopIndex
-		wayBackMachine(loopLength);
+		index = wayBackMachine(loopLength);
 	}
 
 	// TODO Fix up this var below. May not be needed, or at least needs refactoring
@@ -896,10 +876,10 @@ void MusicalAnt::process(const ProcessArgs &args) {
 
 	// Separate gate outputs are used for X and Y
 	/*if (getAntX() != getLastAntX()) {
-				outputs[GATE_OUTPUT_X].setVoltage(gateOut);
+				outputs[GATE_OUTPUT_LEFT].setVoltage(gateOut);
 	}
 	if (getAntY() != getLastAntY()) {
-				outputs[GATE_OUTPUT_Y].setVoltage(gateOut);
+				outputs[GATE_OUTPUT_RIGHT].setVoltage(gateOut);
 	}*/
 	
 
@@ -952,6 +932,7 @@ struct ModuleDisplay : Widget {
 
 			//float brightness;
 
+			int antCell = module->iFromXY(module->antVector.at(X_POSITION), module->antVector.at(Y_POSITION));
 			int shadowAntCell = module->iFromXY(module->shadowAntVector.at(X_POSITION), module->shadowAntVector.at(Y_POSITION));
 			
 			int numCells = module->sideLength*module->sideLength;
@@ -970,11 +951,17 @@ struct ModuleDisplay : Widget {
 				}
 				if(i == shadowAntCell){
 					if(!module->params[MusicalAnt::SHADOW_ANT_ON].getValue()){
-						nvgFillColor(vg, nvgRGBA(0,0,255,255));
+						nvgFillColor(vg, nvgRGBA(0,70,0,255));
 						nvgBeginPath(vg);
 						nvgRect(vg, x*pixelSize, y*pixelSize, pixelSize, pixelSize);
 						nvgFill(vg);
 					}
+				}
+				if(i == antCell){
+					nvgFillColor(vg, nvgRGBA(20,255,50,255));
+					nvgBeginPath(vg);
+					nvgRect(vg, x*pixelSize, y*pixelSize, pixelSize, pixelSize);
+					nvgFill(vg);
 				}
 				//addChild( new ModuleDisplay(module, Vec((x+1)*(pixelSize + gapSize) + DISPLAY_OFFSET_X, (y+1)*(pixelSize + gapSize) + DISPLAY_OFFSET_Y), pixelSize, i));
 				//addChild(createLight<SmallLight<GreenLight>>(Vec((x+1)*6 + DISPLAY_OFFSET_X, (y+1)*6 + DISPLAY_OFFSET_Y), module, MusicalAnt::GRID_LIGHTS + i));
@@ -1181,8 +1168,8 @@ struct MusicalAntWidget : ModuleWidget {
 		addInput(createInput<PJ301MPort>(Vec(115.9, 181), module, MusicalAnt::EXT_CLOCK_INPUT));
 		addOutput(createOutput<PJ301MPort>(Vec(23.9, 181), module, MusicalAnt::GATE_OUTPUT));
 
-		addOutput(createOutput<PJ301MPort>(Vec(52.9, 181), module, MusicalAnt::GATE_OUTPUT_X));
-		addOutput(createOutput<PJ301MPort>(Vec(82.9, 181), module, MusicalAnt::GATE_OUTPUT_Y));
+		addOutput(createOutput<PJ301MPort>(Vec(52.9, 181), module, MusicalAnt::GATE_OUTPUT_LEFT));
+		addOutput(createOutput<PJ301MPort>(Vec(82.9, 181), module, MusicalAnt::GATE_OUTPUT_RIGHT));
 		
 
 		addChild(createLight<SmallLight<GreenLight>>(Vec(108.9, 170), module, MusicalAnt::BLINK_LIGHT));
