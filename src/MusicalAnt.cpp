@@ -261,8 +261,8 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		
 		this->index = index;
 		this->loopIndex = std::max(this->loopIndex, index);
-		cout << "\nIndex: " << index;
-		cout << "\nLoopIndex: " << this->loopIndex;
+	//cout << "\nIndex: " << index;
+	//cout << "\nLoopIndex: " << this->loopIndex;
 		if (this->index >= std::numeric_limits<int>::max())
 			this->index = 0;
 		int shadowDepth = pow(10, (int) params[EFFECT_KNOB_PARAM].getValue());
@@ -549,7 +549,7 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		//cout << "STEPPING ANT. History buffer is: " << historyBufferUsage;
 
 		if (antVectorHistory.size() != cellsHistory.size()) {
-			cout << "\nAntVectorHistory and cellsHistory are different sizes!!";
+		//cout << "\nAntVectorHistory and cellsHistory are different sizes!!";
 		}
 		//historyBufferUsage = historyBufferUsage + 1;
 
@@ -735,14 +735,14 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 
 		//int shadowHistoryTarget = (abs(currShadowAntIndex - stepsBack)) % HISTORY_AMOUNT;
 
-		cout << "\n\nDEBUGGING WAYBACK MACHINE";
-		cout << "\nCurrent Index: " << currIndex;
-		cout << "\nLoopIndex: " << getLoopIndex();
-		cout << "\nStepsBack: " << stepsBack;
-		cout << "\nHistoryBufferUsage: " << historyBufferUsage;
-		cout << "\nHistoryTarget: " << historyTarget;
+	//cout << "\n\nDEBUGGING WAYBACK MACHINE";
+	//cout << "\nCurrent Index: " << currIndex;
+	//cout << "\nLoopIndex: " << getLoopIndex();
+	//cout << "\nStepsBack: " << stepsBack;
+	//cout << "\nHistoryBufferUsage: " << historyBufferUsage;
+	//cout << "\nHistoryTarget: " << historyTarget;
 		//cout << "\nShadowHistoryTarget: " << shadowHistoryTarget;
-		cout << "\n\n";
+	//cout << "\n\n";
 
 		setAntPosition(antVectorHistory[historyTarget][X_POSITION], antVectorHistory[historyTarget][Y_POSITION], antVectorHistory[historyTarget][DIRECTION]);
 		setShadowAntPosition(shadowAntVectorHistory[historyTarget][X_POSITION], shadowAntVectorHistory[historyTarget][Y_POSITION], shadowAntVectorHistory[historyTarget][DIRECTION]);
@@ -770,7 +770,8 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		*/
 
 		//std::copy(cellsHistory[historyTarget], cellsHistory[historyTarget]+CELLS, cells);
-		cells.assign(cellsHistory[historyTarget].begin(), cellsHistory[historyTarget].begin()+CELLS); 
+		//cells.assign(cellsHistory.at(historyTarget).begin(), cellsHistory.at(historyTarget).begin()+CELLS);
+		cells = cellsHistory.at(historyTarget);
 
 
 		/*
@@ -819,7 +820,7 @@ void MusicalAnt::process(const ProcessArgs &args) {
 		(loopLength > 1) && 
 		(loopLength < index) &&
 		(historyBufferUsage > loopLength) &&
-		(index = getLoopIndex())) {
+		(index >= getLoopIndex())) {
 		//^^ Loop must not be default value of zero and must be less than index but equal or more than saved loopIndex
 		setIndex(wayBackMachine(loopLength));
 	}
@@ -1055,75 +1056,6 @@ struct ModuleDisplay : Widget {
 
 };
 
-/*struct ParameterFeedbackDisplay : TransparentWidget
-{
-
-  MusicalAnt *module;
-
-  int memFont = -1;
-  std::string text_label;
-  int pxSize;
-  int align;
-  NVGcolor color;
-  std::shared_ptr<Font> font;
-
-  ParameterFeedbackDisplay( MusicalAnt *module, Vec pos, int px, int al, NVGcolor col ) : pxSize( px ), align( al ), color( col )
-  {
-  	this->module = module;
-    box.pos = pos;
-    color = col;
-    font = APP->window->loadFont(asset::plugin(pluginInstance, "res/DSEG7ClassicMini-Regular.ttf"));
-  }
-
-  void draw( NVGcontext *vg ) {
-  	if(module) {
-	  	text_label = "Ant: " + std::to_string(module->index) + ", Shadow: " + std::to_string(module->shadowIndex);
-
-	    nvgBeginPath( vg );
-	    nvgFontFaceId(vg, font->handle);
-	    nvgFontSize( vg, pxSize );
-	    nvgFillColor( vg, color );
-	    nvgTextAlign( vg, align );
-	    nvgText( vg, 0, 0, text_label.c_str(), NULL );
-	}
-  }
-};*/
-
-/*struct LoopLengthTextLabel : TransparentWidget
-{
-
-  MusicalAnt *module;
-
-  int memFont = -1;
-  std::string text_label;
-  int pxSize;
-  int align;
-  NVGcolor color;
-  std::shared_ptr<Font> font;
-
-  LoopLengthTextLabel( MusicalAnt *module, Vec pos, int px, int al, NVGcolor col ) : pxSize( px ), align( al ), color( col )
-  {
-  	this->module = module;
-    box.pos = pos;
-    color = col;
-    font = APP->window->loadFont(asset::plugin(pluginInstance, "res/DSEG7ClassicMini-Regular.ttf"));
-  }
-
-  void draw( NVGcontext *vg ) {
-
-  	if(module) {
-	  	text_label = std::to_string(module->loopLength);
-
-	    nvgBeginPath( vg );
-	    nvgFontFaceId(vg, font->handle);
-	    nvgFontSize( vg, pxSize );
-	    nvgFillColor( vg, color );
-	    nvgTextAlign( vg, align );
-	    nvgText( vg, 0, 0, text_label.c_str(), NULL );
-	}
-  }
-};*/
-
 
 struct MusicalAntWidget : ModuleWidget {
 	MusicalAnt *module;
@@ -1133,17 +1065,14 @@ struct MusicalAntWidget : ModuleWidget {
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/MusicalAnt.svg")));
 
-		/*addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));*/
+		addChild(createWidget<ScrewBlack>(Vec(0, 0)));
+		addChild(createWidget<ScrewBlack>(Vec(box.size.x - 15, 0)));
+		addChild(createWidget<ScrewBlack>(Vec(0, 365)));
+		addChild(createWidget<ScrewBlack>(Vec(box.size.x - 15, 365)));
 
-		// Testing text
 
-		//addChild( new ParameterFeedbackDisplay(module, Vec(13.5, 345), 10, 1, nvgRGBA(255,0,0,255) ) );
 		CenteredLabel* const dynamicLabel = new CenteredLabel;
 		dynamicLabel->box.pos = Vec(75, 182.2);
-		//dynamicLabel->text = "120 BPM";
 
 		addParam(createParam<RoundBlackKnob>(Vec(143.9, 177), module, MusicalAnt::CLOCK_PARAM));
 
