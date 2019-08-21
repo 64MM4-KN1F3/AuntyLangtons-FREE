@@ -9,7 +9,7 @@ void init(Plugin *p) {
 
 	// Add all Models defined throughout the pluginInstance
 	p->addModel(modelMusicalAnt);
-	p->addModel(modelBottleRocket);
+	//p->addModel(modelBottleRocket);
 	// p->addModel(modelLadyLuck);
 	// TODO Shepherd-tonian "wrapping" arpeggiator with CV input to modulate steps amount and other params
 

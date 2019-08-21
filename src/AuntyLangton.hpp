@@ -10,7 +10,7 @@ extern Plugin *pluginInstance;
 
 // Forward-declare each Model, defined in each module source file
 extern Model *modelMusicalAnt;
-extern Model *modelBottleRocket;
+//extern Model *modelBottleRocket;
 // TODO extern Model *modelLadyLuck;  // Name idea
 // TODO extern Model *modelNoiseJam;  // Name idea
 // TODO Random walk

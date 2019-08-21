@@ -1,11 +1,11 @@
 {
   "slug": "AuntyLangtons",
-  "name": "AuntyLangtons",
-  "version": "1.0.0",
-  "license": "proprietary",
-  "brand": "AuntyLangtons",
+  "name": "Aunty Langtons",
+  "version": "0.9b",
+  "license": "",
+  "brand": "Aunty Langton's",
   "author": "Alex Weatherley",
-  "authorEmail": "",
+  "authorEmail": "aweatherley@gmail.com",
   "authorUrl": "",
   "pluginUrl": "",
   "manualUrl": "",
@@ -14,14 +14,8 @@
   "modules": [
     {
       "slug": "MusicalAnt",
-      "name": "MusicalAnt",
-      "description": "",
-      "tags": []
-    },
-    {
-      "slug": "BottleRocket",
-      "name": "BottleRocket",
-      "description": "",
+      "name": "Musical Ant",
+      "description": "Beta version",
       "tags": []
     }
   ]

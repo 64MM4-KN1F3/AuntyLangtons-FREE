@@ -160,8 +160,8 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 
 	MusicalAnt() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-		configParam(MusicalAnt::CLOCK_PARAM, -2.0f, 5.0f, 1.0f, "");
-		configParam(MusicalAnt::OCTAVE_KNOB_PARAM_X, 0.0, 7.5, 2.0, "");
+		configParam(MusicalAnt::CLOCK_PARAM, -2.0f, 8.0f, 1.0f, "");
+		configParam(MusicalAnt::OCTAVE_KNOB_PARAM_X, 0.0, 7.0, 2.0, "");
 		configParam(MusicalAnt::NOTE_KNOB_PARAM_X, 0.0, QuantizeUtils::NUM_NOTES-1, QuantizeUtils::NOTE_C, "");
 		configParam(MusicalAnt::SCALE_KNOB_PARAM_X, 0.0, QuantizeUtils::NUM_SCALES-1, QuantizeUtils::MINOR, "");
 		configParam(MusicalAnt::VOCT_INVERT_X, 0.0f, 1.0f, 1.0f, "");
@@ -194,6 +194,11 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 	}
 
 	~MusicalAnt() {
+		antVector.clear();
+		shadowAntVector.clear();
+		antVectorHistory.clear();
+		shadowAntVectorHistory.clear();
+		cellsHistory.clear();
 	}
 
 	void onReset() {
@@ -289,7 +294,7 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 	void setAntPosition(int x, int y, int direction) {
 		
 		if(lastAntX == 0) {
-			if (getIndex() >= 2 && this->antVector.size() >= X_POSITION) {
+			if (getIndex() >= 2) {
 				this->lastAntX = this->antVector.at(X_POSITION);
 			}
 		}
@@ -298,7 +303,7 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		}
 
 		if(lastAntY == 0) {
-			if (getIndex() >= 2&& this->antVector.size() >= Y_POSITION) {
+			if (getIndex() >= 2) {
 				this->lastAntY = this->antVector.at(Y_POSITION);
 			}
 		}
