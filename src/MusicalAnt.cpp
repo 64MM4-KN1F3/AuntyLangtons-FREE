@@ -37,34 +37,8 @@ Jeremy Wentworth of JW Modules - http://jeremywentworth.com
 Personal dev notes:
 
 Compile:
-RACK_DIR=/Users/my/Documents/Rack-SDK make dist
+RACK_DIR=/Users/my/Documents/Rack-SDK make
 
-Run Rack in debug mode (display std out to terminal):
-/Applications/Rack_0.6.app/Contents/MacOS/Rack
-
-TODO - Fix Bug resulting in Segmentation Fault when HISTORY_AMOUNT is exceded. Command line output example:
-HistoryBufferUsage: 94 and leaving white
-shadowAntOn= 1Shadow Ant position: X2 Y6 Direction180
-
-HistoryBufferUsage: 95 and leaving black
-shadowAntOn= 1Shadow Ant position: X2 Y5 Direction90
-
-HistoryBufferUsage: 96 and leaving black
-shadowAntOn= 1Shadow Ant position: X3 Y5 Direction180
-
-HistoryBufferUsage: 97 and leaving white
-shadowAntOn= 1Shadow Ant position: X3 Y4 Direction90
-
-HistoryBufferUsage: 98 and leaving white
-shadowAntOn= 1Shadow Ant position: X4 Y4 Direction180
-
-HistoryBufferUsage: 99 and leaving black
-shadowAntOn= 1Shadow Ant position: X4 Y5 Direction270
-
-HistoryBufferUsage: 99 and leaving black
-shadowAntOn= 1Shadow Ant position: X3 Y5 Direction0
-
-Segmentation fault: 11
 
 */
 
@@ -198,6 +172,7 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		shadowAntVector.clear();
 		antVectorHistory.clear();
 		shadowAntVectorHistory.clear();
+		cells.clear();
 		cellsHistory.clear();
 	}
 
@@ -749,8 +724,8 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		//cout << "\nShadowHistoryTarget: " << shadowHistoryTarget;
 	//cout << "\n\n";
 
-		setAntPosition(antVectorHistory[historyTarget][X_POSITION], antVectorHistory[historyTarget][Y_POSITION], antVectorHistory[historyTarget][DIRECTION]);
-		setShadowAntPosition(shadowAntVectorHistory[historyTarget][X_POSITION], shadowAntVectorHistory[historyTarget][Y_POSITION], shadowAntVectorHistory[historyTarget][DIRECTION]);
+		setAntPosition(antVectorHistory.at(historyTarget).at(X_POSITION), antVectorHistory.at(historyTarget).at(Y_POSITION), antVectorHistory.at(historyTarget).at(DIRECTION));
+		setShadowAntPosition(shadowAntVectorHistory.at(historyTarget).at(X_POSITION), shadowAntVectorHistory.at(historyTarget).at(Y_POSITION), shadowAntVectorHistory.at(historyTarget).at(DIRECTION));
 		//cout << "Writing cell history for target state: " << historyTarget;
 
 		/*
@@ -776,8 +751,10 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 
 		//std::copy(cellsHistory[historyTarget], cellsHistory[historyTarget]+CELLS, cells);
 		//cells.assign(cellsHistory.at(historyTarget).begin(), cellsHistory.at(historyTarget).begin()+CELLS);
+		//cells = cellsHistory.at(historyTarget);
+		//std::copy(cellsHistory.at(historyTarget).begin(), cellsHistory.at(historyTarget).end(), back_inserter(cells));
+		//cells.clear();
 		cells = cellsHistory.at(historyTarget);
-
 
 		/*
 		//cout << "\n---AFTER-WAY-BACK---";
@@ -797,8 +774,8 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		}
 		else {
 			//cout << "GOES TO: ELSE";
-			lastAntX = antVectorHistory[historyTarget][X_POSITION];
-			lastAntY = antVectorHistory[historyTarget][Y_POSITION];
+			lastAntX = antVectorHistory.at(historyTarget).at(X_POSITION);
+			lastAntY = antVectorHistory.at(historyTarget).at(Y_POSITION);
 			return currIndex - stepsBack;
 		}
 
@@ -815,7 +792,7 @@ void MusicalAnt::process(const ProcessArgs &args) {
 
 	bool gateIn = false;
 	int numberSteps = (int) params[SKIP_PARAM].getValue() + 1;
-	
+
 	loopOn = params[LOOPMODE_SWITCH_PARAM].getValue();
 
 	loopLength = params[LOOP_LENGTH].getValue() + 1;
@@ -874,7 +851,7 @@ void MusicalAnt::process(const ProcessArgs &args) {
 	pitch += inputs[PITCH_INPUT].getVoltage();
 	pitch = clamp(pitch, -4.0f, 4.0f);
 
-	
+
 
 	params[INDEX_PARAM].setValue(getIndex());
 
@@ -900,10 +877,11 @@ void MusicalAnt::process(const ProcessArgs &args) {
 	if (getAntY() != getLastAntY()) {
 				outputs[GATE_OUTPUT_RIGHT].setVoltage(gateOut);
 	}*/
-	
+
 
 
 	lights[BLINK_LIGHT].value = gateIn ? 1.0f : 0.0f;
+
 }
 
 struct ModuleDisplay : Widget {
@@ -1170,41 +1148,37 @@ struct MusicalAntWidget : ModuleWidget {
 			loopLengthKnob->connectLabel(dynamicLabel, module);
 			sideLengthKnob->connectLabel(dynamicLabel, module);
 			skipParamKnob->connectLabel(dynamicLabel, module);
+
+			addChild(dynamicLabel);
+
+			addParam(octaveKnobX);
+			addParam(noteKnobX);
+			addParam(scaleKnobX);
+
+			addParam(octaveKnobY);
+			addParam(noteKnobY);
+			addParam(scaleKnobY);
+
+			addParam(shadowOctaveKnobX);
+			addParam(shadowNoteKnobX);
+			addParam(shadowScaleKnobX);
+
+			addParam(shadowOctaveKnobY);
+			addParam(shadowNoteKnobY);
+			addParam(shadowScaleKnobY);
+
+			addParam(loopLengthKnob);
+			addParam(sideLengthKnob);
+			addParam(skipParamKnob);
+
+			// Create display
+			ModuleDisplay *display = new ModuleDisplay();
+			display->module = module;
+			display->box.pos = Vec(DISPLAY_OFFSET_X, DISPLAY_OFFSET_Y);
+			display->box.size = Vec(DISPLAY_SIZE_XY, DISPLAY_SIZE_XY);
+			addChild(display);
 		}
-		addChild(dynamicLabel);
-
-		addParam(octaveKnobX);
-		addParam(noteKnobX);
-		addParam(scaleKnobX);
-
-		addParam(octaveKnobY);
-		addParam(noteKnobY);
-		addParam(scaleKnobY);
-
-		addParam(shadowOctaveKnobX);
-		addParam(shadowNoteKnobX);
-		addParam(shadowScaleKnobX);
-
-		addParam(shadowOctaveKnobY);
-		addParam(shadowNoteKnobY);
-		addParam(shadowScaleKnobY);
-
-		addParam(loopLengthKnob);
-		addParam(sideLengthKnob);
-		addParam(skipParamKnob);
-
-		// Create display
-		ModuleDisplay *display = new ModuleDisplay();
-		display->module = module;
-		display->box.pos = Vec(DISPLAY_OFFSET_X, DISPLAY_OFFSET_Y);
-		display->box.size = Vec(DISPLAY_SIZE_XY, DISPLAY_SIZE_XY);
-		addChild(display);
-
-		/*if(module) {
-			//cout << "display - X: " << module->antVector[X_POSITION] << ", Y: " << module->antVector[Y_POSITION] << "\n";
-		}*/
-		//addChild(createLight<SmallLight<RedLight>>(Vec((module->antX+1)*6 + DISPLAY_OFFSET_X, (module->antY+1)*6 + DISPLAY_OFFSET_Y), module, (true)));
-
+		
 	}
 };
 
