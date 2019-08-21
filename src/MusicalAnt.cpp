@@ -162,7 +162,7 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		antVectorHistory.resize( HISTORY_AMOUNT , vector<int>( 3 , 0 ) );
 		shadowAntVectorHistory.resize( HISTORY_AMOUNT , vector<int>( 3 , 0 ) );
 		cells.resize(CELLS, false);
-		cellsHistory.resize( HISTORY_AMOUNT , vector<bool>( CELLS , 0 ) );
+		cellsHistory.resize( HISTORY_AMOUNT , vector<bool>( CELLS , false ) );
 
 		onReset();
 	}

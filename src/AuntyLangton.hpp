@@ -79,14 +79,14 @@ struct RoundSmallBlackKnobSnap : RoundSmallBlackKnob {
 };
 
 ////////////////////////////////////////////// BUTTONS //////////////////////////////////////////////
-struct CKSS_Horizontal : SVGSwitch {
+struct CKSS_Horizontal : app::SVGSwitch {
 	CKSS_Horizontal() {
 		addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/CKSS_Horizontal_0.svg")));
 		addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/CKSS_Horizontal_1.svg")));
 	}
 };
 
-struct AuntyLangButton : SVGSwitch {
+struct AuntyLangButton : app::SVGSwitch {
 	AuntyLangButton() {
 		momentary = true;
 		addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/AuntyLangButton_0.svg")));
