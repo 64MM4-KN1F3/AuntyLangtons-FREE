@@ -208,23 +208,116 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
 		
+		json_t *antVectorJ = json_array();
+		for (int i = 0; i < 3; i++) {
+			json_t *antVectorJ = json_integer((int) antVector.at(i));
+			json_array_append_new(antVectorJ, antVectorJ);
+		}
+		json_object_set_new(rootJ, "antVector", antVectorJ);
+
+		json_t *shadowAntVectorJ = json_array();
+		for (int i = 0; i < 3; i++) {
+			json_t *shadowAntVectorJ = json_integer((int) shadowAntVector.at(i));
+			json_array_append_new(shadowAntVectorJ, shadowAntVectorJ);
+		}
+		json_object_set_new(rootJ, "shadowAntVector", shadowAntVectorJ);
+
+		json_t *antVectorHistoryJ = json_array();
+		int vectorHistoryCellsCount = HISTORY_AMOUNT * 3;
+		for (int i = 0; i < vectorHistoryCellsCount; i++) {
+			json_t *antVectorHistoryJ = json_integer((int) antVectorHistory.at(i/3).at(i%3));
+			json_array_append_new(antVectorHistoryJ, antVectorHistoryJ);
+		}
+		json_object_set_new(rootJ, "antVectorHistory", antVectorHistoryJ);
+
+
+		json_t *shadowAntVectorHistoryJ = json_array();
+		for (int i = 0; i < vectorHistoryCellsCount; i++) {
+			json_t *shadowAntVectorHistoryJ = json_integer((int) shadowAntVectorHistory.at(i/3).at(i%3));
+			json_array_append_new(shadowAntVectorHistoryJ, shadowAntVectorHistoryJ);
+		}
+		json_object_set_new(rootJ, "shadowAntVectorHistory", shadowAntVectorHistoryJ);
+
+		json_t *cellsHistoryJ = json_array();
+		int cellsHistoryCount = HISTORY_AMOUNT * CELLS;
+		for (int i = 0; i < cellsHistoryCount; i++) {
+			json_t *cellsHistoryJ = json_integer((int) cellsHistory.at(i/CELLS).at(i%CELLS));
+			json_array_append_new(cellsHistoryJ, cellsHistoryJ);
+		}
+		json_object_set_new(rootJ, "cellsHistory", cellsHistoryJ);
+
 		json_t *cellsJ = json_array();
 		for (int i = 0; i < CELLS; i++) {
 			json_t *cellJ = json_integer((int) cells.at(i));
 			json_array_append_new(cellsJ, cellJ);
 		}
 		json_object_set_new(rootJ, "cells", cellsJ);
+
+		/*
+		ToJson TODO
+		cellsHistory.clear();
+		index settings ?
+		*/
 		
 		return rootJ;
 	}
 
 	void dataFromJson(json_t *rootJ) override {
+
+		json_t *antVectorJ = json_object_get(rootJ, "antVector");
+		if (antVectorJ) {
+			for (int i = 0; i < 3; i++) {
+				json_t *antVectorJ = json_array_get(antVectorJ, i);
+				if (antVectorJ)
+					antVector.at(i) = json_integer_value(antVectorJ);
+			}
+		}
+
+		json_t *shadowAntVectorJ = json_object_get(rootJ, "shadowAntVector");
+		if (shadowAntVectorJ) {
+			for (int i = 0; i < 3; i++) {
+				json_t *shadowAntVectorJ = json_array_get(shadowAntVectorJ, i);
+				if (shadowAntVectorJ)
+					shadowAntVector.at(i) = json_integer_value(shadowAntVectorJ);
+			}
+		}
+
+		json_t *antVectorHistoryJ = json_object_get(rootJ, "antVectorHistory");
+		int vectorHistoryCellsCount = HISTORY_AMOUNT * 3;
+		if (antVectorHistoryJ) {
+			for (int i = 0; i < vectorHistoryCellsCount; i++) {
+				json_t *antVectorHistoryJ = json_array_get(antVectorHistoryJ, i);
+				if (antVectorHistoryJ)
+					antVectorHistory.at(i/3).at(i%3) = json_integer_value(antVectorHistoryJ);
+			}
+		}
+
+		json_t *shadowAntVectorHistoryJ = json_object_get(rootJ, "shadowAntVectorHistory");
+		if (shadowAntVectorHistoryJ) {
+			for (int i = 0; i < vectorHistoryCellsCount; i++) {
+				json_t *shadowAntVectorHistoryJ = json_array_get(shadowAntVectorHistoryJ, i);
+				if (shadowAntVectorHistoryJ)
+					shadowAntVectorHistory.at(i/3).at(i%3) = json_integer_value(shadowAntVectorHistoryJ);
+			}
+		}
+
+		json_t *cellsHistoryJ = json_object_get(rootJ, "cellsHistory");
+		int cellsHistoryCount = HISTORY_AMOUNT * CELLS;
+		if (cellsHistoryJ) {
+			for (int i = 0; i < cellsHistoryCount; i++) {
+				json_t *cellsHistoryJ = json_array_get(cellsHistoryJ, i);
+				if (cellsHistoryJ)
+					cellsHistory.at(i/CELLS).at(i%CELLS) = (bool) json_integer_value(cellsHistoryJ);
+			}
+		}
+
+
 		json_t *cellsJ = json_object_get(rootJ, "cells");
 		if (cellsJ) {
 			for (int i = 0; i < CELLS; i++) {
 				json_t *cellJ = json_array_get(cellsJ, i);
 				if (cellJ)
-					cells[i] = json_integer_value(cellJ);
+					cells.at(i) = (bool) json_integer_value(cellJ);
 			}
 		}
 	}
