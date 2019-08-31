@@ -894,6 +894,8 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 
 void MusicalAnt::process(const ProcessArgs &args) {
 
+	int currentIndex = getIndex();
+
 	bool gateIn = false;
 	int numberSteps = (int) params[SKIP_PARAM].getValue() + 1;
 
@@ -901,12 +903,14 @@ void MusicalAnt::process(const ProcessArgs &args) {
 
 	loopLength = params[LOOP_LENGTH].getValue() + 1;
 
+
+
 	// Looping implementation
 	if ((loopOn == true) &&
 		(loopLength > 1) && 
 		(loopLength < index) &&
 		(historyBufferUsage > loopLength) &&
-		(index >= getLoopIndex())) {
+		(currentIndex >= getLoopIndex())) {
 		//^^ Loop must not be default value of zero and must be less than index but equal or more than saved loopIndex
 		setIndex(wayBackMachine(loopLength));
 	}
@@ -931,19 +935,6 @@ void MusicalAnt::process(const ProcessArgs &args) {
 	}
 
 
-	/* Manually step the system forward by one
-	if (clockTrigger.process(params[STEP_FWD_BTN_PARAM].getValue())) {
-		walkAnt(1);
-		params[STEP_FWD_BTN_PARAM].getValue() = 0.0;
-	}
-
-	// Manually step the system backward by one
-	if (clockTrigger.process(params[STEP_BCK_BTN_PARAM].getValue())) {
-		wayBackMachine(1);
-		params[STEP_BCK_BTN_PARAM].getValue() = 0.0;
-	}*/
-
-
 
 	// TODO Fix up this var below. May not be needed, or at least needs refactoring
 	int tempSideLength = (int) params[SIDE_LENGTH_PARAM].getValue();
@@ -957,7 +948,7 @@ void MusicalAnt::process(const ProcessArgs &args) {
 
 
 
-	params[INDEX_PARAM].setValue(getIndex());
+	params[INDEX_PARAM].setValue(currentIndex);
 
 
 	outputs[GATE_OUTPUT].setVoltage(gateOut);
@@ -973,16 +964,6 @@ void MusicalAnt::process(const ProcessArgs &args) {
 	else {
 		outputs[VOCT_OUTPUT_POLY].setChannels(2);
 	}
-
-	// Separate gate outputs are used for X and Y
-	/*if (getAntX() != getLastAntX()) {
-				outputs[GATE_OUTPUT_LEFT].setVoltage(gateOut);
-	}
-	if (getAntY() != getLastAntY()) {
-				outputs[GATE_OUTPUT_RIGHT].setVoltage(gateOut);
-	}*/
-
-
 
 	lights[BLINK_LIGHT].value = gateIn ? 1.0f : 0.0f;
 
