@@ -172,18 +172,9 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 	~MusicalAnt() {
 		antVector.clear();
 		shadowAntVector.clear();
-		/*for (unsigned int i = 0; i < antVectorHistory.size(); i++) {
-			antVectorHistory.at(i).clear();
-		}*/
 		antVectorHistory.clear();
-		/*for (unsigned int i = 0; i < shadowAntVectorHistory.size(); i++) {
-			shadowAntVectorHistory.at(i).clear();
-		}*/
 		shadowAntVectorHistory.clear();
 		cells.clear();
-		/*for (unsigned int i = 0; i < cellsHistory.size(); i++) {
-			cellsHistory.at(i).clear();
-		}*/
 		cellsHistory.clear();
 	}
 
@@ -233,6 +224,8 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		}
 		json_object_set_new(rootJ, "shadowAntVector", shadowAntVectorJ);
 
+		/*
+
 		json_t *antVectorHistoryJ = json_array();
 		int vectorHistoryCellsCount = HISTORY_AMOUNT * 3;
 		for (int i = 0; i < vectorHistoryCellsCount; i++) {
@@ -256,6 +249,8 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 			json_array_append_new(cellsHistoryJ, cellsHistoryJ);
 		}
 		json_object_set_new(rootJ, "cellsHistory", cellsHistoryJ);
+
+		*/
 
 		json_t *cellsJ = json_array();
 		for (int i = 0; i < CELLS; i++) {
@@ -293,6 +288,8 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 			}
 		}
 
+		/*
+
 		json_t *antVectorHistoryJ = json_object_get(rootJ, "antVectorHistory");
 		int vectorHistoryCellsCount = HISTORY_AMOUNT * 3;
 		if (antVectorHistoryJ) {
@@ -321,6 +318,7 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 					cellsHistory.at(i/CELLS).at(i%CELLS) = (bool) json_integer_value(cellsHistoryJ);
 			}
 		}
+		*/
 
 
 		json_t *cellsJ = json_object_get(rootJ, "cells");
@@ -331,6 +329,8 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 					cells.at(i) = (bool) json_integer_value(cellJ);
 			}
 		}
+
+		setHistoryBufferUsage(0);
 	}
 
 	int wrap(int kX, int const kLowerBound, int const kUpperBound) {
@@ -364,6 +364,14 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 
 	int getShadowIndex() {
 		return this->shadowIndex;
+	}
+
+	int getHistoryBufferUsage() {
+		return this->historyBufferUsage;
+	}
+
+	void setHistoryBufferUsage(int amount) {
+		historyBufferUsage = amount;
 	}
 
 	void setSideLength(int x){
@@ -903,13 +911,15 @@ void MusicalAnt::process(const ProcessArgs &args) {
 
 	loopLength = params[LOOP_LENGTH].getValue() + 1;
 
+	int currHistBuffUsage = getHistoryBufferUsage();
+
 
 
 	// Looping implementation
 	if ((loopOn == true) &&
 		(loopLength > 1) && 
 		(loopLength < index) &&
-		(historyBufferUsage > loopLength) &&
+		(currHistBuffUsage > loopLength) &&
 		(currentIndex >= getLoopIndex())) {
 		//^^ Loop must not be default value of zero and must be less than index but equal or more than saved loopIndex
 		setIndex(wayBackMachine(loopLength));
