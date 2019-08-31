@@ -124,7 +124,7 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 	vector< vector<int> > shadowAntVectorHistory;
 	int fibo[7] = {8, 13, 21, 34, 55, 89, 144}; // short for Fibonacci (cause I forgot that's why I named it that).
 	int lastAntX, lastAntY;
-	int sideLength = fibo[INITIAL_RESOLUTION_KNOB_POSITION];
+	int sideLength;
 	int historyBufferUsage = 0;
 
 	// Representation of cells
@@ -164,15 +164,26 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		cells.resize(CELLS, false);
 		cellsHistory.resize( HISTORY_AMOUNT , vector<bool>( CELLS , false ) );
 
+		sideLength = fibo[INITIAL_RESOLUTION_KNOB_POSITION];
+
 		onReset();
 	}
 
 	~MusicalAnt() {
 		antVector.clear();
 		shadowAntVector.clear();
+		/*for (unsigned int i = 0; i < antVectorHistory.size(); i++) {
+			antVectorHistory.at(i).clear();
+		}*/
 		antVectorHistory.clear();
+		/*for (unsigned int i = 0; i < shadowAntVectorHistory.size(); i++) {
+			shadowAntVectorHistory.at(i).clear();
+		}*/
 		shadowAntVectorHistory.clear();
 		cells.clear();
+		/*for (unsigned int i = 0; i < cellsHistory.size(); i++) {
+			cellsHistory.at(i).clear();
+		}*/
 		cellsHistory.clear();
 	}
 
