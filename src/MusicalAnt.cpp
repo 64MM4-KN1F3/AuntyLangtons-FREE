@@ -354,6 +354,22 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 			this->shadowIndex += 1; //this->index - shadowDepth;
 	}
 
+	bool getLoopOn() {
+		return this->loopOn;
+	}
+
+	void setLoopOn(bool value) {
+		this->loopOn = value;
+	}
+
+	int getLoopLength() {
+		return this->loopLength;
+	}
+
+	void setLoopLength(int value) {
+		this->loopLength = value;
+	}
+
 	int getLoopIndex() {
 		return this->loopIndex;
 	}
@@ -907,16 +923,18 @@ void MusicalAnt::process(const ProcessArgs &args) {
 	bool gateIn = false;
 	int numberSteps = (int) params[SKIP_PARAM].getValue() + 1;
 
-	loopOn = params[LOOPMODE_SWITCH_PARAM].getValue();
+	bool loopIsOn = params[LOOPMODE_SWITCH_PARAM].getValue();
+	setLoopOn(loopIsOn);
 
 	loopLength = params[LOOP_LENGTH].getValue() + 1;
+	setLoopLength(loopLength);
 
 	int currHistBuffUsage = getHistoryBufferUsage();
 
 
 
 	// Looping implementation
-	if ((loopOn == true) &&
+	if ((loopIsOn == true) &&
 		(loopLength > 1) && 
 		(loopLength < index) &&
 		(currHistBuffUsage > loopLength) &&
