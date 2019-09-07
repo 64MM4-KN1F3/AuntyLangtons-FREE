@@ -172,10 +172,20 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 	~MusicalAnt() {
 		antVector.clear();
 		shadowAntVector.clear();
+		for (unsigned int i = 0; i < antVectorHistory.size(); i++) {
+			antVectorHistory.at(i).clear();
+		}
 		antVectorHistory.clear();
+		for (unsigned int i = 0; i < shadowAntVectorHistory.size(); i++) {
+			shadowAntVectorHistory.at(i).clear();
+		}
 		shadowAntVectorHistory.clear();
 		cells.clear();
+		for (unsigned int i = 0; i < cellsHistory.size(); i++) {
+			cellsHistory.at(i).clear();
+		}
 		cellsHistory.clear();
+
 	}
 
 	void onReset() {
@@ -259,6 +269,13 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		}
 		json_object_set_new(rootJ, "cells", cellsJ);
 
+		json_t *lastAntPosJ = json_array();
+		json_t *lastAntAxisJ = json_integer(getLastAntX());
+		json_array_append_new(lastAntPosJ, lastAntAxisJ);
+		lastAntAxisJ = json_integer(getLastAntY());
+		json_array_append_new(lastAntPosJ, lastAntAxisJ);
+		json_object_set_new(rootJ, "lastAntPos", lastAntPosJ);
+
 		/*
 		ToJson TODO
 		cellsHistory.clear();
@@ -329,6 +346,15 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 					cells.at(i) = (bool) json_integer_value(cellJ);
 			}
 		}
+
+		json_t *lastAntPosJ = json_object_get(rootJ, "lastAntPos");
+		json_t *lastAntAxisJ = json_array_get(lastAntPosJ, 0);
+		if (lastAntPosJ)
+				setLastAntX((int) json_integer_value(lastAntPosJ));
+
+		lastAntAxisJ = json_array_get(lastAntPosJ, 1);
+		if (lastAntPosJ)
+				setLastAntY((int) json_integer_value(lastAntPosJ));
 
 		setHistoryBufferUsage(0);
 	}
@@ -464,6 +490,14 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 
 	int getLastAntY() {
 		return this->lastAntY;
+	}
+
+	void setLastAntX(int value) {
+		this->lastAntX = value;
+	}
+
+	void setLastAntY(int value) {
+		this->lastAntY = value;
 	}
 
 	int getAntDirection() {
@@ -650,6 +684,9 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 
 		// Save last cell state
 		int historyIndex = index % HISTORY_AMOUNT;
+
+		lastAntX = currPositionX;
+		lastAntY = currPositionY;
 		//*cellsHistory[historyIndex] = new bool[CELLS];
 		//cout << "\nCellHistoryIndex: " << historyIndex;
 		// Record current cell state to historical snapshot
@@ -970,7 +1007,6 @@ void MusicalAnt::process(const ProcessArgs &args) {
 	// Compute the frequency from the pitch parameter and input
 	float pitch = params[PITCH_PARAM].getValue();
 	setSideLength(tempSideLength);
-	float gateOut = (gateIn ? 10.0f : 0.0f);
 	pitch += inputs[PITCH_INPUT].getVoltage();
 	pitch = clamp(pitch, -4.0f, 4.0f);
 
@@ -979,7 +1015,7 @@ void MusicalAnt::process(const ProcessArgs &args) {
 	params[INDEX_PARAM].setValue(currentIndex);
 
 
-	outputs[GATE_OUTPUT].setVoltage(gateOut);
+	outputs[GATE_OUTPUT].setVoltage(gateIn ? 10.0f : 0.0f);
 
 	outputs[VOCT_OUTPUT_POLY].setVoltage(!params[VOCT_INVERT_X].getValue() ? closestVoltageForX(tempSideLength - getAntX()) : closestVoltageForX(getAntX()), 0);;
 	outputs[VOCT_OUTPUT_POLY].setVoltage(!params[VOCT_INVERT_Y].getValue() ? closestVoltageForY(tempSideLength - getAntY()) : closestVoltageForY(getAntY()), 1);;
