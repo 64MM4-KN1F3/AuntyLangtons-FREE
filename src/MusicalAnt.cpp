@@ -272,7 +272,7 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 
 		json_t *cellsJ = json_array();
 		for (int i = 0; i < CELLS; i++) {
-			json_t *cellJ = json_integer((int) cells.at(i));
+			json_t *cellJ = json_integer((int) systemState->cells.at(i));
 			json_array_append_new(cellsJ, cellJ);
 		}
 		json_object_set_new(rootJ, "cells", cellsJ);
@@ -344,7 +344,7 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 			for (int i = 0; i < CELLS; i++) {
 				json_t *cellJ = json_array_get(cellsJ, i);
 				if (cellJ)
-					cells.at(i) = (bool) json_integer_value(cellJ);
+					systemState->cells.at(i) = (bool) json_integer_value(cellJ);
 			}
 		}
 
@@ -413,59 +413,24 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 	}
 
 	void setAntPosition(int x, int y, int direction) {
-		
-		if(lastAntX == 0) {
-			if (getIndex() >= 2) {
-				this->lastAntX = this->antVector.at(X_POSITION);
-			}
-		}
-		else {
-			//this->lastAntX = this->antVector.at(X_POSITION);
-		}
-
-		if(lastAntY == 0) {
-			if (getIndex() >= 2) {
-				this->lastAntY = this->antVector.at(Y_POSITION);
-			}
-		}
-		else {
-			//this->lastAntY = this->antVector.at(Y_POSITION);
-		}
-
-		//this->antVector.clear();
-		this->antVector.at(X_POSITION) = wrap(x, 0, sideLength-1);
-		this->antVector.at(Y_POSITION) = wrap(y, 0, sideLength-1);
-		this->antVector.at(DIRECTION) = wrap(direction, 0, 359);
-		/*this->antVector[X_POSITION] = wrap(x, 0, sideLength-1);
-		this->antVector[Y_POSITION] = wrap(y, 0, sideLength-1);
-		this->antVector[DIRECTION] = wrap(direction, 0, 359);
-		*/
+		systemState->antX = wrap(x, 0, sideLength-1);
+		systemState->antY = wrap(y, 0, sideLength-1);
+		systemState->antDirectionDegrees = direction;
 	}
 
 	void setShadowAntPosition(int x, int y, int direction) {
-		
-
-		//this->shadowAntVector.clear();
-		this->shadowAntVector.at(X_POSITION) = wrap(x, 0, sideLength-1);
-		this->shadowAntVector.at(Y_POSITION) = wrap(y, 0, sideLength-1);
-		this->shadowAntVector.at(DIRECTION) = wrap(direction, 0, 359);
-
-		
-
-		/*
-		this->shadowAntVector[X_POSITION] = wrap(x, 0, sideLength-1);
-		this->shadowAntVector[Y_POSITION] = wrap(x, 0, sideLength-1);
-		this->shadowAntVector[DIRECTION] = wrap(direction, 0, 359);
-		*/
+		systemState->shadowAntX = wrap(x, 0, sideLength-1);
+		systemState->shadowAntY = wrap(y, 0, sideLength-1);
+		systemState->shadowAntDirectionDegrees = direction;
 	}
 
 
 	int getAntX() {
-		return this->antVector.at(X_POSITION);
+		return systemState->antX;
 	}
 
 	int getAntY() {
-		return this->antVector.at(Y_POSITION);
+		return systemState->antY;
 	}
 
 	int getShadowAntX() {
@@ -498,6 +463,7 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		//TODO put logo back? ^^^
 		for(unsigned int i=0;i<CELLS;i++){
 			cells.at(i) = false; //Logos::AL_logo_144x144[i];
+			systemState->cells.at(i) = false;
 		}
 		// Testing Logo
 		//std::copy(cells, cells+CELLS, Logos::AL_logo_144x144);
@@ -618,12 +584,16 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 	void setCellOn(int cellX, int cellY, bool on){
 		if(cellX >= 0 && cellX < sideLength && 
 		   cellY >=0 && cellY < sideLength){
-			cells.at(iFromXY(cellX, cellY)) = on;
+			systemState->cells.at(iFromXY(cellX, cellY)) = on;
 		}
 	}
 
-	bool isCellOn(int cellX, int cellY){
-		return cells.at(iFromXY(cellX, cellY));
+	void toggleCellState(int cellX, int cellY){
+		setCellOn(cellX, cellY, !getCellState(cellX,cellY));
+	}
+
+	bool getCellState(int cellX, int cellY){
+		return systemState->cells.at(iFromXY(cellX, cellY));
 	}
 
 	void setCellOnByDisplayPos(float displayX, float displayY, bool on){
@@ -631,9 +601,9 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		setCellOn(int(displayX / pixelSize), int(displayY / pixelSize), on);
 	}
 
-	bool isCellOnByDisplayPos(float displayX, float displayY){
+	bool getCellStateByDisplayPos(float displayX, float displayY){
 		float pixelSize = 0.9f * ((float) DISPLAY_SIZE_XY / (float) sideLength);
-		return isCellOn(int(displayX / pixelSize), int(displayY / pixelSize));
+		return getCellState(int(displayX / pixelSize), int(displayY / pixelSize));
 	}
 
 	int iFromXY(int cellX, int cellY){
@@ -654,9 +624,55 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 	    return r < 0 ? r + b : r;
 	}
 
-
-
 	void stepAnt(){
+		// Ant
+
+		int currPositionX = systemState->antX;
+		int currPositionY = systemState->antY;
+		bool currentCellState = getCellState(currPositionX, currPositionY);
+		int currentDirection = systemState->antDirectionDegrees;
+		toggleCellState(currPositionX, currPositionY);
+		int newDirection;
+		if(currentCellState == true)
+			newDirection = wrap(systemState->antDirectionDegrees + antBehaviour->getOnLightInstruction(), 0, 359);
+		if(currentCellState == false)
+			newDirection = wrap(systemState->antDirectionDegrees + antBehaviour->getOnDarkInstruction(), 0, 359);
+
+		switch(currentDirection) {
+			case 0 : {
+				// Ant goes up
+				setAntPosition(currPositionX, currPositionY - 1, newDirection);
+				break;
+			}
+			case 90 : {
+				// Ant goes right
+				setAntPosition(currPositionX + 1, currPositionY, newDirection);
+				break;
+			}
+			case 180 : {
+				// Ant goes down
+				setAntPosition(currPositionX, currPositionY + 1, newDirection);
+				break;
+			}
+			case 270 : {
+				// Ant goes left
+				setAntPosition(currPositionX - 1, currPositionY, newDirection);
+				break;
+			}
+		}
+
+		systemState->antDirectionDegrees = newDirection;
+
+		//Shadow Ant
+
+		bool shadowAntOn = (bool) !params[SHADOW_ANT_ON].getValue();
+
+		if (shadowAntOn) {
+			// Implement ShadowAnt behaviour here.
+		}
+	}
+
+	void stepAnt_old(){
 		/*Pseudo:
 		- current cell is set to opposite
 		- case for 4 direction where setAntPosition is updated
@@ -664,7 +680,7 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		// Get current position value and store for later
 		int currPositionX = getAntX();
 		int currPositionY = getAntY();
-		bool currPositionValue = isCellOn(currPositionX, currPositionY);
+		bool currPositionValue = getCellState(currPositionX, currPositionY);
 		int currDirection = getAntDirection();
 		int newDirection;
 
@@ -752,7 +768,7 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 				// Get current shadow ant position value and store for later
 				int currShadowAntPositionX = this->shadowAntVector.at(X_POSITION);
 				int currShadowAntPositionY = this->shadowAntVector.at(Y_POSITION);
-				bool currShadowAntPositionValue = isCellOn(currShadowAntPositionX, currShadowAntPositionY);
+				bool currShadowAntPositionValue = getCellState(currShadowAntPositionX, currShadowAntPositionY);
 				int currShadowAntDirection = this->shadowAntVector.at(DIRECTION);
 				int newShadowAntDirection;
 
@@ -1035,7 +1051,7 @@ struct ModuleDisplay : Widget {
 			initX = e.pos.x;
 			initY = e.pos.y;
 			if((0 < initX) && (initX < DISPLAY_SIZE_XY) && (0 < initY) && (initY < DISPLAY_SIZE_XY)) {
-				currentlyTurningOn = !module->isCellOnByDisplayPos(initX, initY);
+				currentlyTurningOn = !module->getCellStateByDisplayPos(initX, initY);
 				module->setCellOnByDisplayPos(initX, initY, currentlyTurningOn);
 			}
 		}
@@ -1072,8 +1088,8 @@ struct ModuleDisplay : Widget {
 					y++;
 				}
 				
-				//nvgFillColor(vg, (module->cells[i] ? nvgRGBA(0,255,0,255) : nvgRGBA(255,0,0,255)));
-				if(module->cells.at(i)){
+				//nvgFillColor(vg, (module->systemState->cells[i] ? nvgRGBA(0,255,0,255) : nvgRGBA(255,0,0,255)));
+				if(module->systemState->cells.at(i)){
 					nvgFillColor(vg, ((random::uniform() < 0.5) ? nvgRGBA(0,255,0,PIXEL_BRIGHTNESS) : nvgRGBA(0,255,0,PIXEL_BRIGHTNESS+5)));
 					nvgBeginPath(vg);
 					nvgRect(vg, x*pixelSize, y*pixelSize, pixelSize, pixelSize);
