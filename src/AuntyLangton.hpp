@@ -72,6 +72,33 @@ struct MusicalInstruction {
 		darkInstructionNumber = 0;
 	}
 
+	MusicalInstruction(std::string onLightInput, std::string onDarkInput) {
+		// Custom behaviour
+		int onLightInputSize = onLightInput.size();
+		int onDarkInputSize = onDarkInput.size();
+
+		char onLightStr[onLightInputSize + 1];
+		onLightInput.copy(onLightStr, onLightInputSize + 1);
+		onLightStr[onLightInputSize] = '\0';
+
+		char onDarkStr[onDarkInputSize + 1];
+		onDarkInput.copy(onDarkStr, onDarkInputSize + 1);
+		onDarkStr[onDarkInputSize] = '\0';
+
+		for(int i = 0;i<onLightInputSize;i++){
+			onLight.push_back(onLightStr[i]);
+		}
+
+		for(int j = 0;j<onDarkInputSize;j++){
+			onDark.push_back(onDarkStr[j]);
+		}
+		lightInstructionPeriod = onLightInputSize;
+		darkInstructionPeriod = onDarkInputSize;
+
+		lightInstructionNumber = 0;
+		darkInstructionNumber = 0;
+	}
+
 	int instruction(char input) {
 		if(input == 'L')
 			return L;
