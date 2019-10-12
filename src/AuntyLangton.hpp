@@ -72,23 +72,27 @@ struct MusicalInstruction {
 		darkInstructionNumber = 0;
 	}
 
-	int Instruction(char input) {
+	int instruction(char input) {
 		if(input == 'L')
 			return L;
 		if(input == 'R')
 			return R;
 	}
 
+	int invertInstruction(char input){
+		return -1*instruction(input);
+	}
+
 	int getOnLightInstruction() {
 		char step = onLight.at(lightInstructionNumber);
 		lightInstructionNumber = ((lightInstructionNumber + 1) % lightInstructionPeriod) - 1;
-		return Instruction(step);
+		return instruction(step);
 	}
 
 	int getOnDarkInstruction() {
 		char step = onDark.at(darkInstructionNumber);
 		darkInstructionNumber = ((darkInstructionNumber + 1) % darkInstructionPeriod) - 1;
-		return Instruction(step);
+		return instruction(step);
 	}
 };
 
