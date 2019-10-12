@@ -1,6 +1,12 @@
 #include <rack.hpp>
 #include "QuantizeUtils.cpp"
+
 //#include "Logos.cpp"
+
+
+#define CELLS 20736
+#define L -90
+#define R 90
 
 
 using namespace rack;
@@ -18,9 +24,73 @@ extern Model *modelMusicalAnt;
 // TODO arp with brownian motion built in and modulation step lenght?
 // TODO Modulo util to wrap V/Oct voltages
 
-////////////////////////////////////////////// GRID DISPLAY //////////////////////////////////////////////
+////////////////////////////////////////////// SYSTEM STATE //////////////////////////////////////////////
 
-// Display that can be scaled im resolution
+struct MusicalSystemState {
+  
+  // ant position & direction
+  int antX;
+  int antY;
+  int antDirectionDegrees;
+
+  // shadow ant position & direction
+  int shadowAntX;
+  int shadowAntY;
+  int shadowAntDirectionDegrees;
+
+  std::vector<bool> cells;
+
+  MusicalSystemState() {
+  		cells.resize(CELLS, false);
+  		antX = 0;
+  		antY = 0;
+  		antDirectionDegrees = 0;
+
+  		shadowAntX = 0;
+  		shadowAntY = 0;
+  		shadowAntDirectionDegrees = 0;
+  }
+
+};
+
+struct MusicalInstruction {
+	std::vector<char> onLight;
+	std::vector<char> onDark;
+	int lightInstructionPeriod;
+	int darkInstructionPeriod;
+	int lightInstructionNumber;
+	int darkInstructionNumber;
+
+	MusicalInstruction() {
+		// Default behaviour
+		onLight.push_back('L');
+		onDark.push_back('R');
+		lightInstructionPeriod = onLight.size();
+		darkInstructionPeriod = onDark.size();
+
+		lightInstructionNumber = 0;
+		darkInstructionNumber = 0;
+	}
+
+	int Instruction(char input) {
+		if(input == 'L')
+			return L;
+		if(input == 'R')
+			return R;
+	}
+
+	int getOnLightInstruction() {
+		char step = onLight.at(lightInstructionNumber);
+		lightInstructionNumber = ((lightInstructionNumber + 1) % lightInstructionPeriod) - 1;
+		return Instruction(step);
+	}
+
+	int getOnDarkInstruction() {
+		char step = onDark.at(darkInstructionNumber);
+		darkInstructionNumber = ((darkInstructionNumber + 1) % darkInstructionPeriod) - 1;
+		return Instruction(step);
+	}
+};
 
 ////////////////////////////////////////////// LABELS //////////////////////////////////////////////
 

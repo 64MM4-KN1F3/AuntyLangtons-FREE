@@ -131,6 +131,11 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 	vector<bool> cells;
 	vector< vector<bool> > cellsHistory;
 
+	// New system representation.
+
+	MusicalSystemState* systemState;
+	MusicalInstruction* antBehaviour;
+
 
 	MusicalAnt() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -166,6 +171,9 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 
 		sideLength = fibo[INITIAL_RESOLUTION_KNOB_POSITION];
 
+		systemState = new MusicalSystemState();
+		antBehaviour = new MusicalInstruction();
+
 		onReset();
 	}
 
@@ -176,6 +184,8 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		shadowAntVectorHistory.clear();
 		cells.clear();
 		cellsHistory.clear();
+
+		systemState->cells.clear();
 	}
 
 	void onReset() {
@@ -203,7 +213,15 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 			shadowAntVectorHistory.clear();
 		}*/
 		
+		// New system representation.
 
+		systemState->antX = sideLength/2;
+		systemState->antY = sideLength/2;
+		systemState->antDirectionDegrees = 0;
+
+		systemState->shadowAntX = sideLength/2;
+		systemState->shadowAntY = sideLength/2;
+		systemState->shadowAntDirectionDegrees = 0;
 		
 	}
 
@@ -635,6 +653,8 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 	    int r = a % b;
 	    return r < 0 ? r + b : r;
 	}
+
+
 
 	void stepAnt(){
 		/*Pseudo:
