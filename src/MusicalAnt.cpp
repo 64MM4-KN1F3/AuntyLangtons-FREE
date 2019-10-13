@@ -14,6 +14,8 @@ using namespace std;
 #define DIRECTION 2
 #define PIXEL_BRIGHTNESS 140
 #define INITIAL_RESOLUTION_KNOB_POSITION 5
+#define LEFT -90
+#define RIGHT 90
 
 /*
 Big thanks to..
@@ -434,23 +436,25 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 	}
 
 	int getShadowAntX() {
-		return this->shadowAntVector.at(X_POSITION);
+		return systemState->shadowAntX;
 	}
 
 	int getShadowAntY() {
-		return this->shadowAntVector.at(Y_POSITION);
+		return systemState->shadowAntY;
 	}
 
+	// No longer needed?
 	int getLastAntX() {
 		return this->lastAntX;
 	}
 
+	// No longer needed?
 	int getLastAntY() {
 		return this->lastAntY;
 	}
 
 	int getAntDirection() {
-		return this->antVector.at(DIRECTION);
+		return systemState->antDirectionDegrees;
 	}
 
 	void process(const ProcessArgs &args) override;
@@ -624,7 +628,7 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 	    return r < 0 ? r + b : r;
 	}
 
-	void stepAnt(){
+	void stepAnt(int stepModifier){
 		// Ant
 
 		int currPositionX = systemState->antX;
@@ -632,43 +636,107 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		bool currentCellState = getCellState(currPositionX, currPositionY);
 		int currentDirection = systemState->antDirectionDegrees;
 		toggleCellState(currPositionX, currPositionY);
-		int newDirection;
-		if(currentCellState == true)
-			newDirection = wrap(systemState->antDirectionDegrees + antBehaviour->getOnLightInstruction(), 0, 359);
-		if(currentCellState == false)
-			newDirection = wrap(systemState->antDirectionDegrees + antBehaviour->getOnDarkInstruction(), 0, 359);
+		int antRotation = 0;
+		int newDirection = 0;
+		if(currentCellState == true) {
+			antRotation = antBehaviour->getOnLightInstruction();
+			newDirection = wrap(systemState->antDirectionDegrees + antRotation, 0, 359);
+		}
+		else if(currentCellState == false) {
+			antRotation = antBehaviour->getOnDarkInstruction();
+			newDirection = wrap(systemState->antDirectionDegrees + antRotation, 0, 359);
+		}
 
-		switch(currentDirection) {
+		//Move the ant and set it's new direction
+		switch(newDirection) {
 			case 0 : {
 				// Ant goes up
-				setAntPosition(currPositionX, currPositionY - 1, newDirection);
+				setAntPosition(currPositionX, currPositionY - stepModifier*1, newDirection);
 				break;
 			}
 			case 90 : {
 				// Ant goes right
-				setAntPosition(currPositionX + 1, currPositionY, newDirection);
+				setAntPosition(currPositionX + stepModifier*1, currPositionY, newDirection);
 				break;
 			}
 			case 180 : {
 				// Ant goes down
-				setAntPosition(currPositionX, currPositionY + 1, newDirection);
+				setAntPosition(currPositionX, currPositionY + stepModifier*1, newDirection);
 				break;
 			}
 			case 270 : {
 				// Ant goes left
-				setAntPosition(currPositionX - 1, currPositionY, newDirection);
+				setAntPosition(currPositionX - stepModifier*1, currPositionY, newDirection);
 				break;
 			}
 		}
-
-		systemState->antDirectionDegrees = newDirection;
 
 		//Shadow Ant
 
 		bool shadowAntOn = (bool) !params[SHADOW_ANT_ON].getValue();
 
 		if (shadowAntOn) {
-			// Implement ShadowAnt behaviour here.
+			currPositionX = systemState->shadowAntX;
+			currPositionY = systemState->shadowAntY;
+			currentCellState = getCellState(currPositionX, currPositionY);
+			currentDirection = systemState->shadowAntDirectionDegrees;
+			toggleCellState(currPositionX, currPositionY);
+			antRotation = 0;
+			newDirection = 0;
+			if(currentCellState == true) {
+				antRotation = antBehaviour->getOnLightInstruction();
+				newDirection = wrap(systemState->shadowAntDirectionDegrees + antRotation, 0, 359);
+			}
+			else if(currentCellState == false) {
+				antRotation = antBehaviour->getOnDarkInstruction();
+				newDirection = wrap(systemState->shadowAntDirectionDegrees + antRotation, 0, 359);
+			}
+
+			//Move the shadowAnt and set it's new direction
+			switch(newDirection) {
+				case 90 : {
+					// shadowAnt goes up
+					setShadowAntPosition(currPositionX, currPositionY - stepModifier*1, newDirection);
+					break;
+				}
+				case 180 : {
+					// shadowAnt goes right
+					setShadowAntPosition(currPositionX + stepModifier*1, currPositionY, newDirection);
+					break;
+				}
+				case 270 : {
+					// shadowAnt goes down
+					setShadowAntPosition(currPositionX, currPositionY + stepModifier*1, newDirection);
+					break;
+				}
+				case 0 : {
+					// shadowAnt goes left
+					setShadowAntPosition(currPositionX - stepModifier*1, currPositionY, newDirection);
+					break;
+				}
+			}
+			// Update outputs
+			outputs[VOCT_OUTPUT_SHADOW_X].setVoltage(closestVoltageForShadowX(getShadowAntX()));
+			outputs[VOCT_OUTPUT_SHADOW_Y].setVoltage(closestVoltageForShadowY(getShadowAntY()));
+		}
+
+		int tempSideLength = (int) params[SIDE_LENGTH_PARAM].getValue();
+		outputs[VOCT_OUTPUT_X].setVoltage(!params[VOCT_INVERT_X].getValue() ? closestVoltageForX(tempSideLength - getAntX()) : closestVoltageForX(getAntX()));
+		outputs[VOCT_OUTPUT_Y].setVoltage(!params[VOCT_INVERT_Y].getValue() ? closestVoltageForY(tempSideLength - getAntY()) : closestVoltageForY(getAntY()));
+		
+		//Left turn
+		if(antRotation == LEFT) {
+			outputs[GATE_OUTPUT_LEFT].setVoltage(10.0f);
+			outputs[GATE_OUTPUT_RIGHT].setVoltage(0.0f);
+		}
+		//Right turn 
+		else if(antRotation == RIGHT) {
+			outputs[GATE_OUTPUT_RIGHT].setVoltage(10.0f);
+			outputs[GATE_OUTPUT_LEFT].setVoltage(0.0f);
+		}
+		else {
+			cout << "\nAnt is not rotating at right angles!!! Why!?!?!!?\n";
+			cout << "Ant rotation: " << antRotation << "\n";
 		}
 	}
 
@@ -851,12 +919,18 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		}
  		for(int i = 0; i < steps; i++) {
 			setIndex(index + 1);
-			stepAnt();
+			stepAnt(1);
 		}
 
 	}
 
 	int wayBackMachine(int stepsBack) {
+		for(int i=0;i<stepsBack;i++) {
+			stepAnt(-1);
+		}
+	}
+
+	int wayBackMachine_old(int stepsBack) {
 
 
 		int currIndex = getIndex();
@@ -1078,8 +1152,8 @@ struct ModuleDisplay : Widget {
 
 			//float brightness;
 
-			int antCell = module->iFromXY(module->antVector.at(X_POSITION), module->antVector.at(Y_POSITION));
-			int shadowAntCell = module->iFromXY(module->shadowAntVector.at(X_POSITION), module->shadowAntVector.at(Y_POSITION));
+			int antCell = module->iFromXY(module->systemState->antX, module->systemState->antY);
+			int shadowAntCell = module->iFromXY(module->systemState->shadowAntX, module->systemState->shadowAntY);
 			
 			int numCells = module->sideLength*module->sideLength;
 			for(int i=0; i < numCells; i++){

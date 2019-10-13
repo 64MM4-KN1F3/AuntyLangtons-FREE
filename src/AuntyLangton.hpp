@@ -5,8 +5,8 @@
 
 
 #define CELLS 20736
-#define L -90
-#define R 90
+#define LEFT -90
+#define RIGHT 90
 
 
 using namespace rack;
@@ -100,26 +100,25 @@ struct MusicalInstruction {
 	}
 
 	int instruction(char input) {
+		//std::cout << "\nInstruction: " << input << "\n";
 		if(input == 'L')
-			return L;
+			return LEFT;
 		if(input == 'R')
-			return R;
-	}
-
-	int invertInstruction(char input){
-		return -1*instruction(input);
+			return RIGHT;
 	}
 
 	int getOnLightInstruction() {
-		char step = onLight.at(lightInstructionNumber);
-		lightInstructionNumber = ((lightInstructionNumber + 1) % lightInstructionPeriod) - 1;
-		return instruction(step);
+		int currentInstructionNumber = lightInstructionNumber;
+		lightInstructionNumber = ((lightInstructionNumber + 1) % lightInstructionPeriod);
+		return instruction((char) onLight.at(currentInstructionNumber));
 	}
 
 	int getOnDarkInstruction() {
-		char step = onDark.at(darkInstructionNumber);
-		darkInstructionNumber = ((darkInstructionNumber + 1) % darkInstructionPeriod) - 1;
-		return instruction(step);
+		int currentInstructionNumber = darkInstructionNumber;
+		//std::cout << "\nFirst Instruction: " << onDark.at(darkInstructionNumber) << "\n";
+		darkInstructionNumber = ((darkInstructionNumber + 1) % darkInstructionPeriod);
+		//std::cout << "\n2nd Dark Instruciton Number: " << darkInstructionNumber << "\n";
+		return instruction((char) onDark.at(currentInstructionNumber));
 	}
 };
 
