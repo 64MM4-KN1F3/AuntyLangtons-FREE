@@ -1044,19 +1044,15 @@ void MusicalAnt::process(const ProcessArgs &args) {
 
 
 	// Looping implementation
-	if ((loopIsOn == true) &&
-		(loopLength > 1) && 
-		(loopLength < index) &&
-		(currHistBuffUsage > loopLength) &&
-		(currentIndex >= getLoopIndex())) {
-		//^^ Loop must not be default value of zero and must be less than index but equal or more than saved loopIndex
-		setIndex(wayBackMachine(loopLength));
-	}
+	
 
 	if (inputs[EXT_CLOCK_INPUT].isConnected()) {
 		// External clock
 		if (clockTrigger.process(rescale(inputs[EXT_CLOCK_INPUT].getVoltage(), 0.1f, 2.f, 0.f, 1.f))) {
 			walkAnt(numberSteps);
+			if (loopIsOn == true) {
+				wayBackMachine(loopLength);
+			}
 		}
 		gateIn = clockTrigger.isHigh();
 	}
@@ -1067,6 +1063,9 @@ void MusicalAnt::process(const ProcessArgs &args) {
 		if (phase >= 1.0f) {
 			phase -= 1.0f;
 			walkAnt(numberSteps);
+			if (loopIsOn == true) {
+				wayBackMachine(loopLength);
+			}
 		}
 
 		gateIn = (phase < 0.5f);
