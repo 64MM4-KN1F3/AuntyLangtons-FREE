@@ -159,7 +159,7 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		configParam(MusicalAnt::SHADOW_ANT_ON, 0.0f, 1.0f, 1.0f, "");
 		configParam(MusicalAnt::EFFECT_KNOB_PARAM, 0.0f, 5.0f, 0.0, "");
 		configParam(MusicalAnt::LOOPMODE_SWITCH_PARAM, 0.0f, 1.0f, 0.0f, "");
-		configParam(MusicalAnt::LOOP_LENGTH, 3.0f, 95.0f, 15.0, "");
+		configParam(MusicalAnt::LOOP_LENGTH, 0.0f, 31.0f, 0.0, "");
 		configParam(MusicalAnt::SIDE_LENGTH_PARAM, 0.0f, 6.0f, INITIAL_RESOLUTION_KNOB_POSITION, "");
 		configParam(MusicalAnt::SKIP_PARAM, 0.0f, 9.0f, 0.0f, "");
 		
@@ -628,45 +628,69 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 	    return r < 0 ? r + b : r;
 	}
 
-	void stepAnt(int stepModifier){
+	int turnDegrees(int degrees) {
+		return wrap(degrees, 0, 359);
+	}
+
+	void stepAnt(int stepInverter){
+
+		bool loopIsOn = params[LOOPMODE_SWITCH_PARAM].getValue();
+		
+
 		// Ant
 
 		int currPositionX = systemState->antX;
 		int currPositionY = systemState->antY;
 		bool currentCellState = getCellState(currPositionX, currPositionY);
 		int currentDirection = systemState->antDirectionDegrees;
-		toggleCellState(currPositionX, currPositionY);
 		int antRotation = 0;
 		int newDirection = 0;
-		if(currentCellState == true) {
-			antRotation = antBehaviour->getOnLightInstruction();
-			newDirection = wrap(systemState->antDirectionDegrees + antRotation, 0, 359);
+		if(getLoopOn() != loopIsOn) {
+			//State change
+			if(loopIsOn) {
+				//std::cout << "\nLoop just turned on!\n";
+				systemState->antDirectionDegrees = turnDegrees(systemState->antDirectionDegrees + 180);
+				systemState->shadowAntDirectionDegrees = turnDegrees(systemState->shadowAntDirectionDegrees + 180);
+			}
+			else {
+				//std::cout << "\nLoop just turned off!\n";
+				systemState->antDirectionDegrees = turnDegrees(systemState->antDirectionDegrees + 180);
+				systemState->shadowAntDirectionDegrees = turnDegrees(systemState->shadowAntDirectionDegrees + 180);
+			}
+			setLoopOn(loopIsOn);
 		}
-		else if(currentCellState == false) {
-			antRotation = antBehaviour->getOnDarkInstruction();
-			newDirection = wrap(systemState->antDirectionDegrees + antRotation, 0, 359);
+		else {
+			toggleCellState(currPositionX, currPositionY);
+			if(currentCellState == true) {
+				antRotation = antBehaviour->getOnLightInstruction();
+				newDirection = turnDegrees(currentDirection + antRotation);
+			}
+			else if(currentCellState == false) {
+				antRotation = antBehaviour->getOnDarkInstruction();
+				newDirection = turnDegrees(currentDirection + antRotation);
+			}
 		}
 
 		//Move the ant and set it's new direction
 		switch(newDirection) {
 			case 0 : {
 				// Ant goes up
-				setAntPosition(currPositionX, currPositionY - stepModifier*1, newDirection);
+				setAntPosition(currPositionX, currPositionY - 1, newDirection);
 				break;
 			}
 			case 90 : {
 				// Ant goes right
-				setAntPosition(currPositionX + stepModifier*1, currPositionY, newDirection);
+				setAntPosition(currPositionX + 1, currPositionY, newDirection);
 				break;
 			}
 			case 180 : {
 				// Ant goes down
-				setAntPosition(currPositionX, currPositionY + stepModifier*1, newDirection);
+				setAntPosition(currPositionX, currPositionY + 1, newDirection);
 				break;
 			}
 			case 270 : {
 				// Ant goes left
-				setAntPosition(currPositionX - stepModifier*1, currPositionY, newDirection);
+				setAntPosition(currPositionX - 1, currPositionY, newDirection);
 				break;
 			}
 		}
@@ -685,33 +709,33 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 			newDirection = 0;
 			if(currentCellState == true) {
 				antRotation = antBehaviour->getOnLightInstruction();
-				newDirection = wrap(systemState->shadowAntDirectionDegrees + antRotation, 0, 359);
+				newDirection = turnDegrees(currentDirection + antRotation);
 			}
 			else if(currentCellState == false) {
 				antRotation = antBehaviour->getOnDarkInstruction();
-				newDirection = wrap(systemState->shadowAntDirectionDegrees + antRotation, 0, 359);
+				newDirection = turnDegrees(currentDirection + antRotation);
 			}
 
 			//Move the shadowAnt and set it's new direction
 			switch(newDirection) {
 				case 90 : {
 					// shadowAnt goes up
-					setShadowAntPosition(currPositionX, currPositionY - stepModifier*1, newDirection);
+					setShadowAntPosition(currPositionX, currPositionY - 1, newDirection);
 					break;
 				}
 				case 180 : {
 					// shadowAnt goes right
-					setShadowAntPosition(currPositionX + stepModifier*1, currPositionY, newDirection);
+					setShadowAntPosition(currPositionX + 1, currPositionY, newDirection);
 					break;
 				}
 				case 270 : {
 					// shadowAnt goes down
-					setShadowAntPosition(currPositionX, currPositionY + stepModifier*1, newDirection);
+					setShadowAntPosition(currPositionX, currPositionY + 1, newDirection);
 					break;
 				}
 				case 0 : {
 					// shadowAnt goes left
-					setShadowAntPosition(currPositionX - stepModifier*1, currPositionY, newDirection);
+					setShadowAntPosition(currPositionX - 1, currPositionY, newDirection);
 					break;
 				}
 			}
@@ -916,18 +940,26 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 			if(index + steps > loopIndex) {
 				steps = loopIndex - index;
 			}
+
 		}
- 		for(int i = 0; i < steps; i++) {
+		for(int i = 0; i < steps; i++) {
 			setIndex(index + 1);
 			stepAnt(1);
 		}
-
 	}
 
 	int wayBackMachine(int stepsBack) {
-		for(int i=0;i<stepsBack;i++) {
-			stepAnt(-1);
+		int currIndex = getIndex();
+
+		if(currIndex < stepsBack) {
+			stepsBack = currIndex;
 		}
+
+		for(int i=0;i<stepsBack;i++) {
+			stepAnt(1);
+		}
+
+		return currIndex - stepsBack;
 	}
 
 	int wayBackMachine_old(int stepsBack) {
@@ -1028,13 +1060,15 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 
 void MusicalAnt::process(const ProcessArgs &args) {
 
+
+	bool loopIsOn = params[LOOPMODE_SWITCH_PARAM].getValue();
+
 	int currentIndex = getIndex();
 
 	bool gateIn = false;
 	int numberSteps = (int) params[SKIP_PARAM].getValue() + 1;
 
-	bool loopIsOn = params[LOOPMODE_SWITCH_PARAM].getValue();
-	setLoopOn(loopIsOn);
+	
 
 	loopLength = params[LOOP_LENGTH].getValue() + 1;
 	setLoopLength(loopLength);
@@ -1051,7 +1085,7 @@ void MusicalAnt::process(const ProcessArgs &args) {
 		if (clockTrigger.process(rescale(inputs[EXT_CLOCK_INPUT].getVoltage(), 0.1f, 2.f, 0.f, 1.f))) {
 			walkAnt(numberSteps);
 			if (loopIsOn == true) {
-				wayBackMachine(loopLength);
+				setIndex(wayBackMachine(loopLength));
 			}
 		}
 		gateIn = clockTrigger.isHigh();
@@ -1064,7 +1098,7 @@ void MusicalAnt::process(const ProcessArgs &args) {
 			phase -= 1.0f;
 			walkAnt(numberSteps);
 			if (loopIsOn == true) {
-				wayBackMachine(loopLength);
+				setIndex(wayBackMachine(loopLength));
 			}
 		}
 
