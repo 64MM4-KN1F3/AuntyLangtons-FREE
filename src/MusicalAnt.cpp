@@ -645,31 +645,22 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		int currentDirection = systemState->antDirectionDegrees;
 		int antRotation = 0;
 		int newDirection = 0;
-		if(getLoopOn() != loopIsOn) {
-			//State change
-			if(loopIsOn) {
-				//std::cout << "\nLoop just turned on!\n";
-				systemState->antDirectionDegrees = turnDegrees(systemState->antDirectionDegrees + 180);
-				systemState->shadowAntDirectionDegrees = turnDegrees(systemState->shadowAntDirectionDegrees + 180);
-			}
-			else {
-				//std::cout << "\nLoop just turned off!\n";
-				systemState->antDirectionDegrees = turnDegrees(systemState->antDirectionDegrees + 180);
-				systemState->shadowAntDirectionDegrees = turnDegrees(systemState->shadowAntDirectionDegrees + 180);
-			}
-			setLoopOn(loopIsOn);
+		toggleCellState(currPositionX, currPositionY);
+		
+		if(currentCellState == true) {
+			antRotation = antBehaviour->getOnLightInstruction();
+			newDirection = turnDegrees(currentDirection + antRotation);
 		}
-		else {
-			toggleCellState(currPositionX, currPositionY);
-			if(currentCellState == true) {
-				antRotation = antBehaviour->getOnLightInstruction();
-				newDirection = turnDegrees(currentDirection + antRotation);
-			}
-			else if(currentCellState == false) {
-				antRotation = antBehaviour->getOnDarkInstruction();
-				newDirection = turnDegrees(currentDirection + antRotation);
-			}
+		else if(currentCellState == false) {
+			antRotation = antBehaviour->getOnDarkInstruction();
+			newDirection = turnDegrees(currentDirection + antRotation);
 		}
+
+		std::cout << "\n$$$$$$";
+		std::cout << "\nCurrent Direction: " << currentDirection;
+		std::cout << "\nNext Direction: " << newDirection;
+		std::cout << "\n$$$$$$\n";
+
 
 		//Move the ant and set it's new direction
 		switch(newDirection) {
@@ -1083,9 +1074,23 @@ void MusicalAnt::process(const ProcessArgs &args) {
 	if (inputs[EXT_CLOCK_INPUT].isConnected()) {
 		// External clock
 		if (clockTrigger.process(rescale(inputs[EXT_CLOCK_INPUT].getVoltage(), 0.1f, 2.f, 0.f, 1.f))) {
-			walkAnt(numberSteps);
-			if (loopIsOn == true) {
-				setIndex(wayBackMachine(loopLength));
+			if(getLoopOn() != loopIsOn) {
+				//State change - just turn around 180. No stepping!
+				if(loopIsOn) {
+					std::cout << "\nLoop just turned on!\n";
+					systemState->antDirectionDegrees = turnDegrees(systemState->antDirectionDegrees + 180);
+					systemState->shadowAntDirectionDegrees = turnDegrees(systemState->shadowAntDirectionDegrees + 180);
+				}
+				else {
+					std::cout << "\nLoop just turned off!\n";
+					systemState->antDirectionDegrees = turnDegrees(systemState->antDirectionDegrees + 180);
+					systemState->shadowAntDirectionDegrees = turnDegrees(systemState->shadowAntDirectionDegrees + 180);
+				}
+				setLoopOn(loopIsOn);
+			}
+			else {
+				std::cout << "\nWalking\n";
+				walkAnt(numberSteps);
 			}
 		}
 		gateIn = clockTrigger.isHigh();
@@ -1096,9 +1101,24 @@ void MusicalAnt::process(const ProcessArgs &args) {
 		phase += clockTime * args.sampleTime;
 		if (phase >= 1.0f) {
 			phase -= 1.0f;
-			walkAnt(numberSteps);
-			if (loopIsOn == true) {
-				setIndex(wayBackMachine(loopLength));
+
+			if(getLoopOn() != loopIsOn) {
+				//State change - just turn around 180. No stepping!
+				if(loopIsOn) {
+					std::cout << "\nLoop just turned on!\n";
+					systemState->antDirectionDegrees = turnDegrees(systemState->antDirectionDegrees + 180);
+					systemState->shadowAntDirectionDegrees = turnDegrees(systemState->shadowAntDirectionDegrees + 180);
+				}
+				else {
+					std::cout << "\nLoop just turned off!\n";
+					systemState->antDirectionDegrees = turnDegrees(systemState->antDirectionDegrees + 180);
+					systemState->shadowAntDirectionDegrees = turnDegrees(systemState->shadowAntDirectionDegrees + 180);
+				}
+				setLoopOn(loopIsOn);
+			}
+			else {
+				std::cout << "\nWalking\n";
+				walkAnt(numberSteps);
 			}
 		}
 
