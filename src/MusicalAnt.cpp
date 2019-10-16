@@ -648,7 +648,6 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		
 		if (getLoopOn() != loopIsOn) {
 			newDirection = turnDegrees(currentDirection + 180);
-			setLoopOn(loopIsOn);
 		}
 		else {
 			if(currentCellState == true) {
@@ -701,17 +700,26 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 			currPositionY = systemState->shadowAntY;
 			currentCellState = getCellState(currPositionX, currPositionY);
 			currentDirection = systemState->shadowAntDirectionDegrees;
-			toggleCellState(currPositionX, currPositionY);
+			
 			antRotation = 0;
 			newDirection = 0;
-			if(currentCellState == true) {
-				antRotation = antBehaviour->getOnLightInstruction();
-				newDirection = turnDegrees(currentDirection + antRotation);
+
+			if (getLoopOn() != loopIsOn) {
+				newDirection = turnDegrees(currentDirection + 180);
+				setLoopOn(loopIsOn);
 			}
-			else if(currentCellState == false) {
-				antRotation = antBehaviour->getOnDarkInstruction();
-				newDirection = turnDegrees(currentDirection + antRotation);
+			else {
+				if(currentCellState == true) {
+					antRotation = antBehaviour->getOnLightInstruction();
+					newDirection = turnDegrees(currentDirection + antRotation);
+				}
+				else if(currentCellState == false) {
+					antRotation = antBehaviour->getOnDarkInstruction();
+					newDirection = turnDegrees(currentDirection + antRotation);
+				}
+				toggleCellState(currPositionX, currPositionY);
 			}
+			
 
 			//Move the shadowAnt and set it's new direction
 			switch(newDirection) {
@@ -739,6 +747,10 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 			// Update outputs
 			outputs[VOCT_OUTPUT_SHADOW_X].setVoltage(closestVoltageForShadowX(getShadowAntX()));
 			outputs[VOCT_OUTPUT_SHADOW_Y].setVoltage(closestVoltageForShadowY(getShadowAntY()));
+		}
+		else {
+			// If shadow ant is not turned on we need to remember to update loopIsOn state to it's current value.
+			setLoopOn(loopIsOn);
 		}
 
 		int tempSideLength = (int) params[SIDE_LENGTH_PARAM].getValue();
