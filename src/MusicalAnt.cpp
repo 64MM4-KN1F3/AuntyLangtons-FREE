@@ -44,7 +44,7 @@ RACK_DIR=/Users/my/Documents/Rack-SDK make
 
 */
 
-struct MusicalAnt : Module, QuantizeUtils {//, Logos {
+struct MusicalAnt : Module, QuantizeUtils {
 	enum ParamIds {
 		PITCH_PARAM,
 		RUN_PARAM,
@@ -115,25 +115,14 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 	float phase = 0.0;
 	float blinkPhase = 0.0;
 	int index = 0;
-	int shadowIndex = 0;
 	bool loopOn = false;
 	int loopLength = 0;
 	int loopIndex;
 	dsp::SchmittTrigger clockTrigger;
-	vector<int> antVector;
-	vector< vector<int> > antVectorHistory;
-	vector<int> shadowAntVector;
-	vector< vector<int> > shadowAntVectorHistory;
 	int fibo[7] = {8, 13, 21, 34, 55, 89, 144}; // short for Fibonacci (cause I forgot that's why I named it that).
-	int lastAntX, lastAntY;
 	int sideLength;
-	int historyBufferUsage = 0;
 	bool currentArrowOfTimeForward = true;
 	bool lastArrowOfTimeForward = true;
-
-	// Representation of cells
-	vector<bool> cells;
-	vector< vector<bool> > cellsHistory;
 
 	// New system representation.
 
@@ -164,14 +153,6 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		configParam(MusicalAnt::LOOP_LENGTH, 0.0f, 31.0f, 0.0, "");
 		configParam(MusicalAnt::SIDE_LENGTH_PARAM, 0.0f, 6.0f, INITIAL_RESOLUTION_KNOB_POSITION, "");
 		configParam(MusicalAnt::SKIP_PARAM, 0.0f, 9.0f, 0.0f, "");
-		
-		//Pre-allocating space for vectors
-		antVector.resize(3, 0);
-		shadowAntVector.resize(3, 0);
-		antVectorHistory.resize( HISTORY_AMOUNT , vector<int>( 3 , 0 ) );
-		shadowAntVectorHistory.resize( HISTORY_AMOUNT , vector<int>( 3 , 0 ) );
-		cells.resize(CELLS, false);
-		cellsHistory.resize( HISTORY_AMOUNT , vector<bool>( CELLS , false ) );
 
 		sideLength = fibo[INITIAL_RESOLUTION_KNOB_POSITION];
 
@@ -182,14 +163,7 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 	}
 
 	~MusicalAnt() {
-		antVector.clear();
-		shadowAntVector.clear();
-		antVectorHistory.clear();
-		shadowAntVectorHistory.clear();
-		cells.clear();
-		cellsHistory.clear();
-
-		systemState->cells.clear();
+		//systemState->cells.clear();
 	}
 
 	void onReset() {
@@ -199,10 +173,7 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		
 		setShadowAntPosition(sideLength/2, sideLength/2, 0);
 		
-		lastAntX = 0;
-		lastAntY = 0;
 		index = 0;
-		shadowIndex = 0;
 		loopIndex = 0;
 		
 
@@ -231,20 +202,6 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
-		
-		json_t *antVectorJ = json_array();
-		for (int i = 0; i < 3; i++) {
-			json_t *antVectorJ = json_integer((int) antVector.at(i));
-			json_array_append_new(antVectorJ, antVectorJ);
-		}
-		json_object_set_new(rootJ, "antVector", antVectorJ);
-
-		json_t *shadowAntVectorJ = json_array();
-		for (int i = 0; i < 3; i++) {
-			json_t *shadowAntVectorJ = json_integer((int) shadowAntVector.at(i));
-			json_array_append_new(shadowAntVectorJ, shadowAntVectorJ);
-		}
-		json_object_set_new(rootJ, "shadowAntVector", shadowAntVectorJ);
 
 		/*
 
@@ -292,57 +249,6 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 
 	void dataFromJson(json_t *rootJ) override {
 
-		json_t *antVectorJ = json_object_get(rootJ, "antVector");
-		if (antVectorJ) {
-			for (int i = 0; i < 3; i++) {
-				json_t *antVectorJ = json_array_get(antVectorJ, i);
-				if (antVectorJ)
-					antVector.at(i) = json_integer_value(antVectorJ);
-			}
-		}
-
-		json_t *shadowAntVectorJ = json_object_get(rootJ, "shadowAntVector");
-		if (shadowAntVectorJ) {
-			for (int i = 0; i < 3; i++) {
-				json_t *shadowAntVectorJ = json_array_get(shadowAntVectorJ, i);
-				if (shadowAntVectorJ)
-					shadowAntVector.at(i) = json_integer_value(shadowAntVectorJ);
-			}
-		}
-
-		/*
-
-		json_t *antVectorHistoryJ = json_object_get(rootJ, "antVectorHistory");
-		int vectorHistoryCellsCount = HISTORY_AMOUNT * 3;
-		if (antVectorHistoryJ) {
-			for (int i = 0; i < vectorHistoryCellsCount; i++) {
-				json_t *antVectorHistoryJ = json_array_get(antVectorHistoryJ, i);
-				if (antVectorHistoryJ)
-					antVectorHistory.at(i/3).at(i%3) = json_integer_value(antVectorHistoryJ);
-			}
-		}
-
-		json_t *shadowAntVectorHistoryJ = json_object_get(rootJ, "shadowAntVectorHistory");
-		if (shadowAntVectorHistoryJ) {
-			for (int i = 0; i < vectorHistoryCellsCount; i++) {
-				json_t *shadowAntVectorHistoryJ = json_array_get(shadowAntVectorHistoryJ, i);
-				if (shadowAntVectorHistoryJ)
-					shadowAntVectorHistory.at(i/3).at(i%3) = json_integer_value(shadowAntVectorHistoryJ);
-			}
-		}
-
-		json_t *cellsHistoryJ = json_object_get(rootJ, "cellsHistory");
-		int cellsHistoryCount = HISTORY_AMOUNT * CELLS;
-		if (cellsHistoryJ) {
-			for (int i = 0; i < cellsHistoryCount; i++) {
-				json_t *cellsHistoryJ = json_array_get(cellsHistoryJ, i);
-				if (cellsHistoryJ)
-					cellsHistory.at(i/CELLS).at(i%CELLS) = (bool) json_integer_value(cellsHistoryJ);
-			}
-		}
-		*/
-
-
 		json_t *cellsJ = json_object_get(rootJ, "cells");
 		if (cellsJ) {
 			for (int i = 0; i < CELLS; i++) {
@@ -351,8 +257,6 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 					systemState->cells.at(i) = (bool) json_integer_value(cellJ);
 			}
 		}
-
-		setHistoryBufferUsage(0);
 	}
 
 	int wrap(int kX, int const kLowerBound, int const kUpperBound) {
@@ -388,18 +292,6 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		return this->index;
 	}
 
-	int getShadowIndex() {
-		return this->shadowIndex;
-	}
-
-	int getHistoryBufferUsage() {
-		return this->historyBufferUsage;
-	}
-
-	void setHistoryBufferUsage(int amount) {
-		historyBufferUsage = amount;
-	}
-
 	void setSideLength(int x){
 		sideLength = fibo[x];
 	}
@@ -433,16 +325,6 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		return systemState->shadowAntY;
 	}
 
-	// No longer needed?
-	int getLastAntX() {
-		return this->lastAntX;
-	}
-
-	// No longer needed?
-	int getLastAntY() {
-		return this->lastAntY;
-	}
-
 	int getAntDirection() {
 		return systemState->antDirectionDegrees;
 	}
@@ -450,99 +332,8 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 	void process(const ProcessArgs &args) override;
 
 	void clearCells() {
-
-		/*for(int i=0;i<CELLS;i++){
-			cells[i] = Logos::AL_logo_144x144[i];//false;
-		}*/
-		//TODO put logo back? ^^^
 		for(unsigned int i=0;i<CELLS;i++){
-			cells.at(i) = false; //Logos::AL_logo_144x144[i];
 			systemState->cells.at(i) = false;
-		}
-		// Testing Logo
-		//std::copy(cells, cells+CELLS, Logos::AL_logo_144x144);
-	}
-
-	void randomizeCells() {
-		//clearCells();
-		float rndAmt = params[RND_AMT_KNOB_PARAM].getValue() + inputs[RND_AMT_INPUT].getVoltage()*0.1;
-		switch(int(params[RND_MODE_KNOB_PARAM].getValue())){
-			case RND_BASIC:{
-				int numCells = sideLength*sideLength;
-				for(int i=0;i<numCells;i++){
-					setCellOn(xFromI(i), yFromI(i), random::uniform() < rndAmt);
-				}
-				break;
-			}
-			case RND_EUCLID:{
-				for(int y=0; y < sideLength; y++){
-					if(random::uniform() < rndAmt){
-						int div = int(random::uniform() * sideLength * 0.5) + 1;
-						for(int x=0; x < sideLength; x++){
-							setCellOn(x, y, x % div == 0);
-						}
-					}
-				}
-				break;
-			}
-			case RND_SIN_WAVE:{
-				int sinCount = int(rndAmt * 3) + 1;
-				for(int i=0;i<sinCount;i++){
-					float angle = 0;
-					float angleInc = random::uniform();
-					float offset = sideLength * 0.5;
-					for(int x=0;x<sideLength;x+=1){
-						int y = int(offset + (sinf(angle)*(offset)));
-						setCellOn(x, y, true);
-						angle+=angleInc;
-					}
-				}
-				break;
-			}
-			case RND_LIFE_GLIDERS:{
-				int gliderCount = int(rndAmt * 20);
-				int size = 3;
-				for(int i=0;i<gliderCount;i++){
-					int x = size + int(random::uniform() * (sideLength-size*2));
-					int y = size + int(random::uniform() * (sideLength-size*2));
-					if(random::uniform() < 0.5){
-						//down
-						if(random::uniform() < 0.5){
-							//right
-							setCellOn(x, y, true);
-							setCellOn(x+1, y+1, true);
-							setCellOn(x+1, y+2, true);
-							setCellOn(x, y+2, true);
-							setCellOn(x-1, y+2, true);
-						} else {
-							//left
-							setCellOn(x, y, true);
-							setCellOn(x-1, y+1, true);
-							setCellOn(x+1, y+2, true);
-							setCellOn(x, y+2, true);
-							setCellOn(x-1, y+2, true);
-						}
-					} else {
-						//up
-						if(random::uniform() < 0.5){
-							//right
-							setCellOn(x, y, true);
-							setCellOn(x+1, y-1, true);
-							setCellOn(x+1, y-2, true);
-							setCellOn(x, y-2, true);
-							setCellOn(x-1, y-2, true);
-						} else {
-							//left
-							setCellOn(x, y, true);
-							setCellOn(x-1, y-1, true);
-							setCellOn(x+1, y-2, true);
-							setCellOn(x, y-2, true);
-							setCellOn(x-1, y-2, true);
-						}
-					}
-				}
-				break;
-			}
 		}
 	}
 
@@ -624,7 +415,7 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 
 	void stepAnt(bool arrowOfTime){
 		
-		std::cout << "\nget index :] " << getIndex();
+
 		currentArrowOfTimeForward = arrowOfTime;
 		// Ant
 
@@ -789,8 +580,6 @@ void MusicalAnt::process(const ProcessArgs &args) {
 	loopLength = (params[LOOP_LENGTH].getValue() + 1);
 	setLoopLength(loopLength);
 
-	int currHistBuffUsage = getHistoryBufferUsage();
-
 
 
 	// Looping implementation
@@ -870,7 +659,7 @@ void MusicalAnt::process(const ProcessArgs &args) {
 		outputs[VOCT_OUTPUT_POLY].setChannels(2);
 	}
 
-	lights[BLINK_LIGHT].value = gateIn ? 1.0f : 0.0f;
+	//lights[BLINK_LIGHT].value = gateIn ? 1.0f : 0.0f;
 
 }
 
