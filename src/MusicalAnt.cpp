@@ -637,9 +637,6 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		
 		if (currentArrowOfTimeForward != lastArrowOfTimeForward) {
 			newDirection = turnDegrees(currentDirection + 180);
-			std::cout << "\n$$$$$$";
-			std::cout << "\nANT TURNED 180 DEGRESS!!\n";
-			std::cout << "\n$$$$$$\n";
 		}
 		else {
 			if(currentCellState == true) {
@@ -749,27 +746,25 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 			outputs[GATE_OUTPUT_RIGHT].setVoltage(10.0f);
 			outputs[GATE_OUTPUT_LEFT].setVoltage(0.0f);
 		}
-		else {
-			cout << "\nAnt is not rotating at right angles!!! Why!?!?!!?\n";
-			cout << "Ant rotation: " << antRotation << "\n";
-		}
 
 		lastArrowOfTimeForward = currentArrowOfTimeForward;
 	}
 
 	void walkAnt(int steps) {
+		int paces;
 		if(steps < 0) {
 			currentArrowOfTimeForward = false;
-			steps = steps * -1;
+			paces = steps * -1;
 		}
 		else {
 			currentArrowOfTimeForward = true;
+			paces = steps;
 		}
 
-		for(int i = 0; i < steps; i++) {
-			setIndex(index + 1);
+		for(int i = 0; i < paces; i++) {
 			stepAnt(currentArrowOfTimeForward);
 		}
+		setIndex(index + steps);
 	}
 
 	// For more advanced Module features, read Rack's engine.hpp header file
@@ -804,17 +799,19 @@ void MusicalAnt::process(const ProcessArgs &args) {
 	if (inputs[EXT_CLOCK_INPUT].isConnected()) {
 		// External clock
 		if (clockTrigger.process(rescale(inputs[EXT_CLOCK_INPUT].getVoltage(), 0.1f, 2.f, 0.f, 1.f))) {
-			std::cout << "\nWalking "; //Start function X
+
 			if(getLoopOn() != loopIsOn) {
-				// TODO record loopIndex here then loop around it
-				std::cout << "backwards\n";
+				loopIndex = currentIndex;
 				walkAnt(-1*loopLength*numberSteps);
 				setLoopOn(loopIsOn);
 			}
+			else if(loopIsOn && 
+				(currentIndex >= loopIndex + numberSteps*loopLength)) {
+				walkAnt(-1*numberSteps*loopLength);
+			}
 			else {
-				std::cout << "forward\n";
 				walkAnt(numberSteps);
-			} // End function X
+			} 
 		}
 		gateIn = clockTrigger.isHigh();
 	}
@@ -824,17 +821,18 @@ void MusicalAnt::process(const ProcessArgs &args) {
 		phase += clockTime * args.sampleTime;
 		if (phase >= 1.0f) {
 			phase -= 1.0f;
-			std::cout << "\nWalking "; //Start function X
 			if(getLoopOn() != loopIsOn) {
-				// TODO record loopIndex here then loop around it
-				std::cout << "backwards\n";
+				loopIndex = currentIndex;
 				walkAnt(-1*loopLength*numberSteps);
 				setLoopOn(loopIsOn);
 			}
+			else if(loopIsOn && 
+				(currentIndex >= loopIndex + numberSteps*loopLength)) {
+				walkAnt(-1*numberSteps*loopLength);
+			}
 			else {
-				std::cout << "forward\n";
 				walkAnt(numberSteps);
-			} // End function X
+			} 
 		}
 
 		gateIn = (phase < 0.5f);
