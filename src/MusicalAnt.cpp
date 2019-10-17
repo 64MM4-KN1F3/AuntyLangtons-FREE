@@ -384,10 +384,6 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		this->loopLength = value;
 	}
 
-	int getLoopIndex() {
-		return this->loopIndex;
-	}
-
 	int getIndex() {
 		return this->index;
 	}
@@ -808,8 +804,9 @@ void MusicalAnt::process(const ProcessArgs &args) {
 	if (inputs[EXT_CLOCK_INPUT].isConnected()) {
 		// External clock
 		if (clockTrigger.process(rescale(inputs[EXT_CLOCK_INPUT].getVoltage(), 0.1f, 2.f, 0.f, 1.f))) {
-			std::cout << "\nWalking ";
+			std::cout << "\nWalking "; //Start function X
 			if(getLoopOn() != loopIsOn) {
+				// TODO record loopIndex here then loop around it
 				std::cout << "backwards\n";
 				walkAnt(-1*loopLength*numberSteps);
 				setLoopOn(loopIsOn);
@@ -817,7 +814,7 @@ void MusicalAnt::process(const ProcessArgs &args) {
 			else {
 				std::cout << "forward\n";
 				walkAnt(numberSteps);
-			}
+			} // End function X
 		}
 		gateIn = clockTrigger.isHigh();
 	}
@@ -827,8 +824,9 @@ void MusicalAnt::process(const ProcessArgs &args) {
 		phase += clockTime * args.sampleTime;
 		if (phase >= 1.0f) {
 			phase -= 1.0f;
-			std::cout << "\nWalking ";
+			std::cout << "\nWalking "; //Start function X
 			if(getLoopOn() != loopIsOn) {
+				// TODO record loopIndex here then loop around it
 				std::cout << "backwards\n";
 				walkAnt(-1*loopLength*numberSteps);
 				setLoopOn(loopIsOn);
@@ -836,7 +834,7 @@ void MusicalAnt::process(const ProcessArgs &args) {
 			else {
 				std::cout << "forward\n";
 				walkAnt(numberSteps);
-			}
+			} // End function X
 		}
 
 		gateIn = (phase < 0.5f);
