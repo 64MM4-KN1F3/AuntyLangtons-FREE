@@ -128,6 +128,8 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 	int lastAntX, lastAntY;
 	int sideLength;
 	int historyBufferUsage = 0;
+	bool currentArrowOfTimeForward = true;
+	bool lastArrowOfTimeForward = true;
 
 	// Representation of cells
 	vector<bool> cells;
@@ -364,14 +366,6 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 	void setIndex(int index) {
 		
 		this->index = index;
-		this->loopIndex = std::max(this->loopIndex, index);
-	//cout << "\nIndex: " << index;
-	//cout << "\nLoopIndex: " << this->loopIndex;
-		if (this->index >= std::numeric_limits<int>::max())
-			this->index = 0;
-		int shadowDepth = pow(10, (int) params[EFFECT_KNOB_PARAM].getValue());
-		if (this->index > shadowDepth)
-			this->shadowIndex += 1; //this->index - shadowDepth;
 	}
 
 	bool getLoopOn() {
@@ -632,11 +626,10 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		return wrap(degrees, 0, 359);
 	}
 
-	void stepAnt(int stepInverter){
-
-		bool loopIsOn = params[LOOPMODE_SWITCH_PARAM].getValue();
+	void stepAnt(bool arrowOfTime){
 		
-
+		std::cout << "\nget index :] " << getIndex();
+		currentArrowOfTimeForward = arrowOfTime;
 		// Ant
 
 		int currPositionX = systemState->antX;
@@ -646,8 +639,11 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 		int antRotation = 0;
 		int newDirection = 0;
 		
-		if (getLoopOn() != loopIsOn) {
+		if (currentArrowOfTimeForward != lastArrowOfTimeForward) {
 			newDirection = turnDegrees(currentDirection + 180);
+			std::cout << "\n$$$$$$";
+			std::cout << "\nANT TURNED 180 DEGRESS!!\n";
+			std::cout << "\n$$$$$$\n";
 		}
 		else {
 			if(currentCellState == true) {
@@ -660,11 +656,6 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 			}
 			toggleCellState(currPositionX, currPositionY);
 		}
-
-		std::cout << "\n$$$$$$";
-		std::cout << "\nCurrent Direction: " << currentDirection;
-		std::cout << "\nNext Direction: " << newDirection;
-		std::cout << "\n$$$$$$\n";
 
 
 		//Move the ant and set it's new direction
@@ -704,9 +695,8 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 			antRotation = 0;
 			newDirection = 0;
 
-			if (getLoopOn() != loopIsOn) {
+			if (currentArrowOfTimeForward != lastArrowOfTimeForward) {
 				newDirection = turnDegrees(currentDirection + 180);
-				setLoopOn(loopIsOn);
 			}
 			else {
 				if(currentCellState == true) {
@@ -748,10 +738,6 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 			outputs[VOCT_OUTPUT_SHADOW_X].setVoltage(closestVoltageForShadowX(getShadowAntX()));
 			outputs[VOCT_OUTPUT_SHADOW_Y].setVoltage(closestVoltageForShadowY(getShadowAntY()));
 		}
-		else {
-			// If shadow ant is not turned on we need to remember to update loopIsOn state to it's current value.
-			setLoopOn(loopIsOn);
-		}
 
 		int tempSideLength = (int) params[SIDE_LENGTH_PARAM].getValue();
 		outputs[VOCT_OUTPUT_X].setVoltage(!params[VOCT_INVERT_X].getValue() ? closestVoltageForX(tempSideLength - getAntX()) : closestVoltageForX(getAntX()));
@@ -771,27 +757,23 @@ struct MusicalAnt : Module, QuantizeUtils {//, Logos {
 			cout << "\nAnt is not rotating at right angles!!! Why!?!?!!?\n";
 			cout << "Ant rotation: " << antRotation << "\n";
 		}
+
+		lastArrowOfTimeForward = currentArrowOfTimeForward;
 	}
 
 	void walkAnt(int steps) {
+		if(steps < 0) {
+			currentArrowOfTimeForward = false;
+			steps = steps * -1;
+		}
+		else {
+			currentArrowOfTimeForward = true;
+		}
+
 		for(int i = 0; i < steps; i++) {
 			setIndex(index + 1);
-			stepAnt(1);
+			stepAnt(currentArrowOfTimeForward);
 		}
-	}
-
-	int wayBackMachine(int stepsBack) {
-		int currIndex = getIndex();
-
-		if(currIndex < stepsBack) {
-			stepsBack = currIndex;
-		}
-
-		for(int i=0;i<stepsBack;i++) {
-			stepAnt(1);
-		}
-
-		return currIndex - stepsBack;
 	}
 
 	// For more advanced Module features, read Rack's engine.hpp header file
@@ -813,7 +795,7 @@ void MusicalAnt::process(const ProcessArgs &args) {
 
 	
 
-	loopLength = params[LOOP_LENGTH].getValue() + 1;
+	loopLength = (params[LOOP_LENGTH].getValue() + 1);
 	setLoopLength(loopLength);
 
 	int currHistBuffUsage = getHistoryBufferUsage();
@@ -826,8 +808,16 @@ void MusicalAnt::process(const ProcessArgs &args) {
 	if (inputs[EXT_CLOCK_INPUT].isConnected()) {
 		// External clock
 		if (clockTrigger.process(rescale(inputs[EXT_CLOCK_INPUT].getVoltage(), 0.1f, 2.f, 0.f, 1.f))) {
-			std::cout << "\nWalking\n";
-			walkAnt(numberSteps);
+			std::cout << "\nWalking ";
+			if(getLoopOn() != loopIsOn) {
+				std::cout << "backwards\n";
+				walkAnt(-1*loopLength*numberSteps);
+				setLoopOn(loopIsOn);
+			}
+			else {
+				std::cout << "forward\n";
+				walkAnt(numberSteps);
+			}
 		}
 		gateIn = clockTrigger.isHigh();
 	}
@@ -837,12 +827,21 @@ void MusicalAnt::process(const ProcessArgs &args) {
 		phase += clockTime * args.sampleTime;
 		if (phase >= 1.0f) {
 			phase -= 1.0f;
-			std::cout << "\nWalking\n";
-			walkAnt(numberSteps);
+			std::cout << "\nWalking ";
+			if(getLoopOn() != loopIsOn) {
+				std::cout << "backwards\n";
+				walkAnt(-1*loopLength*numberSteps);
+				setLoopOn(loopIsOn);
+			}
+			else {
+				std::cout << "forward\n";
+				walkAnt(numberSteps);
+			}
 		}
 
 		gateIn = (phase < 0.5f);
 	}
+	
 
 
 
