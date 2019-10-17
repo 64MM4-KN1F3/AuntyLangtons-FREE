@@ -112,17 +112,17 @@ struct MusicalAnt : Module, QuantizeUtils {
 		NUM_RND_MODES
 	};
 
-	float phase = 0.0;
-	float blinkPhase = 0.0;
-	int index = 0;
-	bool loopOn = false;
-	int loopLength = 0;
+	float phase;
+	float blinkPhase;
+	int index;
+	bool loopOn;
+	int loopLength;
 	int loopIndex;
 	dsp::SchmittTrigger clockTrigger;
 	int fibo[7] = {8, 13, 21, 34, 55, 89, 144}; // short for Fibonacci (cause I forgot that's why I named it that).
 	int sideLength;
-	bool currentArrowOfTimeForward = true;
-	bool lastArrowOfTimeForward = true;
+	bool currentArrowOfTimeForward;
+	bool lastArrowOfTimeForward;
 
 	// New system representation.
 
@@ -158,6 +158,14 @@ struct MusicalAnt : Module, QuantizeUtils {
 
 		systemState = new MusicalSystemState();
 		antBehaviour = new MusicalInstruction();
+
+		phase = 0.0;
+		blinkPhase = 0.0;
+		index = 0;
+		loopOn = false;
+		loopLength = 0;
+		currentArrowOfTimeForward = true;
+		lastArrowOfTimeForward = true;
 
 		onReset();
 	}
@@ -671,7 +679,9 @@ struct ModuleDisplay : Widget {
 	float dragX = 0;
 	float dragY = 0;
 
-	ModuleDisplay(){}
+	ModuleDisplay(MusicalAnt *module){
+		this->module = module;
+	}
 
 
 	void onButton(const event::Button &e) override {
@@ -951,8 +961,7 @@ struct MusicalAntWidget : ModuleWidget {
 			addParam(skipParamKnob);
 
 			// Create display
-			ModuleDisplay *display = new ModuleDisplay();
-			display->module = module;
+			ModuleDisplay *display = new ModuleDisplay(module);
 			display->box.pos = Vec(DISPLAY_OFFSET_X, DISPLAY_OFFSET_Y);
 			display->box.size = Vec(DISPLAY_SIZE_XY, DISPLAY_SIZE_XY);
 			addChild(display);
