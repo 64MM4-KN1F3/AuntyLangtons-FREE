@@ -120,14 +120,14 @@ struct MusicalAnt : Module, QuantizeUtils {
 	int loopIndex;
 	dsp::SchmittTrigger clockTrigger;
 	int fibo[7] = {8, 13, 21, 34, 55, 89, 144}; // short for Fibonacci (cause I forgot that's why I named it that).
-	int sideLength;
+	int sideLength = 12;
 	bool currentArrowOfTimeForward;
 	bool lastArrowOfTimeForward;
 
 	// New system representation.
 
-	MusicalSystemState* systemState;
-	MusicalInstruction* antBehaviour;
+	MusicalSystemState* systemState = new MusicalSystemState();
+	MusicalInstruction* antBehaviour = new MusicalInstruction();
 
 
 	MusicalAnt() {
@@ -154,10 +154,8 @@ struct MusicalAnt : Module, QuantizeUtils {
 		configParam(MusicalAnt::SIDE_LENGTH_PARAM, 0.0f, 6.0f, INITIAL_RESOLUTION_KNOB_POSITION, "");
 		configParam(MusicalAnt::SKIP_PARAM, 0.0f, 9.0f, 0.0f, "");
 
-		sideLength = fibo[INITIAL_RESOLUTION_KNOB_POSITION];
-
-		systemState = new MusicalSystemState();
-		antBehaviour = new MusicalInstruction();
+		//systemState = new MusicalSystemState();
+		//antBehaviour = new MusicalInstruction();
 
 		phase = 0.0;
 		blinkPhase = 0.0;
@@ -171,7 +169,9 @@ struct MusicalAnt : Module, QuantizeUtils {
 	}
 
 	~MusicalAnt() {
-		//systemState->cells.clear();
+		systemState->cells.clear();
+		antBehaviour->onLight.clear();
+		antBehaviour->onDark.clear();
 	}
 
 	void onReset() {
@@ -680,7 +680,9 @@ struct ModuleDisplay : Widget {
 	float dragY = 0;
 
 	ModuleDisplay(MusicalAnt *module){
-		this->module = module;
+		if(module){
+			this->module = module;
+		}
 	}
 
 
