@@ -173,7 +173,8 @@ struct RoundSmallBlackKnobSnap : RoundSmallBlackKnob {
 		if(paramQuantity != NULL) {
 			return std::to_string(static_cast<unsigned int>(paramQuantity->getDisplayValue()) + 1);
 		}
-		return "";
+		else 
+			return "";
 	}
 
 };

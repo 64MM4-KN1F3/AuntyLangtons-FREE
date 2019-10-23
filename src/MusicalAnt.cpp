@@ -41,6 +41,7 @@ Personal dev notes:
 Compile:
 RACK_DIR=/Users/my/Documents/Rack-SDK make
 
+JW Dev FAQ - https://github.com/jeremywen/JW-Modules/wiki/Dev-FAQ-for-VCV-Rack
 
 */
 
@@ -177,9 +178,9 @@ struct MusicalAnt : Module, QuantizeUtils {
 	void onReset() {
 		
 		clearCells();
-		setAntPosition(sideLength/2, sideLength/2, 0);
+		setAntPosition((int) sideLength/2, (int) sideLength/2, 0);
 		
-		setShadowAntPosition(sideLength/2, sideLength/2, 0);
+		setShadowAntPosition((int) sideLength/2, (int) sideLength/2, 0);
 		
 		index = 0;
 		loopIndex = 0;
@@ -198,17 +199,18 @@ struct MusicalAnt : Module, QuantizeUtils {
 		
 		// New system representation.
 
-		systemState->antX = sideLength/2;
-		systemState->antY = sideLength/2;
+		systemState->antX = (int) sideLength/2;
+		systemState->antY = (int) sideLength/2;
 		systemState->antDirectionDegrees = 0;
 
-		systemState->shadowAntX = sideLength/2;
-		systemState->shadowAntY = sideLength/2;
+		systemState->shadowAntX = (int) sideLength/2;
+		systemState->shadowAntY = (int) sideLength/2;
 		systemState->shadowAntDirectionDegrees = 0;
 		
 	}
 
 	json_t *dataToJson() override {
+
 		json_t *rootJ = json_object();
 
 		/*
@@ -238,13 +240,14 @@ struct MusicalAnt : Module, QuantizeUtils {
 		json_object_set_new(rootJ, "cellsHistory", cellsHistoryJ);
 
 		*/
-
-		json_t *cellsJ = json_array();
-		for (int i = 0; i < CELLS; i++) {
-			json_t *cellJ = json_integer((int) systemState->cells.at(i));
-			json_array_append_new(cellsJ, cellJ);
+		if(systemState)	{
+			json_t *cellsJ = json_array();
+			for (int i = 0; i < CELLS; i++) {
+				json_t *cellJ = json_integer((int) systemState->cells.at(i));
+				json_array_append_new(cellsJ, cellJ);
+			}
+			json_object_set_new(rootJ, "cells", cellsJ);
 		}
-		json_object_set_new(rootJ, "cells", cellsJ);
 
 		/*
 		ToJson TODO
@@ -258,11 +261,13 @@ struct MusicalAnt : Module, QuantizeUtils {
 	void dataFromJson(json_t *rootJ) override {
 
 		json_t *cellsJ = json_object_get(rootJ, "cells");
-		if (cellsJ) {
-			for (int i = 0; i < CELLS; i++) {
-				json_t *cellJ = json_array_get(cellsJ, i);
-				if (cellJ)
-					systemState->cells.at(i) = (bool) json_integer_value(cellJ);
+		if(systemState)	{
+			if (cellsJ) {
+				for (int i = 0; i < CELLS; i++) {
+					json_t *cellJ = json_array_get(cellsJ, i);
+					if (cellJ)
+						systemState->cells.at(i) = (bool) json_integer_value(cellJ);
+				}
 			}
 		}
 	}
