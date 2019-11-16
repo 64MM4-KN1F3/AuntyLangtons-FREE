@@ -103,7 +103,7 @@ struct MusicalInstruction {
 		//std::cout << "\nInstruction: " << input << "\n";
 		if(input == 'L')
 			return LEFT;
-		if(input == 'R')
+		else
 			return RIGHT;
 	}
 

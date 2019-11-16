@@ -175,7 +175,7 @@ struct MusicalAnt : Module, QuantizeUtils {
 		antBehaviour->onDark.clear();
 	}
 
-	void onReset() {
+	void onReset() override {
 		
 		clearCells();
 		setAntPosition((int) sideLength/2, (int) sideLength/2, 0);
@@ -683,12 +683,12 @@ struct ModuleDisplay : Widget {
 	float initY = 0;
 	float dragX = 0;
 	float dragY = 0;
+	int widgetSideLength;
 
-	ModuleDisplay(MusicalAnt *module){
-		if(module){
-			this->module = module;
-		}
+	ModuleDisplay(){
+		widgetSideLength = module->sideLength;
 	}
+		
 
 
 	void onButton(const event::Button &e) override {
@@ -716,11 +716,10 @@ struct ModuleDisplay : Widget {
 	}
 
 	void draw(NVGcontext *vg) override {
-
 		int x = 0;
 		int y = 0;
 		if(module) {
-			float pixelSize = 0.9f * ((float) DISPLAY_SIZE_XY / (float) module->sideLength);
+			float pixelSize = 0.9f * ((float) DISPLAY_SIZE_XY / (float) widgetSideLength);
 			//addChild( new ModuleDisplay(Vec(100, 100), pixelSize, true));
 
 			//float brightness;
@@ -837,9 +836,6 @@ struct ModuleDisplay : Widget {
 
 
 struct MusicalAntWidget : ModuleWidget {
-	MusicalAnt *module;
-
-
 	MusicalAntWidget(MusicalAnt *module) {
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/MusicalAnt.svg")));
@@ -967,8 +963,10 @@ struct MusicalAntWidget : ModuleWidget {
 			addParam(sideLengthKnob);
 			addParam(skipParamKnob);
 
+
 			// Create display
-			ModuleDisplay *display = new ModuleDisplay(module);
+			ModuleDisplay *display = new ModuleDisplay();
+			display->module = module;
 			display->box.pos = Vec(DISPLAY_OFFSET_X, DISPLAY_OFFSET_Y);
 			display->box.size = Vec(DISPLAY_SIZE_XY, DISPLAY_SIZE_XY);
 			addChild(display);
