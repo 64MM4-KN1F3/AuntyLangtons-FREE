@@ -698,121 +698,122 @@ struct ModuleDisplay : Widget {
 		module->setCellOnByDisplayPos(initX+(newDragX-dragX), initY+(newDragY-dragY), currentlyTurningOn);
 	}
 
-	void draw(NVGcontext *vg) override {
+	void draw(const DrawArgs &args) override {
 
 		int x = 0;
 		int y = 0;
-		if(module) {
-			float pixelSize = 0.9f * ((float) DISPLAY_SIZE_XY / (float) module->sideLength);
-			//addChild( new ModuleDisplay(Vec(100, 100), pixelSize, true));
+		std::vector<bool> cells;
+		if(module == NULL) return;
 
-			//float brightness;
+		float pixelSize = 0.9f * ((float) DISPLAY_SIZE_XY / (float) module->sideLength);
+		//addChild( new ModuleDisplay(Vec(100, 100), pixelSize, true));
 
-			int antCell = module->iFromXY(module->systemState->antX, module->systemState->antY);
-			int shadowAntCell = module->iFromXY(module->systemState->shadowAntX, module->systemState->shadowAntY);
+		//float brightness;
+
+		int antCell = module->iFromXY(module->systemState->antX, module->systemState->antY);
+		int shadowAntCell = module->iFromXY(module->systemState->shadowAntX, module->systemState->shadowAntY);
+		
+		int numCells = module->sideLength*module->sideLength;
+		cells = module->systemState->cells;
+		for(int i=0; i < numCells; i++){
+			x = (int) i%module->sideLength; //increment x up to COL length then loop
+			if((x == 0)&&(i != 0)){ //increment y once x hits positive multiple of COL length
+				y++;
+			}
 			
-			int numCells = module->sideLength*module->sideLength;
-			for(int i=0; i < numCells; i++){
-				x = i%module->sideLength; //increment x up to COL length then loop
-				if((i%module->sideLength == 0)&&(i!=0)){ //increment y once x hits positive multiple of COL length
-					y++;
-				}
-				
-				//nvgFillColor(vg, (module->systemState->cells[i] ? nvgRGBA(0,255,0,255) : nvgRGBA(255,0,0,255)));
-				if(module->systemState->cells.at(i)){
-					nvgFillColor(vg, ((random::uniform() < 0.5) ? nvgRGBA(0,255,0,PIXEL_BRIGHTNESS) : nvgRGBA(0,255,0,PIXEL_BRIGHTNESS+5)));
-					nvgBeginPath(vg);
-					nvgRect(vg, x*pixelSize, y*pixelSize, pixelSize, pixelSize);
-					nvgFill(vg);
-				}
-				if(i == shadowAntCell){
-					if(!module->params[MusicalAnt::SHADOW_ANT_ON].getValue()){
-						nvgFillColor(vg, nvgRGBA(0,70,0,255));
-						nvgBeginPath(vg);
-						nvgRect(vg, x*pixelSize, y*pixelSize, pixelSize, pixelSize);
-						nvgFill(vg);
-					}
-				}
-				if(i == antCell){
-					nvgFillColor(vg, nvgRGBA(20,255,50,255));
-					nvgBeginPath(vg);
-					nvgRect(vg, x*pixelSize, y*pixelSize, pixelSize, pixelSize);
-					nvgFill(vg);
-				}
-				//addChild( new ModuleDisplay(module, Vec((x+1)*(pixelSize + gapSize) + DISPLAY_OFFSET_X, (y+1)*(pixelSize + gapSize) + DISPLAY_OFFSET_Y), pixelSize, i));
-				//addChild(createLight<SmallLight<GreenLight>>(Vec((x+1)*6 + DISPLAY_OFFSET_X, (y+1)*6 + DISPLAY_OFFSET_Y), module, MusicalAnt::GRID_LIGHTS + i));
-				//addChild(createLight<TinyLight<GreenLight>>(Vec((x+1)*3 + DISPLAY_OFFSET_X, (y+1)*3 + DISPLAY_OFFSET_Y), module, MusicalAnt::GRID_LIGHTS + i));
+			//nvgFillColor(vg, (module->systemState->cells[i] ? nvgRGBA(0,255,0,255) : nvgRGBA(255,0,0,255)));
+			if(cells.at(i)){
+				nvgFillColor(args.vg, ((random::uniform() < 0.5) ? nvgRGBA(0,255,0,PIXEL_BRIGHTNESS) : nvgRGBA(0,255,0,PIXEL_BRIGHTNESS+5)));
+				nvgBeginPath(args.vg);
+				nvgRect(args.vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
+				nvgFill(args.vg);
 			}
-
-			// Monitor fuzz
-			float fuzzPixelSize = 2.2;
-			x = 0;
-			y = 0;
-			for(int i=0; i < 3025; i++){
-				x = i%55; //increment x up to COL length then loop
-				if((i%55 == 0)&&(i!=0)){ //increment y once x hits positive multiple of COL length
-					y++;
+			if(i == shadowAntCell){
+				if(!module->params[MusicalAnt::SHADOW_ANT_ON].getValue()){
+					nvgFillColor(args.vg, nvgRGBA(0,70,0,255));
+					nvgBeginPath(args.vg);
+					nvgRect(args.vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
+					nvgFill(args.vg);
 				}
-				nvgFillColor(vg, ((random::uniform() < 0.5) ? nvgRGBA(0,0,0,0) : nvgRGBA(255,255,255,8)));
-				nvgBeginPath(vg);
-				nvgRect(vg, x*fuzzPixelSize, y*fuzzPixelSize, fuzzPixelSize, fuzzPixelSize);
-				nvgFill(vg);
 			}
-
-			// Draw screen reflection over display
-			nvgFillColor(vg, nvgRGBA(255,255,255,7));
-			nvgBeginPath(vg);
-			nvgRect(vg, x*pixelSize, y*pixelSize, pixelSize, pixelSize);
-			nvgCircle(vg, 68, 54, 60);
-			nvgFill(vg);
-
-			nvgBeginPath(vg);
-			nvgRect(vg, x*pixelSize, y*pixelSize, pixelSize, pixelSize);
-			nvgCircle(vg, 77, 48, 40);
-			nvgFill(vg);
-
-			nvgBeginPath(vg);
-			nvgRect(vg, x*pixelSize, y*pixelSize, pixelSize, pixelSize);
-			nvgCircle(vg, 82, 43, 20);
-			nvgFill(vg);
-
-			nvgFillColor(vg, nvgRGBA(255,255,255,5));
-			nvgBeginPath(vg);
-			nvgRect(vg, x*pixelSize, y*pixelSize, pixelSize, pixelSize);
-			nvgCircle(vg, 87, 40, 8);
-			nvgFill(vg);
-
-			nvgFillColor(vg, nvgRGBA(0,0,0,0));
-
-			// LCD shine
-			nvgFillColor(vg, nvgRGBA(255,255,255,10));
-			nvgBeginPath(vg);
-			nvgMoveTo(vg, 105, 326.7);
-			nvgLineTo(vg, 135, 326.7);
-			nvgLineTo(vg, 125, 336);
-			nvgLineTo(vg, 95, 336);
-			nvgClosePath(vg);
-			nvgFill(vg);
-
-			nvgFillColor(vg, nvgRGBA(255,255,255,15));
-			nvgBeginPath(vg);
-			nvgMoveTo(vg, 110, 326.7);
-			nvgLineTo(vg, 130, 326.7);
-			nvgLineTo(vg, 120, 336);
-			nvgLineTo(vg, 100, 336);
-			nvgClosePath(vg);
-			nvgFill(vg);
-
-			nvgFillColor(vg, nvgRGBA(255,255,255,20));
-			nvgBeginPath(vg);
-			nvgMoveTo(vg, 115, 326.7);
-			nvgLineTo(vg, 125, 326.7);
-			nvgLineTo(vg, 115, 336);
-			nvgLineTo(vg, 105, 336);
-			nvgClosePath(vg);
-			nvgFill(vg);
-
+			if(i == antCell){
+				nvgFillColor(args.vg, nvgRGBA(20,255,50,255));
+				nvgBeginPath(args.vg);
+				nvgRect(args.vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
+				nvgFill(args.vg);
+			}
+			//addChild( new ModuleDisplay(module, Vec((x+1)*(pixelSize + gapSize) + DISPLAY_OFFSET_X, (y+1)*(pixelSize + gapSize) + DISPLAY_OFFSET_Y), pixelSize, i));
+			//addChild(createLight<SmallLight<GreenLight>>(Vec((x+1)*6 + DISPLAY_OFFSET_X, (y+1)*6 + DISPLAY_OFFSET_Y), module, MusicalAnt::GRID_LIGHTS + i));
+			//addChild(createLight<TinyLight<GreenLight>>(Vec((x+1)*3 + DISPLAY_OFFSET_X, (y+1)*3 + DISPLAY_OFFSET_Y), module, MusicalAnt::GRID_LIGHTS + i));
 		}
+
+		// Monitor fuzz
+		float fuzzPixelSize = 2.2;
+		x = 0;
+		y = 0;
+		for(int i=0; i < 3025; i++){
+			x = i%55; //increment x up to COL length then loop
+			if((i%55 == 0)&&(i!=0)){ //increment y once x hits positive multiple of COL length
+				y++;
+			}
+			nvgFillColor(args.vg, ((random::uniform() < 0.5) ? nvgRGBA(0,0,0,0) : nvgRGBA(255,255,255,8)));
+			nvgBeginPath(args.vg);
+			nvgRect(args.vg, (float) x*fuzzPixelSize, (float) y*fuzzPixelSize, fuzzPixelSize, fuzzPixelSize);
+			nvgFill(args.vg);
+		}
+
+		// Draw screen reflection over display
+		nvgFillColor(args.vg, nvgRGBA(255,255,255,7));
+		nvgBeginPath(args.vg);
+		//nvgRect(args.vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
+		nvgCircle(args.vg, 68, 54, 60);
+		nvgFill(args.vg);
+
+		nvgBeginPath(args.vg);
+		//nvgRect(args.vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
+		nvgCircle(args.vg, 77, 48, 40);
+		nvgFill(args.vg);
+
+		nvgBeginPath(args.vg);
+		//nvgRect(args.vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
+		nvgCircle(args.vg, 82, 43, 20);
+		nvgFill(args.vg);
+
+		nvgFillColor(args.vg, nvgRGBA(255,255,255,5));
+		nvgBeginPath(args.vg);
+		//nvgRect(args.vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
+		nvgCircle(args.vg, 87, 40, 8);
+		nvgFill(args.vg);
+
+		//nvgFillColor(args.vg, nvgRGBA(0,0,0,0));
+
+		// LCD shine
+		/*nvgFillColor(args.vg, nvgRGBA(255,255,255,10));
+		nvgBeginPath(args.vg);
+		nvgMoveTo(args.vg, 105, 326.7);
+		nvgLineTo(args.vg, 135, 326.7);
+		nvgLineTo(args.vg, 125, 336);
+		nvgLineTo(args.vg, 95, 336);
+		nvgClosePath(args.vg);
+		nvgFill(args.vg);
+
+		nvgFillColor(args.vg, nvgRGBA(255,255,255,15));
+		nvgBeginPath(args.vg);
+		nvgMoveTo(args.vg, 110, 326.7);
+		nvgLineTo(args.vg, 130, 326.7);
+		nvgLineTo(args.vg, 120, 336);
+		nvgLineTo(args.vg, 100, 336);
+		nvgClosePath(args.vg);
+		nvgFill(args.vg);
+
+		nvgFillColor(args.vg, nvgRGBA(255,255,255,20));
+		nvgBeginPath(args.vg);
+		nvgMoveTo(args.vg, 115, 326.7);
+		nvgLineTo(args.vg, 125, 326.7);
+		nvgLineTo(args.vg, 115, 336);
+		nvgLineTo(args.vg, 105, 336);
+		nvgClosePath(args.vg);
+		nvgFill(args.vg);*/
 
 	}
 
