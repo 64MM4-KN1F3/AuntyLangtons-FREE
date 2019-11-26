@@ -101,10 +101,13 @@ struct MusicalInstruction {
 
 	int instruction(char input) {
 		//std::cout << "\nInstruction: " << input << "\n";
-		if(input == 'L')
+		if(input == 'L') {
 			return LEFT;
-		if(input == 'R')
-			return RIGHT;
+		}
+		
+		// Implied else
+		return RIGHT;
+
 	}
 
 	int getOnLightInstruction() {
@@ -127,7 +130,7 @@ struct MusicalInstruction {
 struct CenteredLabel : Widget {
 	std::string text;
 	int fontSize;
-	std::shared_ptr<Font> font;
+	std::shared_ptr<Font> font = NULL;
 
 	CenteredLabel(int _fontSize = 10) {
 		font = APP->window->loadFont(asset::plugin(pluginInstance, "res/DSEG7ClassicMini-Regular.ttf"));
@@ -139,26 +142,28 @@ struct CenteredLabel : Widget {
 		nvgFontFaceId(args.vg, font->handle);
 		nvgFillColor(args.vg, nvgRGB(0, 0, 0));
 		nvgFontSize(args.vg, fontSize);
-		nvgText(args.vg, box.pos.x, box.pos.y, text.c_str(), NULL);
+		nvgText(args.vg, box.pos.x, box.pos.y, "TEST", NULL);
 	}
 };
 
 ////////////////////////////////////////////// KNOBS //////////////////////////////////////////////
 
 struct RoundSmallBlackKnobSnap : RoundSmallBlackKnob {
-	CenteredLabel* linkedLabel = NULL;
-	Module* linkedModule = NULL;
+	CenteredLabel* linkedLabel = new CenteredLabel;
+	Module* linkedModule = new Module;
 
     RoundSmallBlackKnobSnap() {
-        paramQuantity = NULL;
-        snap = true;
+    	paramQuantity = NULL;
+    	snap = true;
     }
 
     void connectLabel(CenteredLabel* label, Module* module) {
-		linkedLabel = label;
-		linkedModule = module;
-		if (linkedModule && linkedLabel) {
-			linkedLabel->text = formatCurrentValue();
+		if(label && module) {
+			linkedLabel = label;
+			linkedModule = module;
+			if (linkedModule && linkedLabel) {
+				linkedLabel->text = formatCurrentValue();
+			}
 		}
 	}
 

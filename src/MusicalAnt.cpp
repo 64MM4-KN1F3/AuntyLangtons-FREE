@@ -101,15 +101,7 @@ struct MusicalAnt : Module, QuantizeUtils {
 	};
 	enum LightIds {
 		BLINK_LIGHT,
-		ENUMS(GRID_LIGHTS, CELLS),
 		NUM_LIGHTS
-	};
-	enum RndMode {
-		RND_BASIC,
-		RND_EUCLID,
-		RND_SIN_WAVE,
-		RND_LIFE_GLIDERS,
-		NUM_RND_MODES
 	};
 
 	float phase = 0.0;
@@ -117,10 +109,10 @@ struct MusicalAnt : Module, QuantizeUtils {
 	int index = 0;
 	bool loopOn = false;
 	int loopLength = 0;
-	int loopIndex;
+	int loopIndex = 0;
 	dsp::SchmittTrigger clockTrigger;
 	int fibo[7] = {8, 13, 21, 34, 55, 89, 144}; // short for Fibonacci (cause I forgot that's why I named it that).
-	int sideLength;
+	int sideLength = 0;
 	bool currentArrowOfTimeForward = true;
 	bool lastArrowOfTimeForward = true;
 
@@ -162,16 +154,16 @@ struct MusicalAnt : Module, QuantizeUtils {
 		onReset();
 	}
 
-	~MusicalAnt() {
-		//systemState->cells.clear();
-	}
+	//~MusicalAnt() {
+	//}
 
 	void onReset() {
 		
 		clearCells();
-		setAntPosition(sideLength/2, sideLength/2, 0);
+		int sideLengthOnReset = getSideLength();
+		setAntPosition((int) (sideLengthOnReset/2), (int) (sideLengthOnReset/2), 0);
 		
-		setShadowAntPosition(sideLength/2, sideLength/2, 0);
+		setShadowAntPosition((int) (sideLengthOnReset/2), (int) (sideLengthOnReset/2), 0);
 		
 		index = 0;
 		loopIndex = 0;
@@ -190,12 +182,12 @@ struct MusicalAnt : Module, QuantizeUtils {
 		
 		// New system representation.
 
-		systemState->antX = sideLength/2;
-		systemState->antY = sideLength/2;
+		systemState->antX = (int) (sideLengthOnReset/2);
+		systemState->antY = (int) (sideLengthOnReset/2);
 		systemState->antDirectionDegrees = 0;
 
-		systemState->shadowAntX = sideLength/2;
-		systemState->shadowAntY = sideLength/2;
+		systemState->shadowAntX = (int) (sideLengthOnReset/2);
+		systemState->shadowAntY = (int) (sideLengthOnReset/2);
 		systemState->shadowAntDirectionDegrees = 0;
 		
 	}
@@ -292,8 +284,12 @@ struct MusicalAnt : Module, QuantizeUtils {
 		return this->index;
 	}
 
-	void setSideLength(int x){
-		sideLength = fibo[x];
+	void setSideLength(int x) {
+		sideLength = fibo[wrap(x, 0, getSideLength()-1)];
+	}
+
+	int getSideLength() {
+		return sideLength;
 	}
 
 	void setAntPosition(int x, int y, int direction) {
@@ -367,8 +363,8 @@ struct MusicalAnt : Module, QuantizeUtils {
 	}
  
 	void setCellOn(int cellX, int cellY, bool on){
-		if(cellX >= 0 && cellX < sideLength && 
-		   cellY >=0 && cellY < sideLength){
+		if(cellX >= 0 && cellX < getSideLength() && 
+		   cellY >=0 && cellY < getSideLength()){
 			systemState->cells.at(iFromXY(cellX, cellY)) = on;
 		}
 	}
@@ -382,25 +378,25 @@ struct MusicalAnt : Module, QuantizeUtils {
 	}
 
 	void setCellOnByDisplayPos(float displayX, float displayY, bool on){
-		float pixelSize = 0.9f * ((float) DISPLAY_SIZE_XY / (float) sideLength);
+		float pixelSize = 0.9f * ((float) DISPLAY_SIZE_XY / (float) getSideLength());
 		setCellOn(int(displayX / pixelSize), int(displayY / pixelSize), on);
 	}
 
 	bool getCellStateByDisplayPos(float displayX, float displayY){
-		float pixelSize = 0.9f * ((float) DISPLAY_SIZE_XY / (float) sideLength);
+		float pixelSize = 0.9f * ((float) DISPLAY_SIZE_XY / (float) getSideLength());
 		return getCellState(int(displayX / pixelSize), int(displayY / pixelSize));
 	}
 
 	int iFromXY(int cellX, int cellY){
-		return cellX + cellY * sideLength;
+		return cellX + cellY * getSideLength();
 	}
 
 	int xFromI(int cellI){
-		return cellI % sideLength;
+		return cellI % getSideLength();
 	}
 
 	int yFromI(int cellI){
-		return cellI / sideLength;
+		return cellI / getSideLength();
 	}
 
 	int mod(int a, int b)
@@ -578,7 +574,7 @@ void MusicalAnt::process(const ProcessArgs &args) {
 	
 
 	loopLength = (params[LOOP_LENGTH].getValue() + 1);
-	setLoopLength(loopLength);
+	//setLoopLength(loopLength);
 
 
 
@@ -698,123 +694,127 @@ struct ModuleDisplay : Widget {
 		module->setCellOnByDisplayPos(initX+(newDragX-dragX), initY+(newDragY-dragY), currentlyTurningOn);
 	}
 
-	void draw(const DrawArgs &args) override {
+	void draw(NVGcontext *vg) override {
 
 		int x = 0;
 		int y = 0;
-		std::vector<bool> cells;
-		if(module == NULL) return;
+			if(module) {
+			int drawSideLength = module->getSideLength();
+			std::vector<bool> cells;
+			cells.resize(CELLS, false);
 
-		float pixelSize = 0.9f * ((float) DISPLAY_SIZE_XY / (float) module->sideLength);
-		//addChild( new ModuleDisplay(Vec(100, 100), pixelSize, true));
+			float pixelSize = 0.9f * ((float) DISPLAY_SIZE_XY / (float) drawSideLength);
+			//addChild( new ModuleDisplay(Vec(100, 100), pixelSize, true));
 
-		//float brightness;
+			//float brightness;
 
-		int antCell = module->iFromXY(module->systemState->antX, module->systemState->antY);
-		int shadowAntCell = module->iFromXY(module->systemState->shadowAntX, module->systemState->shadowAntY);
-		
-		int numCells = module->sideLength*module->sideLength;
-		cells = module->systemState->cells;
-		for(int i=0; i < numCells; i++){
-			x = (int) i%module->sideLength; //increment x up to COL length then loop
-			if((x == 0)&&(i != 0)){ //increment y once x hits positive multiple of COL length
-				y++;
-			}
+			int antCell = module->iFromXY(module->systemState->antX, module->systemState->antY);
+			int shadowAntCell = module->iFromXY(module->systemState->shadowAntX, module->systemState->shadowAntY);
 			
-			//nvgFillColor(vg, (module->systemState->cells[i] ? nvgRGBA(0,255,0,255) : nvgRGBA(255,0,0,255)));
-			if(cells.at(i)){
-				nvgFillColor(args.vg, ((random::uniform() < 0.5) ? nvgRGBA(0,255,0,PIXEL_BRIGHTNESS) : nvgRGBA(0,255,0,PIXEL_BRIGHTNESS+5)));
-				nvgBeginPath(args.vg);
-				nvgRect(args.vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
-				nvgFill(args.vg);
-			}
-			if(i == shadowAntCell){
-				if(!module->params[MusicalAnt::SHADOW_ANT_ON].getValue()){
-					nvgFillColor(args.vg, nvgRGBA(0,70,0,255));
-					nvgBeginPath(args.vg);
-					nvgRect(args.vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
-					nvgFill(args.vg);
+			int numCells = drawSideLength*drawSideLength;
+			cells = module->systemState->cells;
+			for(int i=0; i < numCells; i++){
+				x = (int) i%drawSideLength; //increment x up to COL length then loop
+				if((x == 0)&&(i != 0)){ //increment y once x hits positive multiple of COL length
+					y++;
 				}
+				
+				//nvgFillColor(vg, (module->systemState->cells[i] ? nvgRGBA(0,255,0,255) : nvgRGBA(255,0,0,255)));
+				if(cells.at(i)){
+					nvgFillColor(vg, ((random::uniform() < 0.5) ? nvgRGBA(0,255,0,PIXEL_BRIGHTNESS) : nvgRGBA(0,255,0,PIXEL_BRIGHTNESS+5)));
+					nvgBeginPath(vg);
+					nvgRect(vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
+					nvgFill(vg);
+				}
+				if(i == shadowAntCell){
+					if(!module->params[MusicalAnt::SHADOW_ANT_ON].getValue()){
+						nvgFillColor(vg, nvgRGBA(0,70,0,255));
+						nvgBeginPath(vg);
+						nvgRect(vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
+						nvgFill(vg);
+					}
+				}
+				if(i == antCell){
+					nvgFillColor(vg, nvgRGBA(20,255,50,255));
+					nvgBeginPath(vg);
+					nvgRect(vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
+					nvgFill(vg);
+				}
+				//addChild( new ModuleDisplay(module, Vec((x+1)*(pixelSize + gapSize) + DISPLAY_OFFSET_X, (y+1)*(pixelSize + gapSize) + DISPLAY_OFFSET_Y), pixelSize, i));
+				//addChild(createLight<SmallLight<GreenLight>>(Vec((x+1)*6 + DISPLAY_OFFSET_X, (y+1)*6 + DISPLAY_OFFSET_Y), module, MusicalAnt::GRID_LIGHTS + i));
+				//addChild(createLight<TinyLight<GreenLight>>(Vec((x+1)*3 + DISPLAY_OFFSET_X, (y+1)*3 + DISPLAY_OFFSET_Y), module, MusicalAnt::GRID_LIGHTS + i));
 			}
-			if(i == antCell){
-				nvgFillColor(args.vg, nvgRGBA(20,255,50,255));
-				nvgBeginPath(args.vg);
-				nvgRect(args.vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
-				nvgFill(args.vg);
-			}
-			//addChild( new ModuleDisplay(module, Vec((x+1)*(pixelSize + gapSize) + DISPLAY_OFFSET_X, (y+1)*(pixelSize + gapSize) + DISPLAY_OFFSET_Y), pixelSize, i));
-			//addChild(createLight<SmallLight<GreenLight>>(Vec((x+1)*6 + DISPLAY_OFFSET_X, (y+1)*6 + DISPLAY_OFFSET_Y), module, MusicalAnt::GRID_LIGHTS + i));
-			//addChild(createLight<TinyLight<GreenLight>>(Vec((x+1)*3 + DISPLAY_OFFSET_X, (y+1)*3 + DISPLAY_OFFSET_Y), module, MusicalAnt::GRID_LIGHTS + i));
-		}
 
-		// Monitor fuzz
-		float fuzzPixelSize = 2.2;
-		x = 0;
-		y = 0;
-		for(int i=0; i < 3025; i++){
-			x = i%55; //increment x up to COL length then loop
-			if((i%55 == 0)&&(i!=0)){ //increment y once x hits positive multiple of COL length
-				y++;
+			// Monitor fuzz
+			float fuzzPixelSize = 2.2;
+			x = 0;
+			y = 0;
+			for(int i=0; i < 3025; i++){
+				x = i%55; //increment x up to COL length then loop
+				if((i%55 == 0)&&(i!=0)){ //increment y once x hits positive multiple of COL length
+					y++;
+				}
+				nvgFillColor(vg, ((random::uniform() < 0.5) ? nvgRGBA(0,0,0,0) : nvgRGBA(255,255,255,8)));
+				nvgBeginPath(vg);
+				nvgRect(vg, (float) x*fuzzPixelSize, (float) y*fuzzPixelSize, fuzzPixelSize, fuzzPixelSize);
+				nvgFill(vg);
 			}
-			nvgFillColor(args.vg, ((random::uniform() < 0.5) ? nvgRGBA(0,0,0,0) : nvgRGBA(255,255,255,8)));
+
+			// Draw screen reflection over display
+			nvgFillColor(vg, nvgRGBA(255,255,255,7));
+			nvgBeginPath(vg);
+			//nvgRect(vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
+			nvgCircle(vg, 68, 54, 60);
+			nvgFill(vg);
+
+			nvgBeginPath(vg);
+			//nvgRect(vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
+			nvgCircle(vg, 77, 48, 40);
+			nvgFill(vg);
+
+			nvgBeginPath(vg);
+			//nvgRect(vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
+			nvgCircle(vg, 82, 43, 20);
+			nvgFill(vg);
+
+			nvgFillColor(vg, nvgRGBA(255,255,255,5));
+			nvgBeginPath(vg);
+			//nvgRect(vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
+			nvgCircle(vg, 87, 40, 8);
+			nvgFill(vg);
+
+			//nvgFillColor(args.vg, nvgRGBA(0,0,0,0));
+
+			// LCD shine
+			/*nvgFillColor(args.vg, nvgRGBA(255,255,255,10));
 			nvgBeginPath(args.vg);
-			nvgRect(args.vg, (float) x*fuzzPixelSize, (float) y*fuzzPixelSize, fuzzPixelSize, fuzzPixelSize);
+			nvgMoveTo(args.vg, 105, 326.7);
+			nvgLineTo(args.vg, 135, 326.7);
+			nvgLineTo(args.vg, 125, 336);
+			nvgLineTo(args.vg, 95, 336);
+			nvgClosePath(args.vg);
 			nvgFill(args.vg);
+
+			nvgFillColor(args.vg, nvgRGBA(255,255,255,15));
+			nvgBeginPath(args.vg);
+			nvgMoveTo(args.vg, 110, 326.7);
+			nvgLineTo(args.vg, 130, 326.7);
+			nvgLineTo(args.vg, 120, 336);
+			nvgLineTo(args.vg, 100, 336);
+			nvgClosePath(args.vg);
+			nvgFill(args.vg);
+
+			nvgFillColor(args.vg, nvgRGBA(255,255,255,20));
+			nvgBeginPath(args.vg);
+			nvgMoveTo(args.vg, 115, 326.7);
+			nvgLineTo(args.vg, 125, 326.7);
+			nvgLineTo(args.vg, 115, 336);
+			nvgLineTo(args.vg, 105, 336);
+			nvgClosePath(args.vg);
+			nvgFill(args.vg);*/
+
+			step(); // TODO Figure out if this actually helps??
 		}
-
-		// Draw screen reflection over display
-		nvgFillColor(args.vg, nvgRGBA(255,255,255,7));
-		nvgBeginPath(args.vg);
-		//nvgRect(args.vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
-		nvgCircle(args.vg, 68, 54, 60);
-		nvgFill(args.vg);
-
-		nvgBeginPath(args.vg);
-		//nvgRect(args.vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
-		nvgCircle(args.vg, 77, 48, 40);
-		nvgFill(args.vg);
-
-		nvgBeginPath(args.vg);
-		//nvgRect(args.vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
-		nvgCircle(args.vg, 82, 43, 20);
-		nvgFill(args.vg);
-
-		nvgFillColor(args.vg, nvgRGBA(255,255,255,5));
-		nvgBeginPath(args.vg);
-		//nvgRect(args.vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
-		nvgCircle(args.vg, 87, 40, 8);
-		nvgFill(args.vg);
-
-		//nvgFillColor(args.vg, nvgRGBA(0,0,0,0));
-
-		// LCD shine
-		/*nvgFillColor(args.vg, nvgRGBA(255,255,255,10));
-		nvgBeginPath(args.vg);
-		nvgMoveTo(args.vg, 105, 326.7);
-		nvgLineTo(args.vg, 135, 326.7);
-		nvgLineTo(args.vg, 125, 336);
-		nvgLineTo(args.vg, 95, 336);
-		nvgClosePath(args.vg);
-		nvgFill(args.vg);
-
-		nvgFillColor(args.vg, nvgRGBA(255,255,255,15));
-		nvgBeginPath(args.vg);
-		nvgMoveTo(args.vg, 110, 326.7);
-		nvgLineTo(args.vg, 130, 326.7);
-		nvgLineTo(args.vg, 120, 336);
-		nvgLineTo(args.vg, 100, 336);
-		nvgClosePath(args.vg);
-		nvgFill(args.vg);
-
-		nvgFillColor(args.vg, nvgRGBA(255,255,255,20));
-		nvgBeginPath(args.vg);
-		nvgMoveTo(args.vg, 115, 326.7);
-		nvgLineTo(args.vg, 125, 326.7);
-		nvgLineTo(args.vg, 115, 336);
-		nvgLineTo(args.vg, 105, 336);
-		nvgClosePath(args.vg);
-		nvgFill(args.vg);*/
-
 	}
 
 };
@@ -833,82 +833,82 @@ struct MusicalAntWidget : ModuleWidget {
 		addChild(createWidget<ScrewBlack>(Vec(0, 365)));
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - 15, 365)));
 
-
-		CenteredLabel* const dynamicLabel = new CenteredLabel;
-		dynamicLabel->box.pos = Vec(75, 182.2);
-
-		addParam(createParam<RoundBlackKnob>(Vec(143.9, 177), module, MusicalAnt::CLOCK_PARAM));
-
-		// Ant X panel widgets
-		//addParam(createParam<RoundSmallBlackKnobSnap>(Vec(52.4, 218.5), module, MusicalAnt::OCTAVE_KNOB_PARAM_X));
-		RoundSmallBlackKnobSnap *octaveKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(52.4, 218.5), module, MusicalAnt::OCTAVE_KNOB_PARAM_X));
-		RoundSmallBlackKnobSnap *noteKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(76.9, 218.5), module, MusicalAnt::NOTE_KNOB_PARAM_X));
-		RoundSmallBlackKnobSnap *scaleKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(101.4, 218.5), module, MusicalAnt::SCALE_KNOB_PARAM_X));
-		addOutput(createOutput<PJ301MPort>(Vec(148.9, 218.5), module, MusicalAnt::VOCT_OUTPUT_X));
-		// Invert X V/Oct output
-		addParam(createParam<CKSS>(Vec(127.5, 219.75), module, MusicalAnt::VOCT_INVERT_X));
-		
-		// Ant Y panel widgets
-		RoundSmallBlackKnobSnap *octaveKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(52.4, 254), module, MusicalAnt::OCTAVE_KNOB_PARAM_Y));
-		RoundSmallBlackKnobSnap *noteKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(76.9, 254), module, MusicalAnt::NOTE_KNOB_PARAM_Y));
-		RoundSmallBlackKnobSnap *scaleKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(101.4, 254), module, MusicalAnt::SCALE_KNOB_PARAM_Y));
-		addOutput(createOutput<PJ301MPort>(Vec(148.9, 254), module, MusicalAnt::VOCT_OUTPUT_Y));
-		// Invert Y V/Oct output
-		addParam(createParam<CKSS>(Vec(127.5, 255.25), module, MusicalAnt::VOCT_INVERT_Y));
-
-		// Shadow Ant X panel widgets
-		RoundSmallBlackKnobSnap *shadowOctaveKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(70.9, 289.5), module, MusicalAnt::OCTAVE_KNOB_PARAM_SHADOW_X));
-		RoundSmallBlackKnobSnap *shadowNoteKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(95.4, 289.5), module, MusicalAnt::NOTE_KNOB_PARAM_SHADOW_X));
-		RoundSmallBlackKnobSnap *shadowScaleKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(119.9, 289.5), module, MusicalAnt::SCALE_KNOB_PARAM_SHADOW_X));
-		addOutput(createOutput<PJ301MPort>(Vec(148.9, 289.5), module, MusicalAnt::VOCT_OUTPUT_SHADOW_X));
-
-		// Shadow Ant Y panel widgets
-		RoundSmallBlackKnobSnap *shadowOctaveKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(70.9, 325), module, MusicalAnt::OCTAVE_KNOB_PARAM_SHADOW_Y));
-		RoundSmallBlackKnobSnap *shadowNoteKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(95.4, 325), module, MusicalAnt::NOTE_KNOB_PARAM_SHADOW_Y));
-		RoundSmallBlackKnobSnap *shadowScaleKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(119.9, 325), module, MusicalAnt::SCALE_KNOB_PARAM_SHADOW_Y));
-		addOutput(createOutput<PJ301MPort>(Vec(148.9, 325), module, MusicalAnt::VOCT_OUTPUT_SHADOW_Y));
-
-		
-
-		addInput(createInput<PJ301MPort>(Vec(115.9, 181), module, MusicalAnt::EXT_CLOCK_INPUT));
-		addOutput(createOutput<PJ301MPort>(Vec(23.9, 181), module, MusicalAnt::GATE_OUTPUT));
-
-		addOutput(createOutput<PJ301MPort>(Vec(52.9, 181), module, MusicalAnt::GATE_OUTPUT_LEFT));
-		addOutput(createOutput<PJ301MPort>(Vec(82.9, 181), module, MusicalAnt::GATE_OUTPUT_RIGHT));
-		
-
-		addChild(createLight<SmallLight<GreenLight>>(Vec(108.9, 170), module, MusicalAnt::BLINK_LIGHT));
-
-		// Shadow Ant on switch
-		addParam(createParam<CKSS>(Vec(50.80, 305), module, MusicalAnt::SHADOW_ANT_ON));
-
-		// Effect Knob 
-		addParam(createParam<RoundBlackSnapKnob>(Vec(253.9, 250), module, MusicalAnt::EFFECT_KNOB_PARAM));
-
-		// Loop Mode Switch
-		addParam(createParam<CKSS_Horizontal>(Vec(25, 290), module, MusicalAnt::LOOPMODE_SWITCH_PARAM));
-
-		// Loop length knob
-
-		//addParam(createParam<RoundSmallBlackKnobSnap>(Vec(23.65, 306.5), module, MusicalAnt::LOOP_LENGTH));
-		RoundSmallBlackKnobSnap *loopLengthKnob = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(23.65, 306.5), module, MusicalAnt::LOOP_LENGTH));
-		// Loop length text
-
-		//addChild( new LoopLengthTextLabel(module, Vec(253.55, 80), 20, 1, nvgRGBA(255,0,0,255) ) );
-
-		// Resolution/SideLength Knob
-		RoundSmallBlackKnobSnap *sideLengthKnob = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(23.9, 218.5), module, MusicalAnt::SIDE_LENGTH_PARAM));
-
-		// Skip Knob
-		RoundSmallBlackKnobSnap *skipParamKnob = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(23.9, 254), module, MusicalAnt::SKIP_PARAM));
-
-		// AuntyLangButton!
-		addParam(createParam<AuntyLangButton>(Vec(83.5, 352), module, MusicalAnt::AUNTYLANGBUTTON_PARAM));
-
-		// Poly V/Oct out
-		addOutput(createOutput<PJ301MPort>(Vec(23, 341.25), module, MusicalAnt::VOCT_OUTPUT_POLY));
-		
 		if(module){
+			CenteredLabel* const dynamicLabel = new CenteredLabel;
+			dynamicLabel->box.pos = Vec(75, 182.2);
+
+			addParam(createParam<RoundBlackKnob>(Vec(143.9, 177), module, MusicalAnt::CLOCK_PARAM));
+
+			// Ant X panel widgets
+			//addParam(createParam<RoundSmallBlackKnobSnap>(Vec(52.4, 218.5), module, MusicalAnt::OCTAVE_KNOB_PARAM_X));
+			RoundSmallBlackKnobSnap *octaveKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(52.4, 218.5), module, MusicalAnt::OCTAVE_KNOB_PARAM_X));
+			RoundSmallBlackKnobSnap *noteKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(76.9, 218.5), module, MusicalAnt::NOTE_KNOB_PARAM_X));
+			RoundSmallBlackKnobSnap *scaleKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(101.4, 218.5), module, MusicalAnt::SCALE_KNOB_PARAM_X));
+			addOutput(createOutput<PJ301MPort>(Vec(148.9, 218.5), module, MusicalAnt::VOCT_OUTPUT_X));
+			// Invert X V/Oct output
+			addParam(createParam<CKSS>(Vec(127.5, 219.75), module, MusicalAnt::VOCT_INVERT_X));
+			
+			// Ant Y panel widgets
+			RoundSmallBlackKnobSnap *octaveKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(52.4, 254), module, MusicalAnt::OCTAVE_KNOB_PARAM_Y));
+			RoundSmallBlackKnobSnap *noteKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(76.9, 254), module, MusicalAnt::NOTE_KNOB_PARAM_Y));
+			RoundSmallBlackKnobSnap *scaleKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(101.4, 254), module, MusicalAnt::SCALE_KNOB_PARAM_Y));
+			addOutput(createOutput<PJ301MPort>(Vec(148.9, 254), module, MusicalAnt::VOCT_OUTPUT_Y));
+			// Invert Y V/Oct output
+			addParam(createParam<CKSS>(Vec(127.5, 255.25), module, MusicalAnt::VOCT_INVERT_Y));
+
+			// Shadow Ant X panel widgets
+			RoundSmallBlackKnobSnap *shadowOctaveKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(70.9, 289.5), module, MusicalAnt::OCTAVE_KNOB_PARAM_SHADOW_X));
+			RoundSmallBlackKnobSnap *shadowNoteKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(95.4, 289.5), module, MusicalAnt::NOTE_KNOB_PARAM_SHADOW_X));
+			RoundSmallBlackKnobSnap *shadowScaleKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(119.9, 289.5), module, MusicalAnt::SCALE_KNOB_PARAM_SHADOW_X));
+			addOutput(createOutput<PJ301MPort>(Vec(148.9, 289.5), module, MusicalAnt::VOCT_OUTPUT_SHADOW_X));
+
+			// Shadow Ant Y panel widgets
+			RoundSmallBlackKnobSnap *shadowOctaveKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(70.9, 325), module, MusicalAnt::OCTAVE_KNOB_PARAM_SHADOW_Y));
+			RoundSmallBlackKnobSnap *shadowNoteKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(95.4, 325), module, MusicalAnt::NOTE_KNOB_PARAM_SHADOW_Y));
+			RoundSmallBlackKnobSnap *shadowScaleKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(119.9, 325), module, MusicalAnt::SCALE_KNOB_PARAM_SHADOW_Y));
+			addOutput(createOutput<PJ301MPort>(Vec(148.9, 325), module, MusicalAnt::VOCT_OUTPUT_SHADOW_Y));
+
+			
+
+			addInput(createInput<PJ301MPort>(Vec(115.9, 181), module, MusicalAnt::EXT_CLOCK_INPUT));
+			addOutput(createOutput<PJ301MPort>(Vec(23.9, 181), module, MusicalAnt::GATE_OUTPUT));
+
+			addOutput(createOutput<PJ301MPort>(Vec(52.9, 181), module, MusicalAnt::GATE_OUTPUT_LEFT));
+			addOutput(createOutput<PJ301MPort>(Vec(82.9, 181), module, MusicalAnt::GATE_OUTPUT_RIGHT));
+			
+
+			addChild(createLight<SmallLight<GreenLight>>(Vec(108.9, 170), module, MusicalAnt::BLINK_LIGHT));
+
+			// Shadow Ant on switch
+			addParam(createParam<CKSS>(Vec(50.80, 305), module, MusicalAnt::SHADOW_ANT_ON));
+
+			// Effect Knob 
+			addParam(createParam<RoundBlackSnapKnob>(Vec(253.9, 250), module, MusicalAnt::EFFECT_KNOB_PARAM));
+
+			// Loop Mode Switch
+			addParam(createParam<CKSS_Horizontal>(Vec(25, 290), module, MusicalAnt::LOOPMODE_SWITCH_PARAM));
+
+			// Loop length knob
+
+			//addParam(createParam<RoundSmallBlackKnobSnap>(Vec(23.65, 306.5), module, MusicalAnt::LOOP_LENGTH));
+			RoundSmallBlackKnobSnap *loopLengthKnob = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(23.65, 306.5), module, MusicalAnt::LOOP_LENGTH));
+			// Loop length text
+
+			//addChild( new LoopLengthTextLabel(module, Vec(253.55, 80), 20, 1, nvgRGBA(255,0,0,255) ) );
+
+			// Resolution/SideLength Knob
+			RoundSmallBlackKnobSnap *sideLengthKnob = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(23.9, 218.5), module, MusicalAnt::SIDE_LENGTH_PARAM));
+
+			// Skip Knob
+			RoundSmallBlackKnobSnap *skipParamKnob = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(23.9, 254), module, MusicalAnt::SKIP_PARAM));
+
+			// AuntyLangButton!
+			addParam(createParam<AuntyLangButton>(Vec(83.5, 352), module, MusicalAnt::AUNTYLANGBUTTON_PARAM));
+
+			// Poly V/Oct out
+			addOutput(createOutput<PJ301MPort>(Vec(23, 341.25), module, MusicalAnt::VOCT_OUTPUT_POLY));
+			
+			
 			octaveKnobX->connectLabel(dynamicLabel, module);
 			noteKnobX->connectLabel(dynamicLabel, module);
 			scaleKnobX->connectLabel(dynamicLabel, module);
@@ -958,7 +958,6 @@ struct MusicalAntWidget : ModuleWidget {
 			display->box.size = Vec(DISPLAY_SIZE_XY, DISPLAY_SIZE_XY);
 			addChild(display);
 		}
-		
 	}
 };
 
