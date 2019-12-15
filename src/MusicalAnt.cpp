@@ -124,27 +124,27 @@ struct MusicalAnt : Module, QuantizeUtils {
 
 	MusicalAnt() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-		configParam(MusicalAnt::CLOCK_PARAM, -2.0f, 8.0f, 1.0f, "");
-		configParam(MusicalAnt::OCTAVE_KNOB_PARAM_X, 0.0, 7.0, 2.0, "");
-		configParam(MusicalAnt::NOTE_KNOB_PARAM_X, 0.0, QuantizeUtils::NUM_NOTES-1, QuantizeUtils::NOTE_C, "");
-		configParam(MusicalAnt::SCALE_KNOB_PARAM_X, 0.0, QuantizeUtils::NUM_SCALES-1, QuantizeUtils::MINOR, "");
-		configParam(MusicalAnt::VOCT_INVERT_X, 0.0f, 1.0f, 1.0f, "");
-		configParam(MusicalAnt::OCTAVE_KNOB_PARAM_Y, 0.0, 7.0, 2.0, "");
-		configParam(MusicalAnt::NOTE_KNOB_PARAM_Y, 0.0, QuantizeUtils::NUM_NOTES-1, QuantizeUtils::NOTE_C, "");
-		configParam(MusicalAnt::SCALE_KNOB_PARAM_Y, 0.0, QuantizeUtils::NUM_SCALES-1, QuantizeUtils::MINOR, "");
-		configParam(MusicalAnt::VOCT_INVERT_Y, 0.0f, 1.0f, 1.0f, "");
-		configParam(MusicalAnt::OCTAVE_KNOB_PARAM_SHADOW_X, 0.0, 7.0, 2.0, "");
-		configParam(MusicalAnt::NOTE_KNOB_PARAM_SHADOW_X, 0.0, QuantizeUtils::NUM_NOTES-1, QuantizeUtils::NOTE_C, "");
-		configParam(MusicalAnt::SCALE_KNOB_PARAM_SHADOW_X, 0.0, QuantizeUtils::NUM_SCALES-1, QuantizeUtils::MINOR, "");
-		configParam(MusicalAnt::OCTAVE_KNOB_PARAM_SHADOW_Y, 0.0, 7.0, 2.0, "");
-		configParam(MusicalAnt::NOTE_KNOB_PARAM_SHADOW_Y, 0.0, QuantizeUtils::NUM_NOTES-1, QuantizeUtils::NOTE_C, "");
-		configParam(MusicalAnt::SCALE_KNOB_PARAM_SHADOW_Y, 0.0, QuantizeUtils::NUM_SCALES-1, QuantizeUtils::MINOR, "");
-		configParam(MusicalAnt::SHADOW_ANT_ON, 0.0f, 1.0f, 1.0f, "");
-		configParam(MusicalAnt::EFFECT_KNOB_PARAM, 0.0f, 5.0f, 0.0, "");
-		configParam(MusicalAnt::LOOPMODE_SWITCH_PARAM, 0.0f, 1.0f, 0.0f, "");
-		configParam(MusicalAnt::LOOP_LENGTH, 0.0f, 31.0f, 0.0, "");
-		configParam(MusicalAnt::SIDE_LENGTH_PARAM, 0.0f, 6.0f, INITIAL_RESOLUTION_KNOB_POSITION, "");
-		configParam(MusicalAnt::SKIP_PARAM, 0.0f, 9.0f, 0.0f, "");
+		configParam(CLOCK_PARAM, -2.0f, 8.0f, 1.0f, "");
+		configParam(OCTAVE_KNOB_PARAM_X, 0.0, 7.0, 2.0, "");
+		configParam(NOTE_KNOB_PARAM_X, 0.0, QuantizeUtils::NUM_NOTES-1, QuantizeUtils::NOTE_C, "");
+		configParam(SCALE_KNOB_PARAM_X, 0.0, QuantizeUtils::NUM_SCALES-1, QuantizeUtils::MINOR, "");
+		configParam(VOCT_INVERT_X, 0.0f, 1.0f, 1.0f, "");
+		configParam(OCTAVE_KNOB_PARAM_Y, 0.0, 7.0, 2.0, "");
+		configParam(NOTE_KNOB_PARAM_Y, 0.0, QuantizeUtils::NUM_NOTES-1, QuantizeUtils::NOTE_C, "");
+		configParam(SCALE_KNOB_PARAM_Y, 0.0, QuantizeUtils::NUM_SCALES-1, QuantizeUtils::MINOR, "");
+		configParam(VOCT_INVERT_Y, 0.0f, 1.0f, 1.0f, "");
+		configParam(OCTAVE_KNOB_PARAM_SHADOW_X, 0.0, 7.0, 2.0, "");
+		configParam(NOTE_KNOB_PARAM_SHADOW_X, 0.0, QuantizeUtils::NUM_NOTES-1, QuantizeUtils::NOTE_C, "");
+		configParam(SCALE_KNOB_PARAM_SHADOW_X, 0.0, QuantizeUtils::NUM_SCALES-1, QuantizeUtils::MINOR, "");
+		configParam(OCTAVE_KNOB_PARAM_SHADOW_Y, 0.0, 7.0, 2.0, "");
+		configParam(NOTE_KNOB_PARAM_SHADOW_Y, 0.0, QuantizeUtils::NUM_NOTES-1, QuantizeUtils::NOTE_C, "");
+		configParam(SCALE_KNOB_PARAM_SHADOW_Y, 0.0, QuantizeUtils::NUM_SCALES-1, QuantizeUtils::MINOR, "");
+		configParam(SHADOW_ANT_ON, 0.0f, 1.0f, 1.0f, "");
+		configParam(EFFECT_KNOB_PARAM, 0.0f, 5.0f, 0.0, "");
+		configParam(LOOPMODE_SWITCH_PARAM, 0.0f, 1.0f, 0.0f, "");
+		configParam(LOOP_LENGTH, 0.0f, 31.0f, 0.0, "");
+		configParam(SIDE_LENGTH_PARAM, 0.0f, 6.0f, INITIAL_RESOLUTION_KNOB_POSITION, "");
+		configParam(SKIP_PARAM, 0.0f, 9.0f, 0.0f, "");
 
 		sideLength = fibo[INITIAL_RESOLUTION_KNOB_POSITION];
 
@@ -580,7 +580,7 @@ void MusicalAnt::process(const ProcessArgs &args) {
 			if(loopIsOn && (backStepsRemaining >= loopLength*numberSteps)) {
 				//loopIndex = currentIndex;
 				walkAnt(-1*loopLength*numberSteps);
-				//setLoopOn(loopIsOn);
+				///setLoopOn(loopIsOn);
 				backStepsRemaining = clamp(backStepsRemaining - loopLength*numberSteps, 0, loopLength*numberSteps);
 				
 			}
@@ -684,7 +684,7 @@ struct ModuleDisplay : Widget {
 		module->setCellOnByDisplayPos(initX+(newDragX-dragX), initY+(newDragY-dragY), currentlyTurningOn);
 	}
 
-	void draw(NVGcontext *vg) override {
+	void draw(const DrawArgs &draw) override {
 
 		int x = 0;
 		int y = 0;
@@ -709,26 +709,26 @@ struct ModuleDisplay : Widget {
 					y++;
 				}
 				
-				//nvgFillColor(vg, (module->systemState->cells[i] ? nvgRGBA(0,255,0,255) : nvgRGBA(255,0,0,255)));
+				//nvgFillColor(draw.vg, (module->systemState->cells[i] ? nvgRGBA(0,255,0,255) : nvgRGBA(255,0,0,255)));
 				if(cells.at(i)){
-					nvgFillColor(vg, ((random::uniform() < 0.5) ? nvgRGBA(0,255,0,PIXEL_BRIGHTNESS) : nvgRGBA(0,255,0,PIXEL_BRIGHTNESS+5)));
-					nvgBeginPath(vg);
-					nvgRect(vg, x*pixelSize, y*pixelSize, pixelSize, pixelSize);
-					nvgFill(vg);
+					nvgFillColor(draw.vg, ((random::uniform() < 0.5) ? nvgRGBA(0,255,0,PIXEL_BRIGHTNESS) : nvgRGBA(0,255,0,PIXEL_BRIGHTNESS+5)));
+					nvgBeginPath(draw.vg);
+					nvgRect(draw.vg, x*pixelSize, y*pixelSize, pixelSize, pixelSize);
+					nvgFill(draw.vg);
 				}
 				if(i == shadowAntCell){
 					if(!module->params[MusicalAnt::SHADOW_ANT_ON].getValue()){
-						nvgFillColor(vg, nvgRGBA(0,70,0,255));
-						nvgBeginPath(vg);
-						nvgRect(vg, x*pixelSize, y*pixelSize, pixelSize, pixelSize);
-						nvgFill(vg);
+						nvgFillColor(draw.vg, nvgRGBA(0,70,0,255));
+						nvgBeginPath(draw.vg);
+						nvgRect(draw.vg, x*pixelSize, y*pixelSize, pixelSize, pixelSize);
+						nvgFill(draw.vg);
 					}
 				}
 				if(i == antCell){
-					nvgFillColor(vg, nvgRGBA(20,255,50,255));
-					nvgBeginPath(vg);
-					nvgRect(vg, x*pixelSize, y*pixelSize, pixelSize, pixelSize);
-					nvgFill(vg);
+					nvgFillColor(draw.vg, nvgRGBA(20,255,50,255));
+					nvgBeginPath(draw.vg);
+					nvgRect(draw.vg, x*pixelSize, y*pixelSize, pixelSize, pixelSize);
+					nvgFill(draw.vg);
 				}
 				//addChild( new ModuleDisplay(module, Vec((x+1)*(pixelSize + gapSize) + DISPLAY_OFFSET_X, (y+1)*(pixelSize + gapSize) + DISPLAY_OFFSET_Y), pixelSize, i));
 				//addChild(createLight<SmallLight<GreenLight>>(Vec((x+1)*6 + DISPLAY_OFFSET_X, (y+1)*6 + DISPLAY_OFFSET_Y), module, MusicalAnt::GRID_LIGHTS + i));
@@ -744,34 +744,34 @@ struct ModuleDisplay : Widget {
 				if((i%55 == 0)&&(i!=0)){ //increment y once x hits positive multiple of COL length
 					y++;
 				}
-				nvgFillColor(vg, ((random::uniform() < 0.5) ? nvgRGBA(0,0,0,0) : nvgRGBA(255,255,255,8)));
-				nvgBeginPath(vg);
-				nvgRect(vg, x*fuzzPixelSize, y*fuzzPixelSize, fuzzPixelSize, fuzzPixelSize);
-				nvgFill(vg);
+				nvgFillColor(draw.vg, ((random::uniform() < 0.5) ? nvgRGBA(0,0,0,0) : nvgRGBA(255,255,255,8)));
+				nvgBeginPath(draw.vg);
+				nvgRect(draw.vg, x*fuzzPixelSize, y*fuzzPixelSize, fuzzPixelSize, fuzzPixelSize);
+				nvgFill(draw.vg);
 			}
 
 			// Draw screen reflection over display
-			nvgFillColor(vg, nvgRGBA(255,255,255,7));
-			nvgBeginPath(vg);
-			//nvgRect(vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
-			nvgCircle(vg, 68, 54, 60);
-			nvgFill(vg);
+			nvgFillColor(draw.vg, nvgRGBA(255,255,255,7));
+			nvgBeginPath(draw.vg);
+			//nvgRect(draw.vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
+			nvgCircle(draw.vg, 68, 54, 60);
+			nvgFill(draw.vg);
 
-			nvgBeginPath(vg);
-			//nvgRect(vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
-			nvgCircle(vg, 77, 48, 40);
-			nvgFill(vg);
+			nvgBeginPath(draw.vg);
+			//nvgRect(draw.vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
+			nvgCircle(draw.vg, 77, 48, 40);
+			nvgFill(draw.vg);
 
-			nvgBeginPath(vg);
-			//nvgRect(vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
-			nvgCircle(vg, 82, 43, 20);
-			nvgFill(vg);
+			nvgBeginPath(draw.vg);
+			//nvgRect(draw.vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
+			nvgCircle(draw.vg, 82, 43, 20);
+			nvgFill(draw.vg);
 
-			nvgFillColor(vg, nvgRGBA(255,255,255,5));
-			nvgBeginPath(vg);
-			//nvgRect(vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
-			nvgCircle(vg, 87, 40, 8);
-			nvgFill(vg);
+			nvgFillColor(draw.vg, nvgRGBA(255,255,255,5));
+			nvgBeginPath(draw.vg);
+			//nvgRect(draw.vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
+			nvgCircle(draw.vg, 87, 40, 8);
+			nvgFill(draw.vg);
 
 			//nvgFillColor(args.vg, nvgRGBA(0,0,0,0));
 
@@ -802,8 +802,6 @@ struct ModuleDisplay : Widget {
 			nvgLineTo(args.vg, 105, 336);
 			nvgClosePath(args.vg);
 			nvgFill(args.vg);*/
-
-			step(); // TODO Figure out if this actually helps??
 		}
 	}
 
@@ -811,7 +809,6 @@ struct ModuleDisplay : Widget {
 
 
 struct MusicalAntWidget : ModuleWidget {
-	MusicalAnt *module;
 
 
 	MusicalAntWidget(MusicalAnt *module) {
