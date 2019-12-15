@@ -106,10 +106,10 @@ struct MusicalAnt : Module, QuantizeUtils {
 
 	float phase = 0.0;
 	float blinkPhase = 0.0;
-	int index = 0;
 	bool loopOn = false;
 	int loopLength = 0;
-	int loopIndex = 0;
+	int backStepsRemaining = 0;
+	//int loopIndex = 0;
 	dsp::SchmittTrigger clockTrigger;
 	int fibo[7] = {8, 13, 21, 34, 55, 89, 144}; // short for Fibonacci (cause I forgot that's why I named it that).
 	int sideLength = 0;
@@ -161,12 +161,11 @@ struct MusicalAnt : Module, QuantizeUtils {
 		
 		clearCells();
 		int sideLengthOnReset = getSideLength();
-		setAntPosition((int) (sideLengthOnReset/2), (int) (sideLengthOnReset/2), 0);
+		setAntPosition(sideLengthOnReset/2, sideLengthOnReset/2, 0);
 		
-		setShadowAntPosition((int) (sideLengthOnReset/2), (int) (sideLengthOnReset/2), 0);
+		setShadowAntPosition(sideLengthOnReset/2, sideLengthOnReset/2, 0);
 		
-		index = 0;
-		loopIndex = 0;
+		//loopIndex = 0;
 		
 
 
@@ -182,12 +181,12 @@ struct MusicalAnt : Module, QuantizeUtils {
 		
 		// New system representation.
 
-		systemState->antX = (int) (sideLengthOnReset/2);
-		systemState->antY = (int) (sideLengthOnReset/2);
+		systemState->antX = sideLengthOnReset/2;
+		systemState->antY = sideLengthOnReset/2;
 		systemState->antDirectionDegrees = 0;
 
-		systemState->shadowAntX = (int) (sideLengthOnReset/2);
-		systemState->shadowAntY = (int) (sideLengthOnReset/2);
+		systemState->shadowAntX = sideLengthOnReset/2;
+		systemState->shadowAntY = sideLengthOnReset/2;
 		systemState->shadowAntDirectionDegrees = 0;
 		
 	}
@@ -224,11 +223,13 @@ struct MusicalAnt : Module, QuantizeUtils {
 		*/
 
 		json_t *cellsJ = json_array();
-		for (int i = 0; i < CELLS; i++) {
-			json_t *cellJ = json_integer((int) systemState->cells.at(i));
-			json_array_append_new(cellsJ, cellJ);
+		if(systemState) {
+			for (int i = 0; i < CELLS; i++) {
+				json_t *cellJ = json_integer(systemState->cells.at(i));
+				json_array_append_new(cellsJ, cellJ);
+			}
+			json_object_set_new(rootJ, "cells", cellsJ);
 		}
-		json_object_set_new(rootJ, "cells", cellsJ);
 
 		/*
 		ToJson TODO
@@ -246,7 +247,7 @@ struct MusicalAnt : Module, QuantizeUtils {
 			for (int i = 0; i < CELLS; i++) {
 				json_t *cellJ = json_array_get(cellsJ, i);
 				if (cellJ)
-					systemState->cells.at(i) = (bool) json_integer_value(cellJ);
+					systemState->cells.at(i) = json_integer_value(cellJ);
 			}
 		}
 	}
@@ -259,17 +260,15 @@ struct MusicalAnt : Module, QuantizeUtils {
     	return kLowerBound + (kX - kLowerBound) % range_size;
     }
 
-	void setIndex(int index) {
-		
-		this->index = index;
-	}
-
 	bool getLoopOn() {
 		return this->loopOn;
 	}
 
-	void setLoopOn(bool value) {
-		this->loopOn = value;
+	void setLoopOn(bool loopIsOn) {
+		this->loopOn = loopIsOn;
+		if(loopIsOn) {
+			backStepsRemaining = getLoopLength() * (params[SKIP_PARAM].getValue() + 1);
+		}	
 	}
 
 	int getLoopLength() {
@@ -280,9 +279,6 @@ struct MusicalAnt : Module, QuantizeUtils {
 		this->loopLength = value;
 	}
 
-	int getIndex() {
-		return this->index;
-	}
 
 	void setSideLength(int x) {
 		sideLength = fibo[wrap(x, 0, getSideLength()-1)];
@@ -378,13 +374,13 @@ struct MusicalAnt : Module, QuantizeUtils {
 	}
 
 	void setCellOnByDisplayPos(float displayX, float displayY, bool on){
-		float pixelSize = 0.9f * ((float) DISPLAY_SIZE_XY / (float) getSideLength());
-		setCellOn(int(displayX / pixelSize), int(displayY / pixelSize), on);
+		float pixelSize = 0.9f * (static_cast<float>(DISPLAY_SIZE_XY) / static_cast<float>(getSideLength()));
+		setCellOn(displayX / pixelSize, displayY / pixelSize, on);
 	}
 
 	bool getCellStateByDisplayPos(float displayX, float displayY){
-		float pixelSize = 0.9f * ((float) DISPLAY_SIZE_XY / (float) getSideLength());
-		return getCellState(int(displayX / pixelSize), int(displayY / pixelSize));
+		float pixelSize = 0.9f * (static_cast<float>(DISPLAY_SIZE_XY) / (float) getSideLength());
+		return getCellState(displayX / pixelSize, displayY / pixelSize);
 	}
 
 	int iFromXY(int cellX, int cellY){
@@ -519,7 +515,7 @@ struct MusicalAnt : Module, QuantizeUtils {
 			outputs[VOCT_OUTPUT_SHADOW_Y].setVoltage(closestVoltageForShadowY(getShadowAntY()));
 		}
 
-		int tempSideLength = (int) params[SIDE_LENGTH_PARAM].getValue();
+		int tempSideLength = params[SIDE_LENGTH_PARAM].getValue();
 		outputs[VOCT_OUTPUT_X].setVoltage(!params[VOCT_INVERT_X].getValue() ? closestVoltageForX(tempSideLength - getAntX()) : closestVoltageForX(getAntX()));
 		outputs[VOCT_OUTPUT_Y].setVoltage(!params[VOCT_INVERT_Y].getValue() ? closestVoltageForY(tempSideLength - getAntY()) : closestVoltageForY(getAntY()));
 		
@@ -548,10 +544,16 @@ struct MusicalAnt : Module, QuantizeUtils {
 			paces = steps;
 		}
 
+		if(getLoopOn()) {
+			backStepsRemaining = backStepsRemaining + steps;
+			if(backStepsRemaining < 0) {
+				backStepsRemaining = 0;
+			}
+		}
+
 		for(int i = 0; i < paces; i++) {
 			stepAnt(currentArrowOfTimeForward);
 		}
-		setIndex(index + steps);
 	}
 
 	// For more advanced Module features, read Rack's engine.hpp header file
@@ -566,10 +568,10 @@ void MusicalAnt::process(const ProcessArgs &args) {
 
 	bool loopIsOn = params[LOOPMODE_SWITCH_PARAM].getValue();
 
-	int currentIndex = getIndex();
+	//int currentIndex = getIndex();
 
 	bool gateIn = false;
-	int numberSteps = (int) params[SKIP_PARAM].getValue() + 1;
+	int numberSteps = params[SKIP_PARAM].getValue() + 1;
 
 	
 
@@ -585,14 +587,13 @@ void MusicalAnt::process(const ProcessArgs &args) {
 		// External clock
 		if (clockTrigger.process(rescale(inputs[EXT_CLOCK_INPUT].getVoltage(), 0.1f, 2.f, 0.f, 1.f))) {
 
-			if(getLoopOn() != loopIsOn) {
-				loopIndex = currentIndex;
+			if(loopIsOn && (backStepsRemaining > 0)) {
+				//loopIndex = currentIndex;
 				walkAnt(-1*loopLength*numberSteps);
-				setLoopOn(loopIsOn);
 			}
-			else if(loopIsOn && 
-				(currentIndex >= loopIndex + numberSteps*loopLength)) {
-				walkAnt(-1*numberSteps*loopLength);
+			else if(loopIsOn && (backStepsRemaining <= 0)) {
+				walkAnt(numberSteps*loopLength);
+				setLoopOn(loopIsOn);
 			}
 			else {
 				walkAnt(numberSteps);
@@ -607,14 +608,14 @@ void MusicalAnt::process(const ProcessArgs &args) {
 		if (phase >= 1.0f) {
 			phase -= 1.0f;
 			if(getLoopOn() != loopIsOn) {
-				loopIndex = currentIndex;
+				//loopIndex = currentIndex;
 				walkAnt(-1*loopLength*numberSteps);
 				setLoopOn(loopIsOn);
 			}
-			else if(loopIsOn && 
+			/*else if(loopIsOn && 
 				(currentIndex >= loopIndex + numberSteps*loopLength)) {
 				walkAnt(-1*numberSteps*loopLength);
-			}
+			}*/
 			else {
 				walkAnt(numberSteps);
 			} 
@@ -627,7 +628,7 @@ void MusicalAnt::process(const ProcessArgs &args) {
 
 
 	// TODO Fix up this var below. May not be needed, or at least needs refactoring
-	int tempSideLength = (int) params[SIDE_LENGTH_PARAM].getValue();
+	int tempSideLength = params[SIDE_LENGTH_PARAM].getValue();
 
 	// Compute the frequency from the pitch parameter and input
 	float pitch = params[PITCH_PARAM].getValue();
@@ -638,14 +639,14 @@ void MusicalAnt::process(const ProcessArgs &args) {
 
 
 
-	params[INDEX_PARAM].setValue(currentIndex);
+	//params[INDEX_PARAM].setValue(currentIndex);
 
 
 	outputs[GATE_OUTPUT].setVoltage(gateOut);
 
 	outputs[VOCT_OUTPUT_POLY].setVoltage(!params[VOCT_INVERT_X].getValue() ? closestVoltageForX(tempSideLength - getAntX()) : closestVoltageForX(getAntX()), 0);;
 	outputs[VOCT_OUTPUT_POLY].setVoltage(!params[VOCT_INVERT_Y].getValue() ? closestVoltageForY(tempSideLength - getAntY()) : closestVoltageForY(getAntY()), 1);;
-	if((bool) !params[SHADOW_ANT_ON].getValue()) {
+	if(!params[SHADOW_ANT_ON].getValue()) {
 		outputs[VOCT_OUTPUT_POLY].setVoltage(closestVoltageForShadowX(getShadowAntX()), 2);
 		outputs[VOCT_OUTPUT_POLY].setVoltage(closestVoltageForShadowY(getShadowAntY()), 3);
 		// Don't forget to set the number of output channels
@@ -703,7 +704,7 @@ struct ModuleDisplay : Widget {
 			std::vector<bool> cells;
 			cells.resize(CELLS, false);
 
-			float pixelSize = 0.9f * ((float) DISPLAY_SIZE_XY / (float) drawSideLength);
+			float pixelSize = 0.9f * (static_cast<float>(DISPLAY_SIZE_XY) / static_cast<float>(drawSideLength));
 			//addChild( new ModuleDisplay(Vec(100, 100), pixelSize, true));
 
 			//float brightness;
@@ -714,7 +715,7 @@ struct ModuleDisplay : Widget {
 			int numCells = drawSideLength*drawSideLength;
 			cells = module->systemState->cells;
 			for(int i=0; i < numCells; i++){
-				x = (int) i%drawSideLength; //increment x up to COL length then loop
+				x = i%drawSideLength; //increment x up to COL length then loop
 				if((x == 0)&&(i != 0)){ //increment y once x hits positive multiple of COL length
 					y++;
 				}
@@ -723,21 +724,21 @@ struct ModuleDisplay : Widget {
 				if(cells.at(i)){
 					nvgFillColor(vg, ((random::uniform() < 0.5) ? nvgRGBA(0,255,0,PIXEL_BRIGHTNESS) : nvgRGBA(0,255,0,PIXEL_BRIGHTNESS+5)));
 					nvgBeginPath(vg);
-					nvgRect(vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
+					nvgRect(vg, x*pixelSize, y*pixelSize, pixelSize, pixelSize);
 					nvgFill(vg);
 				}
 				if(i == shadowAntCell){
 					if(!module->params[MusicalAnt::SHADOW_ANT_ON].getValue()){
 						nvgFillColor(vg, nvgRGBA(0,70,0,255));
 						nvgBeginPath(vg);
-						nvgRect(vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
+						nvgRect(vg, x*pixelSize, y*pixelSize, pixelSize, pixelSize);
 						nvgFill(vg);
 					}
 				}
 				if(i == antCell){
 					nvgFillColor(vg, nvgRGBA(20,255,50,255));
 					nvgBeginPath(vg);
-					nvgRect(vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
+					nvgRect(vg, x*pixelSize, y*pixelSize, pixelSize, pixelSize);
 					nvgFill(vg);
 				}
 				//addChild( new ModuleDisplay(module, Vec((x+1)*(pixelSize + gapSize) + DISPLAY_OFFSET_X, (y+1)*(pixelSize + gapSize) + DISPLAY_OFFSET_Y), pixelSize, i));
@@ -756,7 +757,7 @@ struct ModuleDisplay : Widget {
 				}
 				nvgFillColor(vg, ((random::uniform() < 0.5) ? nvgRGBA(0,0,0,0) : nvgRGBA(255,255,255,8)));
 				nvgBeginPath(vg);
-				nvgRect(vg, (float) x*fuzzPixelSize, (float) y*fuzzPixelSize, fuzzPixelSize, fuzzPixelSize);
+				nvgRect(vg, x*fuzzPixelSize, y*fuzzPixelSize, fuzzPixelSize, fuzzPixelSize);
 				nvgFill(vg);
 			}
 
