@@ -186,7 +186,7 @@ struct MusicalAnt : Module, QuantizeUtils {
 	}
 
 	json_t *dataToJson() override {
-		json_t *rootJ = json_object();
+	
 
 		/*
 
@@ -215,14 +215,19 @@ struct MusicalAnt : Module, QuantizeUtils {
 		json_object_set_new(rootJ, "cellsHistory", cellsHistoryJ);
 
 		*/
-
-		json_t *cellsJ = json_array();
 		if(systemState) {
+			json_t *rootJ = json_object();
+			json_t *cellsJ = json_array();
+		
 			for (int i = 0; i < CELLS; i++) {
 				json_t *cellJ = json_integer(systemState->cells.at(i));
 				json_array_append_new(cellsJ, cellJ);
 			}
 			json_object_set_new(rootJ, "cells", cellsJ);
+			return rootJ;
+		}
+		else {
+			return NULL;
 		}
 
 		/*
@@ -231,17 +236,19 @@ struct MusicalAnt : Module, QuantizeUtils {
 		index settings ?
 		*/
 		
-		return rootJ;
+		
 	}
 
 	void dataFromJson(json_t *rootJ) override {
 
-		json_t *cellsJ = json_object_get(rootJ, "cells");
-		if (cellsJ) {
-			for (int i = 0; i < CELLS; i++) {
-				json_t *cellJ = json_array_get(cellsJ, i);
-				if (cellJ)
-					systemState->cells.at(i) = json_integer_value(cellJ);
+		if(systemState) {
+			json_t *cellsJ = json_object_get(rootJ, "cells");
+			if (cellsJ) {
+				for (int i = 0; i < CELLS; i++) {
+					json_t *cellJ = json_array_get(cellsJ, i);
+					if (cellJ)
+						systemState->cells.at(i) = json_integer_value(cellJ);
+				}
 			}
 		}
 	}
@@ -650,26 +657,32 @@ struct ModuleDisplay : Widget {
 
 	void onButton(const event::Button &e) override {
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
-			e.consume(this);
-			// e.target = this;
-			initX = e.pos.x;
-			initY = e.pos.y;
-			if((0 < initX) && (initX < DISPLAY_SIZE_XY) && (0 < initY) && (initY < DISPLAY_SIZE_XY)) {
-				currentlyTurningOn = !module->getCellStateByDisplayPos(initX, initY);
-				module->setCellOnByDisplayPos(initX, initY, currentlyTurningOn);
+			if(module) {
+				e.consume(this);
+				// e.target = this;
+				initX = e.pos.x;
+				initY = e.pos.y;
+				if((0 < initX) && (initX < DISPLAY_SIZE_XY) && (0 < initY) && (initY < DISPLAY_SIZE_XY)) {
+					currentlyTurningOn = !module->getCellStateByDisplayPos(initX, initY);
+					module->setCellOnByDisplayPos(initX, initY, currentlyTurningOn);
+				}
 			}
 		}
 	}
 	
 	void onDragStart(const event::DragStart &e) override {
-		dragX = APP->scene->rack->mousePos.x;
-		dragY = APP->scene->rack->mousePos.y;
+		if(module) {
+			dragX = APP->scene->rack->mousePos.x;
+			dragY = APP->scene->rack->mousePos.y;
+		}
 	}
 
 	void onDragMove(const event::DragMove &e) override {
 		float newDragX = APP->scene->rack->mousePos.x;
 		float newDragY = APP->scene->rack->mousePos.y;
-		module->setCellOnByDisplayPos(initX+(newDragX-dragX), initY+(newDragY-dragY), currentlyTurningOn);
+		if(module) {
+			module->setCellOnByDisplayPos(initX+(newDragX-dragX), initY+(newDragY-dragY), currentlyTurningOn);
+		}
 	}
 
 	void draw(const DrawArgs &draw) override {
@@ -732,7 +745,7 @@ struct ModuleDisplay : Widget {
 				if((i%55 == 0)&&(i!=0)){ //increment y once x hits positive multiple of COL length
 					y++;
 				}
-				nvgFillColor(draw.vg, ((1 < 0.5) ? nvgRGBA(0,0,0,0) : nvgRGBA(255,255,255,8)));
+				nvgFillColor(draw.vg, ((random::uniform() < 0.5) ? nvgRGBA(0,0,0,0) : nvgRGBA(255,255,255,8)));
 				nvgBeginPath(draw.vg);
 				nvgRect(draw.vg, static_cast<float>(x)*fuzzPixelSize, static_cast<float>(y)*fuzzPixelSize, fuzzPixelSize, fuzzPixelSize);
 				nvgFill(draw.vg);

@@ -137,12 +137,12 @@ struct CenteredLabel : Widget {
 		fontSize = _fontSize;
 		box.size.y = BND_WIDGET_HEIGHT;
 	}
-	void draw(const DrawArgs &args) override {
-		nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
-		nvgFontFaceId(args.vg, font->handle);
-		nvgFillColor(args.vg, nvgRGB(0, 0, 0));
-		nvgFontSize(args.vg, fontSize);
-		nvgText(args.vg, box.pos.x, box.pos.y, "TEST", NULL);
+	void draw(const DrawArgs &draw) override {
+		nvgTextAlign(draw.vg, NVG_ALIGN_CENTER);
+		nvgFontFaceId(draw.vg, font->handle);
+		nvgFillColor(draw.vg, nvgRGB(0, 0, 0));
+		nvgFontSize(draw.vg, fontSize);
+		nvgText(draw.vg, box.pos.x, box.pos.y, "TEST", NULL);
 	}
 };
 
@@ -153,7 +153,7 @@ struct RoundSmallBlackKnobSnap : RoundSmallBlackKnob {
 	Module* linkedModule = NULL;
 
     RoundSmallBlackKnobSnap() {
-    	paramQuantity = NULL;
+    	//paramQuantity = NULL;
     	snap = true;
     }
 
