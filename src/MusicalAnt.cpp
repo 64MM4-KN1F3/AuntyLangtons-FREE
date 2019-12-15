@@ -46,37 +46,29 @@ RACK_DIR=/Users/my/Documents/Rack-SDK make
 
 struct MusicalAnt : Module, QuantizeUtils {
 	enum ParamIds {
-		PITCH_PARAM,
-		RUN_PARAM,
 		CLOCK_PARAM,
-		RND_MODE_KNOB_PARAM,
-		RND_TRIG_BTN_PARAM,
-		RND_AMT_KNOB_PARAM,
-		SCALE_KNOB_PARAM_X,
-		SCALE_KNOB_PARAM_Y,
-		SCALE_KNOB_PARAM_SHADOW_X,
-		SCALE_KNOB_PARAM_SHADOW_Y,
-		NOTE_KNOB_PARAM_X,
-		NOTE_KNOB_PARAM_Y,
-		NOTE_KNOB_PARAM_SHADOW_X,
-		NOTE_KNOB_PARAM_SHADOW_Y,
-		OCTAVE_KNOB_PARAM_X,
-		OCTAVE_KNOB_PARAM_Y,
-		OCTAVE_KNOB_PARAM_SHADOW_X,
-		OCTAVE_KNOB_PARAM_SHADOW_Y,
-		INDEX_PARAM,
+		SCALE_KNOB_X_PARAM,
+		SCALE_KNOB_Y_PARAM,
+		SCALE_KNOB_SHADOW_X_PARAM,
+		SCALE_KNOB_SHADOW_Y_PARAM,
+		NOTE_KNOB_X_PARAM,
+		NOTE_KNOB_Y_PARAM,
+		NOTE_KNOB_SHADOW_X_PARAM,
+		NOTE_KNOB_SHADOW_Y_PARAM,
+		OCTAVE_KNOB_X_PARAM,
+		OCTAVE_KNOB_Y_PARAM,
+		OCTAVE_KNOB_SHADOW_X_PARAM,
+		OCTAVE_KNOB_SHADOW_Y_PARAM,
 		SKIP_PARAM,
 		EFFECT_KNOB_PARAM,
-		SHADOW_ANT_ON,
+		SHADOW_ANT_ON_PARAM,
 		SIDE_LENGTH_PARAM,
-		STEP_FWD_BTN_PARAM,
-		STEP_BCK_BTN_PARAM,
 		LOOPMODE_SWITCH_PARAM,
-		LOOP_LENGTH,
-		VOCT_INVERT_X,
-		VOCT_INVERT_Y,
+		LOOP_LENGTH_PARAM,
+		VOCT_INVERT_X_PARAM,
+		VOCT_INVERT_Y_PARAM,
 		AUNTYLANGBUTTON_PARAM,
-		VOCT_OUTPUT_POLY,
+		VOCT_OUTPUT_POLY_PARAM,
 		NUM_PARAMS
 	};
 	enum InputIds {
@@ -125,26 +117,28 @@ struct MusicalAnt : Module, QuantizeUtils {
 	MusicalAnt() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		configParam(CLOCK_PARAM, -2.0f, 8.0f, 1.0f, "");
-		configParam(OCTAVE_KNOB_PARAM_X, 0.0, 7.0, 2.0, "");
-		configParam(NOTE_KNOB_PARAM_X, 0.0, QuantizeUtils::NUM_NOTES-1, QuantizeUtils::NOTE_C, "");
-		configParam(SCALE_KNOB_PARAM_X, 0.0, QuantizeUtils::NUM_SCALES-1, QuantizeUtils::MINOR, "");
-		configParam(VOCT_INVERT_X, 0.0f, 1.0f, 1.0f, "");
-		configParam(OCTAVE_KNOB_PARAM_Y, 0.0, 7.0, 2.0, "");
-		configParam(NOTE_KNOB_PARAM_Y, 0.0, QuantizeUtils::NUM_NOTES-1, QuantizeUtils::NOTE_C, "");
-		configParam(SCALE_KNOB_PARAM_Y, 0.0, QuantizeUtils::NUM_SCALES-1, QuantizeUtils::MINOR, "");
-		configParam(VOCT_INVERT_Y, 0.0f, 1.0f, 1.0f, "");
-		configParam(OCTAVE_KNOB_PARAM_SHADOW_X, 0.0, 7.0, 2.0, "");
-		configParam(NOTE_KNOB_PARAM_SHADOW_X, 0.0, QuantizeUtils::NUM_NOTES-1, QuantizeUtils::NOTE_C, "");
-		configParam(SCALE_KNOB_PARAM_SHADOW_X, 0.0, QuantizeUtils::NUM_SCALES-1, QuantizeUtils::MINOR, "");
-		configParam(OCTAVE_KNOB_PARAM_SHADOW_Y, 0.0, 7.0, 2.0, "");
-		configParam(NOTE_KNOB_PARAM_SHADOW_Y, 0.0, QuantizeUtils::NUM_NOTES-1, QuantizeUtils::NOTE_C, "");
-		configParam(SCALE_KNOB_PARAM_SHADOW_Y, 0.0, QuantizeUtils::NUM_SCALES-1, QuantizeUtils::MINOR, "");
-		configParam(SHADOW_ANT_ON, 0.0f, 1.0f, 1.0f, "");
+		configParam(OCTAVE_KNOB_X_PARAM, 0.0, 7.0, 2.0, "");
+		configParam(NOTE_KNOB_X_PARAM, 0.0, QuantizeUtils::NUM_NOTES-1, QuantizeUtils::NOTE_C, "");
+		configParam(SCALE_KNOB_X_PARAM, 0.0, QuantizeUtils::NUM_SCALES-1, QuantizeUtils::MINOR, "");
+		configParam(VOCT_INVERT_X_PARAM, 0.0f, 1.0f, 1.0f, "");
+		configParam(OCTAVE_KNOB_Y_PARAM, 0.0, 7.0, 2.0, "");
+		configParam(NOTE_KNOB_Y_PARAM, 0.0, QuantizeUtils::NUM_NOTES-1, QuantizeUtils::NOTE_C, "");
+		configParam(SCALE_KNOB_Y_PARAM, 0.0, QuantizeUtils::NUM_SCALES-1, QuantizeUtils::MINOR, "");
+		configParam(VOCT_INVERT_Y_PARAM, 0.0f, 1.0f, 1.0f, "");
+		configParam(OCTAVE_KNOB_SHADOW_X_PARAM, 0.0, 7.0, 2.0, "");
+		configParam(NOTE_KNOB_SHADOW_X_PARAM, 0.0, QuantizeUtils::NUM_NOTES-1, QuantizeUtils::NOTE_C, "");
+		configParam(SCALE_KNOB_SHADOW_X_PARAM, 0.0, QuantizeUtils::NUM_SCALES-1, QuantizeUtils::MINOR, "");
+		configParam(OCTAVE_KNOB_SHADOW_Y_PARAM, 0.0, 7.0, 2.0, "");
+		configParam(NOTE_KNOB_SHADOW_Y_PARAM, 0.0, QuantizeUtils::NUM_NOTES-1, QuantizeUtils::NOTE_C, "");
+		configParam(SCALE_KNOB_SHADOW_Y_PARAM, 0.0, QuantizeUtils::NUM_SCALES-1, QuantizeUtils::MINOR, "");
+		configParam(SHADOW_ANT_ON_PARAM, 0.0f, 1.0f, 1.0f, "");
 		configParam(EFFECT_KNOB_PARAM, 0.0f, 5.0f, 0.0, "");
 		configParam(LOOPMODE_SWITCH_PARAM, 0.0f, 1.0f, 0.0f, "");
-		configParam(LOOP_LENGTH, 0.0f, 31.0f, 0.0, "");
+		configParam(LOOP_LENGTH_PARAM, 0.0f, 31.0f, 0.0, "");
 		configParam(SIDE_LENGTH_PARAM, 0.0f, 6.0f, INITIAL_RESOLUTION_KNOB_POSITION, "");
 		configParam(SKIP_PARAM, 0.0f, 9.0f, 0.0f, "");
+		configParam(VOCT_OUTPUT_POLY_PARAM, 0.0f, 1.0f, 1.0f, "");
+		configParam(AUNTYLANGBUTTON_PARAM, 0.0f, 1.0f, 1.0f, "");
 
 		sideLength = fibo[INITIAL_RESOLUTION_KNOB_POSITION];
 
@@ -327,31 +321,31 @@ struct MusicalAnt : Module, QuantizeUtils {
 	}
 
 	float closestVoltageForX(int cellFromBottom){
-		int octave = params[OCTAVE_KNOB_PARAM_X].getValue();
-		int rootNote = params[NOTE_KNOB_PARAM_X].getValue();
-		int scale = params[SCALE_KNOB_PARAM_X].getValue();
+		int octave = params[OCTAVE_KNOB_X_PARAM].getValue();
+		int rootNote = params[NOTE_KNOB_X_PARAM].getValue();
+		int scale = params[SCALE_KNOB_X_PARAM].getValue();
 		return closestVoltageInScale(octave + (cellFromBottom * 0.0833), rootNote, scale);
 	}
 
 	float closestVoltageForShadowX(int cellFromBottom){
-		int octave = params[OCTAVE_KNOB_PARAM_SHADOW_X].getValue();
-		int rootNote = params[NOTE_KNOB_PARAM_SHADOW_X].getValue();
-		int scale = params[SCALE_KNOB_PARAM_SHADOW_X].getValue();
+		int octave = params[OCTAVE_KNOB_SHADOW_X_PARAM].getValue();
+		int rootNote = params[NOTE_KNOB_SHADOW_X_PARAM].getValue();
+		int scale = params[SCALE_KNOB_SHADOW_X_PARAM].getValue();
 		return closestVoltageInScale(octave + (cellFromBottom * 0.0833), rootNote, scale);
 	}
 
 	float closestVoltageForY(int cellFromBottom){
-		int octave = params[OCTAVE_KNOB_PARAM_Y].getValue();
-		int rootNote = params[NOTE_KNOB_PARAM_Y].getValue();
-		int scale = params[SCALE_KNOB_PARAM_Y].getValue();
+		int octave = params[OCTAVE_KNOB_Y_PARAM].getValue();
+		int rootNote = params[NOTE_KNOB_Y_PARAM].getValue();
+		int scale = params[SCALE_KNOB_Y_PARAM].getValue();
 		return closestVoltageInScale(octave + (cellFromBottom * 0.0833), rootNote, scale);
 	}
 
 
 	float closestVoltageForShadowY(int cellFromBottom){
-		int octave = params[OCTAVE_KNOB_PARAM_SHADOW_Y].getValue();
-		int rootNote = params[NOTE_KNOB_PARAM_SHADOW_Y].getValue();
-		int scale = params[SCALE_KNOB_PARAM_SHADOW_Y].getValue();
+		int octave = params[OCTAVE_KNOB_SHADOW_Y_PARAM].getValue();
+		int rootNote = params[NOTE_KNOB_SHADOW_Y_PARAM].getValue();
+		int scale = params[SCALE_KNOB_SHADOW_Y_PARAM].getValue();
 		return closestVoltageInScale(octave + (cellFromBottom * 0.0833), rootNote, scale);
 	}
  
@@ -457,7 +451,7 @@ struct MusicalAnt : Module, QuantizeUtils {
 
 		//Shadow Ant
 
-		bool shadowAntOn = (bool) !params[SHADOW_ANT_ON].getValue();
+		bool shadowAntOn = (bool) !params[SHADOW_ANT_ON_PARAM].getValue();
 
 		if (shadowAntOn) {
 			currPositionX = systemState->shadowAntX;
@@ -513,8 +507,8 @@ struct MusicalAnt : Module, QuantizeUtils {
 		}
 
 		int tempSideLength = params[SIDE_LENGTH_PARAM].getValue();
-		outputs[VOCT_OUTPUT_X].setVoltage(!params[VOCT_INVERT_X].getValue() ? closestVoltageForX(tempSideLength - getAntX()) : closestVoltageForX(getAntX()));
-		outputs[VOCT_OUTPUT_Y].setVoltage(!params[VOCT_INVERT_Y].getValue() ? closestVoltageForY(tempSideLength - getAntY()) : closestVoltageForY(getAntY()));
+		outputs[VOCT_OUTPUT_X].setVoltage(!params[VOCT_INVERT_X_PARAM].getValue() ? closestVoltageForX(tempSideLength - getAntX()) : closestVoltageForX(getAntX()));
+		outputs[VOCT_OUTPUT_Y].setVoltage(!params[VOCT_INVERT_Y_PARAM].getValue() ? closestVoltageForY(tempSideLength - getAntY()) : closestVoltageForY(getAntY()));
 		
 		//Left turn
 		if(antRotation == LEFT) {
@@ -565,7 +559,7 @@ void MusicalAnt::process(const ProcessArgs &args) {
 
 	
 
-	loopLength = (params[LOOP_LENGTH].getValue() + 1);
+	loopLength = (params[LOOP_LENGTH_PARAM].getValue() + 1);
 	//setLoopLength(loopLength);
 
 
@@ -619,30 +613,24 @@ void MusicalAnt::process(const ProcessArgs &args) {
 	// TODO Fix up this var below. May not be needed, or at least needs refactoring
 	int tempSideLength = params[SIDE_LENGTH_PARAM].getValue();
 
-	// Compute the frequency from the pitch parameter and input
-	float pitch = params[PITCH_PARAM].getValue();
 	setSideLength(tempSideLength);
 	float gateOut = (gateIn ? 10.0f : 0.0f);
-	pitch += inputs[PITCH_INPUT].getVoltage();
-	pitch = clamp(pitch, -4.0f, 4.0f);
-
-
 
 	//params[INDEX_PARAM].setValue(currentIndex);
 
 
 	outputs[GATE_OUTPUT].setVoltage(gateOut);
 
-	outputs[VOCT_OUTPUT_POLY].setVoltage(!params[VOCT_INVERT_X].getValue() ? closestVoltageForX(tempSideLength - getAntX()) : closestVoltageForX(getAntX()), 0);;
-	outputs[VOCT_OUTPUT_POLY].setVoltage(!params[VOCT_INVERT_Y].getValue() ? closestVoltageForY(tempSideLength - getAntY()) : closestVoltageForY(getAntY()), 1);;
-	if(!params[SHADOW_ANT_ON].getValue()) {
-		outputs[VOCT_OUTPUT_POLY].setVoltage(closestVoltageForShadowX(getShadowAntX()), 2);
-		outputs[VOCT_OUTPUT_POLY].setVoltage(closestVoltageForShadowY(getShadowAntY()), 3);
+	outputs[VOCT_OUTPUT_POLY_PARAM].setVoltage(!params[VOCT_INVERT_X_PARAM].getValue() ? closestVoltageForX(tempSideLength - getAntX()) : closestVoltageForX(getAntX()), 0);;
+	outputs[VOCT_OUTPUT_POLY_PARAM].setVoltage(!params[VOCT_INVERT_Y_PARAM].getValue() ? closestVoltageForY(tempSideLength - getAntY()) : closestVoltageForY(getAntY()), 1);;
+	if(!params[SHADOW_ANT_ON_PARAM].getValue()) {
+		outputs[VOCT_OUTPUT_POLY_PARAM].setVoltage(closestVoltageForShadowX(getShadowAntX()), 2);
+		outputs[VOCT_OUTPUT_POLY_PARAM].setVoltage(closestVoltageForShadowY(getShadowAntY()), 3);
 		// Don't forget to set the number of output channels
-		outputs[VOCT_OUTPUT_POLY].setChannels(4);
+		outputs[VOCT_OUTPUT_POLY_PARAM].setChannels(4);
 	}
 	else {
-		outputs[VOCT_OUTPUT_POLY].setChannels(2);
+		outputs[VOCT_OUTPUT_POLY_PARAM].setChannels(2);
 	}
 
 	//lights[BLINK_LIGHT].value = gateIn ? 1.0f : 0.0f;
@@ -717,7 +705,7 @@ struct ModuleDisplay : Widget {
 					nvgFill(draw.vg);
 				}
 				if(i == shadowAntCell){
-					if(!module->params[MusicalAnt::SHADOW_ANT_ON].getValue()){
+					if(!module->params[MusicalAnt::SHADOW_ANT_ON_PARAM].getValue()){
 						nvgFillColor(draw.vg, nvgRGBA(0,70,0,255));
 						nvgBeginPath(draw.vg);
 						nvgRect(draw.vg, x*pixelSize, y*pixelSize, pixelSize, pixelSize);
@@ -827,32 +815,32 @@ struct MusicalAntWidget : ModuleWidget {
 			addParam(createParam<RoundBlackKnob>(Vec(143.9, 177), module, MusicalAnt::CLOCK_PARAM));
 
 			// Ant X panel widgets
-			//addParam(createParam<RoundSmallBlackKnobSnap>(Vec(52.4, 218.5), module, MusicalAnt::OCTAVE_KNOB_PARAM_X));
-			RoundSmallBlackKnobSnap *octaveKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(52.4, 218.5), module, MusicalAnt::OCTAVE_KNOB_PARAM_X));
-			RoundSmallBlackKnobSnap *noteKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(76.9, 218.5), module, MusicalAnt::NOTE_KNOB_PARAM_X));
-			RoundSmallBlackKnobSnap *scaleKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(101.4, 218.5), module, MusicalAnt::SCALE_KNOB_PARAM_X));
+			//addParam(createParam<RoundSmallBlackKnobSnap>(Vec(52.4, 218.5), module, MusicalAnt::OCTAVE_KNOB_X_PARAM));
+			RoundSmallBlackKnobSnap *octaveKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(52.4, 218.5), module, MusicalAnt::OCTAVE_KNOB_X_PARAM));
+			RoundSmallBlackKnobSnap *noteKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(76.9, 218.5), module, MusicalAnt::NOTE_KNOB_X_PARAM));
+			RoundSmallBlackKnobSnap *scaleKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(101.4, 218.5), module, MusicalAnt::SCALE_KNOB_X_PARAM));
 			addOutput(createOutput<PJ301MPort>(Vec(148.9, 218.5), module, MusicalAnt::VOCT_OUTPUT_X));
 			// Invert X V/Oct output
-			addParam(createParam<CKSS>(Vec(127.5, 219.75), module, MusicalAnt::VOCT_INVERT_X));
+			addParam(createParam<CKSS>(Vec(127.5, 219.75), module, MusicalAnt::VOCT_INVERT_X_PARAM));
 			
 			// Ant Y panel widgets
-			RoundSmallBlackKnobSnap *octaveKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(52.4, 254), module, MusicalAnt::OCTAVE_KNOB_PARAM_Y));
-			RoundSmallBlackKnobSnap *noteKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(76.9, 254), module, MusicalAnt::NOTE_KNOB_PARAM_Y));
-			RoundSmallBlackKnobSnap *scaleKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(101.4, 254), module, MusicalAnt::SCALE_KNOB_PARAM_Y));
+			RoundSmallBlackKnobSnap *octaveKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(52.4, 254), module, MusicalAnt::OCTAVE_KNOB_Y_PARAM));
+			RoundSmallBlackKnobSnap *noteKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(76.9, 254), module, MusicalAnt::NOTE_KNOB_Y_PARAM));
+			RoundSmallBlackKnobSnap *scaleKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(101.4, 254), module, MusicalAnt::SCALE_KNOB_Y_PARAM));
 			addOutput(createOutput<PJ301MPort>(Vec(148.9, 254), module, MusicalAnt::VOCT_OUTPUT_Y));
 			// Invert Y V/Oct output
-			addParam(createParam<CKSS>(Vec(127.5, 255.25), module, MusicalAnt::VOCT_INVERT_Y));
+			addParam(createParam<CKSS>(Vec(127.5, 255.25), module, MusicalAnt::VOCT_INVERT_Y_PARAM));
 
 			// Shadow Ant X panel widgets
-			RoundSmallBlackKnobSnap *shadowOctaveKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(70.9, 289.5), module, MusicalAnt::OCTAVE_KNOB_PARAM_SHADOW_X));
-			RoundSmallBlackKnobSnap *shadowNoteKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(95.4, 289.5), module, MusicalAnt::NOTE_KNOB_PARAM_SHADOW_X));
-			RoundSmallBlackKnobSnap *shadowScaleKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(119.9, 289.5), module, MusicalAnt::SCALE_KNOB_PARAM_SHADOW_X));
+			RoundSmallBlackKnobSnap *shadowOctaveKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(70.9, 289.5), module, MusicalAnt::OCTAVE_KNOB_SHADOW_X_PARAM));
+			RoundSmallBlackKnobSnap *shadowNoteKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(95.4, 289.5), module, MusicalAnt::NOTE_KNOB_SHADOW_X_PARAM));
+			RoundSmallBlackKnobSnap *shadowScaleKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(119.9, 289.5), module, MusicalAnt::SCALE_KNOB_SHADOW_X_PARAM));
 			addOutput(createOutput<PJ301MPort>(Vec(148.9, 289.5), module, MusicalAnt::VOCT_OUTPUT_SHADOW_X));
 
 			// Shadow Ant Y panel widgets
-			RoundSmallBlackKnobSnap *shadowOctaveKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(70.9, 325), module, MusicalAnt::OCTAVE_KNOB_PARAM_SHADOW_Y));
-			RoundSmallBlackKnobSnap *shadowNoteKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(95.4, 325), module, MusicalAnt::NOTE_KNOB_PARAM_SHADOW_Y));
-			RoundSmallBlackKnobSnap *shadowScaleKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(119.9, 325), module, MusicalAnt::SCALE_KNOB_PARAM_SHADOW_Y));
+			RoundSmallBlackKnobSnap *shadowOctaveKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(70.9, 325), module, MusicalAnt::OCTAVE_KNOB_SHADOW_Y_PARAM));
+			RoundSmallBlackKnobSnap *shadowNoteKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(95.4, 325), module, MusicalAnt::NOTE_KNOB_SHADOW_Y_PARAM));
+			RoundSmallBlackKnobSnap *shadowScaleKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(119.9, 325), module, MusicalAnt::SCALE_KNOB_SHADOW_Y_PARAM));
 			addOutput(createOutput<PJ301MPort>(Vec(148.9, 325), module, MusicalAnt::VOCT_OUTPUT_SHADOW_Y));
 
 			
@@ -867,7 +855,7 @@ struct MusicalAntWidget : ModuleWidget {
 			addChild(createLight<SmallLight<GreenLight>>(Vec(108.9, 170), module, MusicalAnt::BLINK_LIGHT));
 
 			// Shadow Ant on switch
-			addParam(createParam<CKSS>(Vec(50.80, 305), module, MusicalAnt::SHADOW_ANT_ON));
+			addParam(createParam<CKSS>(Vec(50.80, 305), module, MusicalAnt::SHADOW_ANT_ON_PARAM));
 
 			// Effect Knob 
 			addParam(createParam<RoundBlackSnapKnob>(Vec(253.9, 250), module, MusicalAnt::EFFECT_KNOB_PARAM));
@@ -877,8 +865,8 @@ struct MusicalAntWidget : ModuleWidget {
 
 			// Loop length knob
 
-			//addParam(createParam<RoundSmallBlackKnobSnap>(Vec(23.65, 306.5), module, MusicalAnt::LOOP_LENGTH));
-			RoundSmallBlackKnobSnap *loopLengthKnob = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(23.65, 306.5), module, MusicalAnt::LOOP_LENGTH));
+			//addParam(createParam<RoundSmallBlackKnobSnap>(Vec(23.65, 306.5), module, MusicalAnt::LOOP_LENGTH_PARAM));
+			RoundSmallBlackKnobSnap *loopLengthKnob = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(23.65, 306.5), module, MusicalAnt::LOOP_LENGTH_PARAM));
 			// Loop length text
 
 			//addChild( new LoopLengthTextLabel(module, Vec(253.55, 80), 20, 1, nvgRGBA(255,0,0,255) ) );
@@ -893,7 +881,7 @@ struct MusicalAntWidget : ModuleWidget {
 			addParam(createParam<AuntyLangButton>(Vec(83.5, 352), module, MusicalAnt::AUNTYLANGBUTTON_PARAM));
 
 			// Poly V/Oct out
-			addOutput(createOutput<PJ301MPort>(Vec(23, 341.25), module, MusicalAnt::VOCT_OUTPUT_POLY));
+			addOutput(createOutput<PJ301MPort>(Vec(23, 341.25), module, MusicalAnt::VOCT_OUTPUT_POLY_PARAM));
 			
 			
 			octaveKnobX->connectLabel(dynamicLabel, module);
