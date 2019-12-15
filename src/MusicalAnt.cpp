@@ -587,13 +587,14 @@ void MusicalAnt::process(const ProcessArgs &args) {
 		// External clock
 		if (clockTrigger.process(rescale(inputs[EXT_CLOCK_INPUT].getVoltage(), 0.1f, 2.f, 0.f, 1.f))) {
 
-			if(loopIsOn && (backStepsRemaining > 0)) {
-				//loopIndex = currentIndex;
+			if(getLoopOn() != loopIsOn) {
+				loopIndex = currentIndex;
 				walkAnt(-1*loopLength*numberSteps);
-			}
-			else if(loopIsOn && (backStepsRemaining <= 0)) {
-				walkAnt(numberSteps*loopLength);
 				setLoopOn(loopIsOn);
+			}
+			else if(loopIsOn && 
+				(currentIndex >= loopIndex + numberSteps*loopLength)) {
+				walkAnt(-1*numberSteps*loopLength);
 			}
 			else {
 				walkAnt(numberSteps);
