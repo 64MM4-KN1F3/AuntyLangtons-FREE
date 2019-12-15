@@ -266,9 +266,6 @@ struct MusicalAnt : Module, QuantizeUtils {
 
 	void setLoopOn(bool loopIsOn) {
 		this->loopOn = loopIsOn;
-		if(loopIsOn) {
-			backStepsRemaining = getLoopLength() * (params[SKIP_PARAM].getValue() + 1);
-		}	
 	}
 
 	int getLoopLength() {
@@ -544,13 +541,6 @@ struct MusicalAnt : Module, QuantizeUtils {
 			paces = steps;
 		}
 
-		if(getLoopOn()) {
-			backStepsRemaining = backStepsRemaining + steps;
-			if(backStepsRemaining < 0) {
-				backStepsRemaining = 0;
-			}
-		}
-
 		for(int i = 0; i < paces; i++) {
 			stepAnt(currentArrowOfTimeForward);
 		}
@@ -587,18 +577,17 @@ void MusicalAnt::process(const ProcessArgs &args) {
 		// External clock
 		if (clockTrigger.process(rescale(inputs[EXT_CLOCK_INPUT].getVoltage(), 0.1f, 2.f, 0.f, 1.f))) {
 
-			if(getLoopOn() != loopIsOn) {
-				loopIndex = currentIndex;
+			if(loopIsOn && (backStepsRemaining >= loopLength*numberSteps)) {
+				//loopIndex = currentIndex;
 				walkAnt(-1*loopLength*numberSteps);
-				setLoopOn(loopIsOn);
-			}
-			else if(loopIsOn && 
-				(currentIndex >= loopIndex + numberSteps*loopLength)) {
-				walkAnt(-1*numberSteps*loopLength);
+				//setLoopOn(loopIsOn);
+				backStepsRemaining = clamp(backStepsRemaining - loopLength*numberSteps, 0, loopLength*numberSteps);
+				
 			}
 			else {
 				walkAnt(numberSteps);
-			} 
+				backStepsRemaining = clamp(backStepsRemaining + numberSteps, 0, loopLength*numberSteps);
+			}
 		}
 		gateIn = clockTrigger.isHigh();
 	}
@@ -608,17 +597,16 @@ void MusicalAnt::process(const ProcessArgs &args) {
 		phase += clockTime * args.sampleTime;
 		if (phase >= 1.0f) {
 			phase -= 1.0f;
-			if(getLoopOn() != loopIsOn) {
+			if(loopIsOn && (backStepsRemaining >= loopLength*numberSteps)) {
 				//loopIndex = currentIndex;
 				walkAnt(-1*loopLength*numberSteps);
-				setLoopOn(loopIsOn);
+				//setLoopOn(loopIsOn);
+				backStepsRemaining = clamp(backStepsRemaining - loopLength*numberSteps, 0, loopLength*numberSteps);
+				
 			}
-			/*else if(loopIsOn && 
-				(currentIndex >= loopIndex + numberSteps*loopLength)) {
-				walkAnt(-1*numberSteps*loopLength);
-			}*/
 			else {
 				walkAnt(numberSteps);
+				backStepsRemaining = clamp(backStepsRemaining + numberSteps, 0, loopLength*numberSteps);
 			} 
 		}
 
