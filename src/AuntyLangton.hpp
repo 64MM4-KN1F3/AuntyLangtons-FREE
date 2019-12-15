@@ -149,8 +149,8 @@ struct CenteredLabel : Widget {
 ////////////////////////////////////////////// KNOBS //////////////////////////////////////////////
 
 struct RoundSmallBlackKnobSnap : RoundSmallBlackKnob {
-	CenteredLabel* linkedLabel = new CenteredLabel;
-	Module* linkedModule = new Module;
+	CenteredLabel* linkedLabel = NULL;
+	Module* linkedModule = NULL;
 
     RoundSmallBlackKnobSnap() {
     	paramQuantity = NULL;

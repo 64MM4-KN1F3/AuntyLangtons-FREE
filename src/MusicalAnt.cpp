@@ -701,21 +701,21 @@ struct ModuleDisplay : Widget {
 				if(cells.at(i)){
 					nvgFillColor(draw.vg, ((random::uniform() < 0.5) ? nvgRGBA(0,255,0,PIXEL_BRIGHTNESS) : nvgRGBA(0,255,0,PIXEL_BRIGHTNESS+5)));
 					nvgBeginPath(draw.vg);
-					nvgRect(draw.vg, x*pixelSize, y*pixelSize, pixelSize, pixelSize);
+					nvgRect(draw.vg, static_cast<float>(x)*pixelSize, static_cast<float>(y)*pixelSize, pixelSize, pixelSize);
 					nvgFill(draw.vg);
 				}
 				if(i == shadowAntCell){
 					if(!module->params[MusicalAnt::SHADOW_ANT_ON_PARAM].getValue()){
 						nvgFillColor(draw.vg, nvgRGBA(0,70,0,255));
 						nvgBeginPath(draw.vg);
-						nvgRect(draw.vg, x*pixelSize, y*pixelSize, pixelSize, pixelSize);
+						nvgRect(draw.vg, static_cast<float>(x)*pixelSize, static_cast<float>(y)*pixelSize, pixelSize, pixelSize);
 						nvgFill(draw.vg);
 					}
 				}
 				if(i == antCell){
 					nvgFillColor(draw.vg, nvgRGBA(20,255,50,255));
 					nvgBeginPath(draw.vg);
-					nvgRect(draw.vg, x*pixelSize, y*pixelSize, pixelSize, pixelSize);
+					nvgRect(draw.vg, static_cast<float>(x)*pixelSize, static_cast<float>(y)*pixelSize, pixelSize, pixelSize);
 					nvgFill(draw.vg);
 				}
 				//addChild( new ModuleDisplay(module, Vec((x+1)*(pixelSize + gapSize) + DISPLAY_OFFSET_X, (y+1)*(pixelSize + gapSize) + DISPLAY_OFFSET_Y), pixelSize, i));
@@ -732,64 +732,30 @@ struct ModuleDisplay : Widget {
 				if((i%55 == 0)&&(i!=0)){ //increment y once x hits positive multiple of COL length
 					y++;
 				}
-				nvgFillColor(draw.vg, ((random::uniform() < 0.5) ? nvgRGBA(0,0,0,0) : nvgRGBA(255,255,255,8)));
+				nvgFillColor(draw.vg, ((1 < 0.5) ? nvgRGBA(0,0,0,0) : nvgRGBA(255,255,255,8)));
 				nvgBeginPath(draw.vg);
-				nvgRect(draw.vg, x*fuzzPixelSize, y*fuzzPixelSize, fuzzPixelSize, fuzzPixelSize);
+				nvgRect(draw.vg, static_cast<float>(x)*fuzzPixelSize, static_cast<float>(y)*fuzzPixelSize, fuzzPixelSize, fuzzPixelSize);
 				nvgFill(draw.vg);
 			}
 
 			// Draw screen reflection over display
 			nvgFillColor(draw.vg, nvgRGBA(255,255,255,7));
 			nvgBeginPath(draw.vg);
-			//nvgRect(draw.vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
 			nvgCircle(draw.vg, 68, 54, 60);
 			nvgFill(draw.vg);
 
 			nvgBeginPath(draw.vg);
-			//nvgRect(draw.vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
 			nvgCircle(draw.vg, 77, 48, 40);
 			nvgFill(draw.vg);
 
 			nvgBeginPath(draw.vg);
-			//nvgRect(draw.vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
 			nvgCircle(draw.vg, 82, 43, 20);
 			nvgFill(draw.vg);
 
 			nvgFillColor(draw.vg, nvgRGBA(255,255,255,5));
 			nvgBeginPath(draw.vg);
-			//nvgRect(draw.vg, (float) x*pixelSize, (float) y*pixelSize, pixelSize, pixelSize);
 			nvgCircle(draw.vg, 87, 40, 8);
 			nvgFill(draw.vg);
-
-			//nvgFillColor(args.vg, nvgRGBA(0,0,0,0));
-
-			// LCD shine
-			/*nvgFillColor(args.vg, nvgRGBA(255,255,255,10));
-			nvgBeginPath(args.vg);
-			nvgMoveTo(args.vg, 105, 326.7);
-			nvgLineTo(args.vg, 135, 326.7);
-			nvgLineTo(args.vg, 125, 336);
-			nvgLineTo(args.vg, 95, 336);
-			nvgClosePath(args.vg);
-			nvgFill(args.vg);
-
-			nvgFillColor(args.vg, nvgRGBA(255,255,255,15));
-			nvgBeginPath(args.vg);
-			nvgMoveTo(args.vg, 110, 326.7);
-			nvgLineTo(args.vg, 130, 326.7);
-			nvgLineTo(args.vg, 120, 336);
-			nvgLineTo(args.vg, 100, 336);
-			nvgClosePath(args.vg);
-			nvgFill(args.vg);
-
-			nvgFillColor(args.vg, nvgRGBA(255,255,255,20));
-			nvgBeginPath(args.vg);
-			nvgMoveTo(args.vg, 115, 326.7);
-			nvgLineTo(args.vg, 125, 326.7);
-			nvgLineTo(args.vg, 115, 336);
-			nvgLineTo(args.vg, 105, 336);
-			nvgClosePath(args.vg);
-			nvgFill(args.vg);*/
 		}
 	}
 
