@@ -41,7 +41,10 @@ Personal dev notes:
 Compile:
 RACK_DIR=/Users/my/Documents/Rack-SDK make
 
+Compile for AddressSanitizer:
+Add following to Makefile: CXXFLAGS += -g -fsanitize=address
 
+Run with: DYLD_INSERT_LIBRARIES=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/11.0.0/lib/darwin/libclang_rt.asan_osx_dynamic.dylib ./Rack
 */
 
 struct MusicalAnt : Module, QuantizeUtils {
@@ -72,11 +75,8 @@ struct MusicalAnt : Module, QuantizeUtils {
 		NUM_PARAMS
 	};
 	enum InputIds {
-		CLOCK_INPUT,
 		EXT_CLOCK_INPUT,
 		PITCH_INPUT,
-		RND_TRIG_INPUT,
-		RND_AMT_INPUT,
 		NUM_INPUTS
 	};
 	enum OutputIds {
@@ -407,7 +407,7 @@ struct MusicalAnt : Module, QuantizeUtils {
 		
 
 		currentArrowOfTimeForward = arrowOfTime;
-		// Ant
+		// Ant.
 
 		int currPositionX = systemState->antX;
 		int currPositionY = systemState->antY;
@@ -831,7 +831,7 @@ struct MusicalAntWidget : ModuleWidget {
 			addOutput(createOutput<PJ301MPort>(Vec(82.9, 181), module, MusicalAnt::GATE_OUTPUT_RIGHT));
 			
 
-			addChild(createLight<SmallLight<GreenLight>>(Vec(108.9, 170), module, MusicalAnt::BLINK_LIGHT));
+			//addChild(createLight<SmallLight<GreenLight>>(Vec(108.9, 170), module, MusicalAnt::BLINK_LIGHT));
 
 			// Shadow Ant on switch
 			addParam(createParam<CKSS>(Vec(50.80, 305), module, MusicalAnt::SHADOW_ANT_ON_PARAM));
