@@ -1,8 +1,6 @@
 #include <rack.hpp>
 #include "QuantizeUtils.cpp"
-
-//#include "Logos.cpp"
-
+#include "Logos.cpp"
 
 #define CELLS 20736
 #define LEFT -90
@@ -130,7 +128,7 @@ struct MusicalInstruction {
 struct CenteredLabel : Widget {
 	std::string text;
 	int fontSize;
-	std::shared_ptr<Font> font = NULL;
+	std::shared_ptr<Font> font;
 
 	CenteredLabel(int _fontSize = 10) {
 		font = APP->window->loadFont(asset::plugin(pluginInstance, "res/DSEG7ClassicMini-Regular.ttf"));
@@ -142,7 +140,7 @@ struct CenteredLabel : Widget {
 		nvgFontFaceId(draw.vg, font->handle);
 		nvgFillColor(draw.vg, nvgRGB(0, 0, 0));
 		nvgFontSize(draw.vg, fontSize);
-		nvgText(draw.vg, box.pos.x, box.pos.y, "TEST", NULL);
+		nvgText(draw.vg, box.pos.x, box.pos.y, text.c_str(), NULL );
 	}
 };
 
@@ -153,7 +151,7 @@ struct RoundSmallBlackKnobSnap : RoundSmallBlackKnob {
 	Module* linkedModule = NULL;
 
     RoundSmallBlackKnobSnap() {
-    	//paramQuantity = NULL;
+    	paramQuantity = NULL;
     	snap = true;
     }
 

@@ -24,8 +24,6 @@ Jeremy Wentworth of JW Modules - http://jeremywentworth.com
 .. for providing the open source structure to build upon.
 */
 
-// TODO 1 - 4 way switch: Off, Sparkle, Fade, Mirror - Off - Ant is normal, sparkle is random additive noise, fade is random subtractive noise, mirror is second ant with mirrored left/right moves. Knob controls amount of noise and fading amount on Fade. Fade utilises a second shadowAnt delayed by a power of 10 steps. Second ant has exact same function as normal ant, thereby undoing it's old moves.
-// TODO 2 - uncomment and finish the manual drawing functionality
 // TODO 3 - Try dual outputs for one axis using a shepard tone
 // TODO 4 - Add a splash screen for when the pluginInstance is initialized (done) and then remove it.
 // TODO 5 (done) - X or Y out only fires if ant is changing on that axis?
@@ -47,7 +45,7 @@ Add following to Makefile: CXXFLAGS += -g -fsanitize=address
 Run with: DYLD_INSERT_LIBRARIES=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/11.0.0/lib/darwin/libclang_rt.asan_osx_dynamic.dylib ./Rack
 */
 
-struct MusicalAnt : Module, QuantizeUtils {
+struct MusicalAnt : Module, QuantizeUtils{
 	enum ParamIds {
 		CLOCK_PARAM,
 		SCALE_KNOB_X_PARAM,
@@ -137,7 +135,7 @@ struct MusicalAnt : Module, QuantizeUtils {
 		configParam(LOOP_LENGTH_PARAM, 0.0f, 31.0f, 0.0, "");
 		configParam(SIDE_LENGTH_PARAM, 0.0f, 6.0f, INITIAL_RESOLUTION_KNOB_POSITION, "");
 		configParam(SKIP_PARAM, 0.0f, 9.0f, 0.0f, "");
-		configParam(AUNTYLANGBUTTON_PARAM, 0.0f, 1.0f, 1.0f, "");
+		configParam(AUNTYLANGBUTTON_PARAM, 0.0f, 1.0f, 0.0f, "");
 
 		sideLength = fibo[INITIAL_RESOLUTION_KNOB_POSITION];
 
@@ -402,6 +400,8 @@ struct MusicalAnt : Module, QuantizeUtils {
 		else {
 			outputs[VOCT_OUTPUT_POLY_OUTPUT].setChannels(2);
 		}
+
+		lights[BLINK_LIGHT].value = gateIn ? 1.0f : 0.0f;
 	}
 
 	void clearCells() {
@@ -727,7 +727,7 @@ struct MusicalAnt : Module, QuantizeUtils {
 
 }*/
 
-struct ModuleDisplay : Widget {
+struct ModuleDisplay : Widget, Logos {
 	MusicalAnt *module;
 	bool currentlyTurningOn = false;
 	float initX = 0;
@@ -786,7 +786,17 @@ struct ModuleDisplay : Widget {
 			int shadowAntCell = module->iFromXY(module->systemState->shadowAntX, module->systemState->shadowAntY);
 			
 			int numCells = drawSideLength*drawSideLength;
-			cells = module->systemState->cells;
+
+			if(module->params[MusicalAnt::AUNTYLANGBUTTON_PARAM].getValue() == 1.0) {
+				for(int i=0;i<CELLS;i++){
+					cells.at(i) = Logos::AL_logo_144x144[i];//false;
+				}
+			}
+			else {
+				cells = module->systemState->cells;
+			}
+			
+
 			for(int i=0; i < numCells; i++){
 				x = i%drawSideLength; //increment x up to COL length then loop
 				if((x == 0)&&(i != 0)){ //increment y once x hits positive multiple of COL length
@@ -852,6 +862,34 @@ struct ModuleDisplay : Widget {
 			nvgBeginPath(draw.vg);
 			nvgCircle(draw.vg, 87, 40, 8);
 			nvgFill(draw.vg);
+
+			// LCD shine
+			nvgFillColor(draw.vg, nvgRGBA(255,255,255,10));
+			nvgBeginPath(draw.vg);
+			nvgMoveTo(draw.vg, 105, 326.7);
+			nvgLineTo(draw.vg, 135, 326.7);
+			nvgLineTo(draw.vg, 125, 336);
+			nvgLineTo(draw.vg, 95, 336);
+			nvgClosePath(draw.vg);
+			nvgFill(draw.vg);
+
+			nvgFillColor(draw.vg, nvgRGBA(255,255,255,15));
+			nvgBeginPath(draw.vg);
+			nvgMoveTo(draw.vg, 110, 326.7);
+			nvgLineTo(draw.vg, 130, 326.7);
+			nvgLineTo(draw.vg, 120, 336);
+			nvgLineTo(draw.vg, 100, 336);
+			nvgClosePath(draw.vg);
+			nvgFill(draw.vg);
+
+			nvgFillColor(draw.vg, nvgRGBA(255,255,255,20));
+			nvgBeginPath(draw.vg);
+			nvgMoveTo(draw.vg, 115, 326.7);
+			nvgLineTo(draw.vg, 125, 326.7);
+			nvgLineTo(draw.vg, 115, 336);
+			nvgLineTo(draw.vg, 105, 336);
+			nvgClosePath(draw.vg);
+			nvgFill(draw.vg);
 		}
 	}
 
@@ -914,7 +952,7 @@ struct MusicalAntWidget : ModuleWidget {
 			addOutput(createOutput<PJ301MPort>(Vec(82.9, 181), module, MusicalAnt::GATE_OUTPUT_RIGHT));
 			
 
-			//addChild(createLight<SmallLight<GreenLight>>(Vec(108.9, 170), module, MusicalAnt::BLINK_LIGHT));
+			addChild(createLight<SmallLight<GreenLight>>(Vec(108.9, 170), module, MusicalAnt::BLINK_LIGHT));
 
 			// Shadow Ant on switch
 			addParam(createParam<CKSS>(Vec(50.80, 305), module, MusicalAnt::SHADOW_ANT_ON_PARAM));
