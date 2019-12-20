@@ -71,7 +71,6 @@ struct MusicalAnt : Module, QuantizeUtils {
 		VOCT_INVERT_X_PARAM,
 		VOCT_INVERT_Y_PARAM,
 		AUNTYLANGBUTTON_PARAM,
-		VOCT_OUTPUT_POLY_PARAM,
 		NUM_PARAMS
 	};
 	enum InputIds {
@@ -89,6 +88,7 @@ struct MusicalAnt : Module, QuantizeUtils {
 		VOCT_OUTPUT_SHADOW_Y,
 		RND_VOCT_OUTPUT,
 		RND_GATE_OUTPUT,
+		VOCT_OUTPUT_POLY_OUTPUT,
 		NUM_OUTPUTS
 	};
 	enum LightIds {
@@ -137,7 +137,6 @@ struct MusicalAnt : Module, QuantizeUtils {
 		configParam(LOOP_LENGTH_PARAM, 0.0f, 31.0f, 0.0, "");
 		configParam(SIDE_LENGTH_PARAM, 0.0f, 6.0f, INITIAL_RESOLUTION_KNOB_POSITION, "");
 		configParam(SKIP_PARAM, 0.0f, 9.0f, 0.0f, "");
-		configParam(VOCT_OUTPUT_POLY_PARAM, 0.0f, 1.0f, 1.0f, "");
 		configParam(AUNTYLANGBUTTON_PARAM, 0.0f, 1.0f, 1.0f, "");
 
 		sideLength = fibo[INITIAL_RESOLUTION_KNOB_POSITION];
@@ -319,7 +318,91 @@ struct MusicalAnt : Module, QuantizeUtils {
 		return systemState->antDirectionDegrees;
 	}
 
-	void process(const ProcessArgs &args) override;
+	void process(const ProcessArgs &args) {
+		bool loopIsOn = params[LOOPMODE_SWITCH_PARAM].getValue();
+
+		//int currentIndex = getIndex();
+
+		bool gateIn = false;
+		int numberSteps = params[SKIP_PARAM].getValue() + 1;
+
+		
+
+		loopLength = params[LOOP_LENGTH_PARAM].getValue() + 1;
+		//setLoopLength(loopLength);
+
+
+
+		// Looping implementation
+		
+
+		if (inputs[EXT_CLOCK_INPUT].isConnected()) {
+			// External clock
+			if (clockTrigger.process(rescale(inputs[EXT_CLOCK_INPUT].getVoltage(), 0.1f, 2.f, 0.f, 1.f))) {
+
+				if(loopIsOn && (backStepsRemaining >= loopLength*numberSteps)) {
+					//loopIndex = currentIndex;
+					walkAnt(-1*loopLength*numberSteps);
+					///setLoopOn(loopIsOn);
+					backStepsRemaining = clamp(backStepsRemaining - loopLength*numberSteps, 0, loopLength*numberSteps);
+					
+				}
+				else {
+					walkAnt(numberSteps);
+					backStepsRemaining = clamp(backStepsRemaining + numberSteps, 0, loopLength*numberSteps);
+				}
+			}
+			gateIn = clockTrigger.isHigh();
+		}
+		else {
+			// Internal clock
+			float clockParam = params[CLOCK_PARAM].getValue();
+			if(clockParam > 0.0) {
+				float clockTime = powf(2.0f, params[CLOCK_PARAM].getValue());
+				phase += clockTime * args.sampleTime;
+				if (phase >= 1.0f) {
+					phase -= 1.0f;
+					if(loopIsOn && (backStepsRemaining >= loopLength*numberSteps)) {
+						//loopIndex = currentIndex;
+						walkAnt(-1*loopLength*numberSteps);
+						//setLoopOn(loopIsOn);
+						backStepsRemaining = clamp(backStepsRemaining - loopLength*numberSteps, 0, loopLength*numberSteps);
+						
+					}
+					else {
+						walkAnt(numberSteps);
+						backStepsRemaining = clamp(backStepsRemaining + numberSteps, 0, loopLength*numberSteps);
+					} 
+				}
+				gateIn = (phase < 0.5f);
+			}
+		}
+		
+
+
+
+		// TODO Fix up this var below. May not be needed, or at least needs refactoring
+		int tempSideLength = params[SIDE_LENGTH_PARAM].getValue();
+
+		setSideLength(tempSideLength);
+		float gateOut = (gateIn ? 10.0f : 0.0f);
+
+		//params[INDEX_PARAM].setValue(currentIndex);
+
+		outputs[GATE_OUTPUT].setVoltage(gateOut);
+
+		outputs[VOCT_OUTPUT_POLY_OUTPUT].setVoltage(!params[VOCT_INVERT_X_PARAM].getValue() ? closestVoltageForX(tempSideLength - getAntX()) : closestVoltageForX(getAntX()), 0);;
+		outputs[VOCT_OUTPUT_POLY_OUTPUT].setVoltage(!params[VOCT_INVERT_Y_PARAM].getValue() ? closestVoltageForY(tempSideLength - getAntY()) : closestVoltageForY(getAntY()), 1);;
+		if(params[SHADOW_ANT_ON_PARAM].getValue() == 1.0) {
+			outputs[VOCT_OUTPUT_POLY_OUTPUT].setVoltage(closestVoltageForShadowX(getShadowAntX()), 2);
+			outputs[VOCT_OUTPUT_POLY_OUTPUT].setVoltage(closestVoltageForShadowY(getShadowAntY()), 3);
+			// Don't forget to set the number of output channels
+			outputs[VOCT_OUTPUT_POLY_OUTPUT].setChannels(4);
+		}
+		else {
+			outputs[VOCT_OUTPUT_POLY_OUTPUT].setChannels(2);
+		}
+	}
 
 	void clearCells() {
 		for(unsigned int i=0;i<CELLS;i++){
@@ -554,7 +637,7 @@ struct MusicalAnt : Module, QuantizeUtils {
 };
 
 
-void MusicalAnt::process(const ProcessArgs &args) {
+/*void MusicalAnt::process(const ProcessArgs &args) {
 
 
 	bool loopIsOn = params[LOOPMODE_SWITCH_PARAM].getValue();
@@ -628,21 +711,21 @@ void MusicalAnt::process(const ProcessArgs &args) {
 
 	outputs[GATE_OUTPUT].setVoltage(gateOut);
 
-	outputs[VOCT_OUTPUT_POLY_PARAM].setVoltage(!params[VOCT_INVERT_X_PARAM].getValue() ? closestVoltageForX(tempSideLength - getAntX()) : closestVoltageForX(getAntX()), 0);;
-	outputs[VOCT_OUTPUT_POLY_PARAM].setVoltage(!params[VOCT_INVERT_Y_PARAM].getValue() ? closestVoltageForY(tempSideLength - getAntY()) : closestVoltageForY(getAntY()), 1);;
+	outputs[VOCT_OUTPUT_POLY_OUTPUT].setVoltage(!params[VOCT_INVERT_X_PARAM].getValue() ? closestVoltageForX(tempSideLength - getAntX()) : closestVoltageForX(getAntX()), 0);;
+	outputs[VOCT_OUTPUT_POLY_OUTPUT].setVoltage(!params[VOCT_INVERT_Y_PARAM].getValue() ? closestVoltageForY(tempSideLength - getAntY()) : closestVoltageForY(getAntY()), 1);;
 	if(!params[SHADOW_ANT_ON_PARAM].getValue()) {
-		outputs[VOCT_OUTPUT_POLY_PARAM].setVoltage(closestVoltageForShadowX(getShadowAntX()), 2);
-		outputs[VOCT_OUTPUT_POLY_PARAM].setVoltage(closestVoltageForShadowY(getShadowAntY()), 3);
+		outputs[VOCT_OUTPUT_POLY_OUTPUT].setVoltage(closestVoltageForShadowX(getShadowAntX()), 2);
+		outputs[VOCT_OUTPUT_POLY_OUTPUT].setVoltage(closestVoltageForShadowY(getShadowAntY()), 3);
 		// Don't forget to set the number of output channels
-		outputs[VOCT_OUTPUT_POLY_PARAM].setChannels(4);
+		outputs[VOCT_OUTPUT_POLY_OUTPUT].setChannels(4);
 	}
 	else {
-		outputs[VOCT_OUTPUT_POLY_PARAM].setChannels(2);
+		outputs[VOCT_OUTPUT_POLY_OUTPUT].setChannels(2);
 	}
 
 	//lights[BLINK_LIGHT].value = gateIn ? 1.0f : 0.0f;
 
-}
+}*/
 
 struct ModuleDisplay : Widget {
 	MusicalAnt *module;
@@ -860,7 +943,7 @@ struct MusicalAntWidget : ModuleWidget {
 			addParam(createParam<AuntyLangButton>(Vec(83.5, 352), module, MusicalAnt::AUNTYLANGBUTTON_PARAM));
 
 			// Poly V/Oct out
-			addOutput(createOutput<PJ301MPort>(Vec(23, 341.25), module, MusicalAnt::VOCT_OUTPUT_POLY_PARAM));
+			addOutput(createOutput<PJ301MPort>(Vec(23, 341.25), module, MusicalAnt::VOCT_OUTPUT_POLY_OUTPUT));
 			
 			
 			octaveKnobX->connectLabel(dynamicLabel, module);
