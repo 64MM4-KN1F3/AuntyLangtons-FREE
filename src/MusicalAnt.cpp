@@ -148,7 +148,7 @@ struct MusicalAnt : Module, QuantizeUtils{
 	//~MusicalAnt() {
 	//}
 
-	void onReset() {
+	void onReset() override {
 		
 		clearCells();
 		int sideLengthOnReset = getSideLength();
@@ -310,7 +310,7 @@ struct MusicalAnt : Module, QuantizeUtils{
 		return systemState->antDirectionDegrees;
 	}
 
-	void process(const ProcessArgs &args) {
+	void process(const ProcessArgs &args) override {
 		bool loopIsOn = params[LOOPMODE_SWITCH_PARAM].getValue();
 
 		//int currentIndex = getIndex();
