@@ -2,11 +2,11 @@
   "slug": "AuntyLangtonsFree",
   "name": "Aunty Langton's - FREE",
   "version": "1.0.0",
-  "license": "",
+  "license": "GPL-3.0-only",
   "brand": "Aunty Langton's",
   "author": "Alex Weatherley",
   "authorEmail": "aweatherley@gmail.com",
-  "authorUrl": "",
+  "authorUrl": "https://github.com/64MM4-KN1F3/AuntyLangtons-FREE",
   "pluginUrl": "https://community.vcvrack.com/uploads/default/original/2X/8/8475f6ad2e0d80d4d479f97bea509d987d3bc313.png",
   "manualUrl": "https://community.vcvrack.com/uploads/default/original/2X/8/8475f6ad2e0d80d4d479f97bea509d987d3bc313.png",
   "sourceUrl": "https://github.com/64MM4-KN1F3/AuntyLangtons-FREE",
@@ -15,8 +15,8 @@
     {
       "slug": "MusicalAnt",
       "name": "Musical Ant",
-      "description": "Release 1.0.0",
-      "tags": []
+      "description": "A Lanton's Ant implementation in Rack",
+      "tags": ["Sequencer", "Clock generator", "Clock modulator", "Arpeggiator", "Poly"]
     }
   ]
 }
