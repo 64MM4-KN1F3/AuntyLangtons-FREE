@@ -15,7 +15,7 @@
     {
       "slug": "MusicalAnt",
       "name": "Musical Ant",
-      "description": "A Lanton's Ant implementation in Rack",
+      "description": "A Langton's Ant implementation in Rack",
       "tags": ["Sequencer", "Clock generator", "Clock modulator", "Arpeggiator", "Poly"]
     }
   ]
