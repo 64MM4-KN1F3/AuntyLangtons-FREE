@@ -16,9 +16,11 @@ Learn more about Langton's Ant [here](https://en.wikipedia.org/wiki/Langton%27s_
 
 In this implementation of Langton's Ant, the module outputs a quantized X and Y voltage depending on the X or Y position of the ant on the 2D plane. This quantized voltage can be changed by the Octave, Note and Pitch knobs. These two voltages are combined into a Poly output port.
 
-There is also a Shadow Ant which, when enabled, will output an additional two X and Y voltages correlated to the position of the Shadow Ant. The Shadow ant likes to clean up after the first any and sometimes they dance together in some strange period.
+There is also a Shadow Ant which, when enabled, will output an additional two X and Y voltages correlated to the position of the Shadow Ant. The Shadow ant likes to clean up after the first any and sometimes they dance together in some strange period. Eg.
 
-There is *also* a loop switch that allows the user to loop over up to 32 steps. Try drawing near the ant(s) while looping and you will see interesting, evolved sequences such as: **TODO INSERT ANIMATED GIF**
+![ShadowDance](https://media.giphy.com/media/SRrOaKWPQkBuJjyC7E/source.gif)
+
+There is *also* a loop switch that allows the user to loop over up to 32 steps. Try drawing near the ant(s) while looping and you will see interesting, evolved sequences due to your interference with the environment.
 
 ### Panel Overview
 
@@ -26,10 +28,14 @@ There is *also* a loop switch that allows the user to loop over up to 32 steps. 
 
 ## Thanks
 
+Andrew Belt (VCV Rack creator) - Thank you for creating and open sourcing such an amazing creative tool!
 For info on VCV Rack check out: https://vcvrack.com/
-(Thank you Andrew Belt for creating such an amazing tool)
 
-JW Modules - Thank you very much for open sourcing your modules Jeremy, I have learnt so much from them! http://jeremywentworth.com/
+JW Modules - Thank you very much for open sourcing your modules Jeremy, I have learnt so much from them!
+See a buch of Jeremy's excellent work here: http://jeremywentworth.com/
 
-Font usage: https://github.com/keshikan/DSEG
-(thanks Keshikan けしかん!)
+DSEG LCD-style font - Thank you Keshikan けしかん!
+Find this font here: https://github.com/keshikan/DSEG
+
+Christopher Langton - Of course, thanks to the creator of the Ant!
+https://en.wikipedia.org/wiki/Christopher_Langton
