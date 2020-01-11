@@ -32,7 +32,7 @@ Andrew Belt (VCV Rack creator) - Thank you for creating and open sourcing such a
 For info on VCV Rack check out: https://vcvrack.com/
 
 JW Modules - Thank you very much for open sourcing your modules Jeremy, I have learnt so much from them!
-See a buch of Jeremy's excellent work here: http://jeremywentworth.com/
+See a bunch of Jeremy's excellent work here: http://jeremywentworth.com/
 
 DSEG LCD-style font - Thank you Keshikan けしかん!
 Find this font here: https://github.com/keshikan/DSEG
