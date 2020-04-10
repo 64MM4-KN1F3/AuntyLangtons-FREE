@@ -1,6 +1,6 @@
 
 # AUNTY LANGTON'S FREE
-
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=YQX9FWDCXSK34&currency_code=AUD&source=url)
 ## Aunty Langton's Musical Ant
 
 ### Description
@@ -39,3 +39,6 @@ Find this font here: https://github.com/keshikan/DSEG
 
 Christopher Langton - Of course, thanks to the creator of the Ant!
 https://en.wikipedia.org/wiki/Christopher_Langton
+
+<br><br>
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=YQX9FWDCXSK34&currency_code=AUD&source=url)
