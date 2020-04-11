@@ -902,131 +902,130 @@ struct MusicalAntWidget : ModuleWidget {
 		addChild(createWidget<ScrewBlack>(Vec(0, 365)));
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - 15, 365)));
 
-		if(module){
-			CenteredLabel* const dynamicLabel = new CenteredLabel;
-			dynamicLabel->box.pos = Vec(75, 182.2);
+		CenteredLabel* const dynamicLabel = new CenteredLabel;
+		dynamicLabel->box.pos = Vec(75, 182.2);
 
-			addParam(createParam<RoundBlackKnob>(Vec(143.9, 177), module, MusicalAnt::CLOCK_PARAM));
+		addParam(createParam<RoundBlackKnob>(Vec(143.9, 177), module, MusicalAnt::CLOCK_PARAM));
 
-			// Ant X panel widgets
-			//addParam(createParam<RoundSmallBlackKnobSnap>(Vec(52.4, 218.5), module, MusicalAnt::OCTAVE_KNOB_X_PARAM));
-			RoundSmallBlackKnobSnap *octaveKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(52.4, 218.5), module, MusicalAnt::OCTAVE_KNOB_X_PARAM));
-			RoundSmallBlackKnobSnap *noteKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(76.9, 218.5), module, MusicalAnt::NOTE_KNOB_X_PARAM));
-			RoundSmallBlackKnobSnap *scaleKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(101.4, 218.5), module, MusicalAnt::SCALE_KNOB_X_PARAM));
-			addOutput(createOutput<PJ301MPort>(Vec(148.9, 218.5), module, MusicalAnt::VOCT_OUTPUT_X));
-			// Invert X V/Oct output
-			addParam(createParam<CKSS>(Vec(127.5, 219.75), module, MusicalAnt::VOCT_INVERT_X_PARAM));
-			
-			// Ant Y panel widgets
-			RoundSmallBlackKnobSnap *octaveKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(52.4, 254), module, MusicalAnt::OCTAVE_KNOB_Y_PARAM));
-			RoundSmallBlackKnobSnap *noteKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(76.9, 254), module, MusicalAnt::NOTE_KNOB_Y_PARAM));
-			RoundSmallBlackKnobSnap *scaleKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(101.4, 254), module, MusicalAnt::SCALE_KNOB_Y_PARAM));
-			addOutput(createOutput<PJ301MPort>(Vec(148.9, 254), module, MusicalAnt::VOCT_OUTPUT_Y));
-			// Invert Y V/Oct output
-			addParam(createParam<CKSS>(Vec(127.5, 255.25), module, MusicalAnt::VOCT_INVERT_Y_PARAM));
+		// Ant X panel widgets
+		//addParam(createParam<RoundSmallBlackKnobSnap>(Vec(52.4, 218.5), module, MusicalAnt::OCTAVE_KNOB_X_PARAM));
+		RoundSmallBlackKnobSnap *octaveKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(52.4, 218.5), module, MusicalAnt::OCTAVE_KNOB_X_PARAM));
+		RoundSmallBlackKnobSnap *noteKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(76.9, 218.5), module, MusicalAnt::NOTE_KNOB_X_PARAM));
+		RoundSmallBlackKnobSnap *scaleKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(101.4, 218.5), module, MusicalAnt::SCALE_KNOB_X_PARAM));
+		addOutput(createOutput<PJ301MPort>(Vec(148.9, 218.5), module, MusicalAnt::VOCT_OUTPUT_X));
+		// Invert X V/Oct output
+		addParam(createParam<CKSS>(Vec(127.5, 219.75), module, MusicalAnt::VOCT_INVERT_X_PARAM));
+		
+		// Ant Y panel widgets
+		RoundSmallBlackKnobSnap *octaveKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(52.4, 254), module, MusicalAnt::OCTAVE_KNOB_Y_PARAM));
+		RoundSmallBlackKnobSnap *noteKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(76.9, 254), module, MusicalAnt::NOTE_KNOB_Y_PARAM));
+		RoundSmallBlackKnobSnap *scaleKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(101.4, 254), module, MusicalAnt::SCALE_KNOB_Y_PARAM));
+		addOutput(createOutput<PJ301MPort>(Vec(148.9, 254), module, MusicalAnt::VOCT_OUTPUT_Y));
+		// Invert Y V/Oct output
+		addParam(createParam<CKSS>(Vec(127.5, 255.25), module, MusicalAnt::VOCT_INVERT_Y_PARAM));
 
-			// Shadow Ant X panel widgets
-			RoundSmallBlackKnobSnap *shadowOctaveKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(70.9, 289.5), module, MusicalAnt::OCTAVE_KNOB_SHADOW_X_PARAM));
-			RoundSmallBlackKnobSnap *shadowNoteKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(95.4, 289.5), module, MusicalAnt::NOTE_KNOB_SHADOW_X_PARAM));
-			RoundSmallBlackKnobSnap *shadowScaleKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(119.9, 289.5), module, MusicalAnt::SCALE_KNOB_SHADOW_X_PARAM));
-			addOutput(createOutput<PJ301MPort>(Vec(148.9, 289.5), module, MusicalAnt::VOCT_OUTPUT_SHADOW_X));
+		// Shadow Ant X panel widgets
+		RoundSmallBlackKnobSnap *shadowOctaveKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(70.9, 289.5), module, MusicalAnt::OCTAVE_KNOB_SHADOW_X_PARAM));
+		RoundSmallBlackKnobSnap *shadowNoteKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(95.4, 289.5), module, MusicalAnt::NOTE_KNOB_SHADOW_X_PARAM));
+		RoundSmallBlackKnobSnap *shadowScaleKnobX = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(119.9, 289.5), module, MusicalAnt::SCALE_KNOB_SHADOW_X_PARAM));
+		addOutput(createOutput<PJ301MPort>(Vec(148.9, 289.5), module, MusicalAnt::VOCT_OUTPUT_SHADOW_X));
 
-			// Shadow Ant Y panel widgets
-			RoundSmallBlackKnobSnap *shadowOctaveKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(70.9, 325), module, MusicalAnt::OCTAVE_KNOB_SHADOW_Y_PARAM));
-			RoundSmallBlackKnobSnap *shadowNoteKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(95.4, 325), module, MusicalAnt::NOTE_KNOB_SHADOW_Y_PARAM));
-			RoundSmallBlackKnobSnap *shadowScaleKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(119.9, 325), module, MusicalAnt::SCALE_KNOB_SHADOW_Y_PARAM));
-			addOutput(createOutput<PJ301MPort>(Vec(148.9, 325), module, MusicalAnt::VOCT_OUTPUT_SHADOW_Y));
+		// Shadow Ant Y panel widgets
+		RoundSmallBlackKnobSnap *shadowOctaveKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(70.9, 325), module, MusicalAnt::OCTAVE_KNOB_SHADOW_Y_PARAM));
+		RoundSmallBlackKnobSnap *shadowNoteKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(95.4, 325), module, MusicalAnt::NOTE_KNOB_SHADOW_Y_PARAM));
+		RoundSmallBlackKnobSnap *shadowScaleKnobY = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(119.9, 325), module, MusicalAnt::SCALE_KNOB_SHADOW_Y_PARAM));
+		addOutput(createOutput<PJ301MPort>(Vec(148.9, 325), module, MusicalAnt::VOCT_OUTPUT_SHADOW_Y));
 
-			
+		
 
-			addInput(createInput<PJ301MPort>(Vec(115.9, 181), module, MusicalAnt::EXT_CLOCK_INPUT));
-			addOutput(createOutput<PJ301MPort>(Vec(23.9, 181), module, MusicalAnt::GATE_OUTPUT));
+		addInput(createInput<PJ301MPort>(Vec(115.9, 181), module, MusicalAnt::EXT_CLOCK_INPUT));
+		addOutput(createOutput<PJ301MPort>(Vec(23.9, 181), module, MusicalAnt::GATE_OUTPUT));
 
-			addOutput(createOutput<PJ301MPort>(Vec(52.9, 181), module, MusicalAnt::GATE_OUTPUT_LEFT));
-			addOutput(createOutput<PJ301MPort>(Vec(82.9, 181), module, MusicalAnt::GATE_OUTPUT_RIGHT));
-			
+		addOutput(createOutput<PJ301MPort>(Vec(52.9, 181), module, MusicalAnt::GATE_OUTPUT_LEFT));
+		addOutput(createOutput<PJ301MPort>(Vec(82.9, 181), module, MusicalAnt::GATE_OUTPUT_RIGHT));
+		
 
-			addChild(createLight<SmallLight<GreenLight>>(Vec(108.9, 170), module, MusicalAnt::BLINK_LIGHT));
+		addChild(createLight<SmallLight<GreenLight>>(Vec(108.9, 170), module, MusicalAnt::BLINK_LIGHT));
 
-			// Shadow Ant on switch
-			addParam(createParam<CKSS>(Vec(50.80, 305), module, MusicalAnt::SHADOW_ANT_ON_PARAM));
+		// Shadow Ant on switch
+		addParam(createParam<CKSS>(Vec(50.80, 305), module, MusicalAnt::SHADOW_ANT_ON_PARAM));
 
-			// Effect Knob 
-			addParam(createParam<RoundBlackSnapKnob>(Vec(253.9, 250), module, MusicalAnt::EFFECT_KNOB_PARAM));
+		// Effect Knob 
+		addParam(createParam<RoundBlackSnapKnob>(Vec(253.9, 250), module, MusicalAnt::EFFECT_KNOB_PARAM));
 
-			// Loop Mode Switch
-			addParam(createParam<CKSS_Horizontal>(Vec(25, 290), module, MusicalAnt::LOOPMODE_SWITCH_PARAM));
+		// Loop Mode Switch
+		addParam(createParam<CKSS_Horizontal>(Vec(25, 290), module, MusicalAnt::LOOPMODE_SWITCH_PARAM));
 
-			// Loop length knob
+		// Loop length knob
 
-			//addParam(createParam<RoundSmallBlackKnobSnap>(Vec(23.65, 306.5), module, MusicalAnt::LOOP_LENGTH_PARAM));
-			RoundSmallBlackKnobSnap *loopLengthKnob = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(23.65, 306.5), module, MusicalAnt::LOOP_LENGTH_PARAM));
-			// Loop length text
+		//addParam(createParam<RoundSmallBlackKnobSnap>(Vec(23.65, 306.5), module, MusicalAnt::LOOP_LENGTH_PARAM));
+		RoundSmallBlackKnobSnap *loopLengthKnob = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(23.65, 306.5), module, MusicalAnt::LOOP_LENGTH_PARAM));
+		// Loop length text
 
-			//addChild( new LoopLengthTextLabel(module, Vec(253.55, 80), 20, 1, nvgRGBA(255,0,0,255) ) );
+		//addChild( new LoopLengthTextLabel(module, Vec(253.55, 80), 20, 1, nvgRGBA(255,0,0,255) ) );
 
-			// Resolution/SideLength Knob
-			RoundSmallBlackKnobSnap *sideLengthKnob = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(23.9, 218.5), module, MusicalAnt::SIDE_LENGTH_PARAM));
+		// Resolution/SideLength Knob
+		RoundSmallBlackKnobSnap *sideLengthKnob = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(23.9, 218.5), module, MusicalAnt::SIDE_LENGTH_PARAM));
 
-			// Skip Knob
-			RoundSmallBlackKnobSnap *skipParamKnob = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(23.9, 254), module, MusicalAnt::SKIP_PARAM));
+		// Skip Knob
+		RoundSmallBlackKnobSnap *skipParamKnob = dynamic_cast<RoundSmallBlackKnobSnap*>(createParam<RoundSmallBlackKnobSnap>(Vec(23.9, 254), module, MusicalAnt::SKIP_PARAM));
 
-			// AuntyLangButton!
-			addParam(createParam<AuntyLangButton>(Vec(83.5, 352), module, MusicalAnt::AUNTYLANGBUTTON_PARAM));
+		// AuntyLangButton!
+		addParam(createParam<AuntyLangButton>(Vec(83.5, 352), module, MusicalAnt::AUNTYLANGBUTTON_PARAM));
 
-			// Poly V/Oct out
-			addOutput(createOutput<PJ301MPort>(Vec(23, 341.25), module, MusicalAnt::VOCT_OUTPUT_POLY_OUTPUT));
-			
-			
-			octaveKnobX->connectLabel(dynamicLabel, module);
-			noteKnobX->connectLabel(dynamicLabel, module);
-			scaleKnobX->connectLabel(dynamicLabel, module);
+		// Poly V/Oct out
+		addOutput(createOutput<PJ301MPort>(Vec(23, 341.25), module, MusicalAnt::VOCT_OUTPUT_POLY_OUTPUT));
+		
+		
+		octaveKnobX->connectLabel(dynamicLabel, module);
+		noteKnobX->connectLabel(dynamicLabel, module);
+		scaleKnobX->connectLabel(dynamicLabel, module);
 
-			octaveKnobY->connectLabel(dynamicLabel, module);
-			noteKnobY->connectLabel(dynamicLabel, module);
-			scaleKnobY->connectLabel(dynamicLabel, module);
+		octaveKnobY->connectLabel(dynamicLabel, module);
+		noteKnobY->connectLabel(dynamicLabel, module);
+		scaleKnobY->connectLabel(dynamicLabel, module);
 
-			shadowOctaveKnobX->connectLabel(dynamicLabel, module);
-			shadowNoteKnobX->connectLabel(dynamicLabel, module);
-			shadowScaleKnobX->connectLabel(dynamicLabel, module);
+		shadowOctaveKnobX->connectLabel(dynamicLabel, module);
+		shadowNoteKnobX->connectLabel(dynamicLabel, module);
+		shadowScaleKnobX->connectLabel(dynamicLabel, module);
 
-			shadowOctaveKnobY->connectLabel(dynamicLabel, module);
-			shadowNoteKnobY->connectLabel(dynamicLabel, module);
-			shadowScaleKnobY->connectLabel(dynamicLabel, module);
+		shadowOctaveKnobY->connectLabel(dynamicLabel, module);
+		shadowNoteKnobY->connectLabel(dynamicLabel, module);
+		shadowScaleKnobY->connectLabel(dynamicLabel, module);
 
-			loopLengthKnob->connectLabel(dynamicLabel, module);
-			sideLengthKnob->connectLabel(dynamicLabel, module);
-			skipParamKnob->connectLabel(dynamicLabel, module);
+		loopLengthKnob->connectLabel(dynamicLabel, module);
+		sideLengthKnob->connectLabel(dynamicLabel, module);
+		skipParamKnob->connectLabel(dynamicLabel, module);
 
-			addChild(dynamicLabel);
+		addChild(dynamicLabel);
 
-			addParam(octaveKnobX);
-			addParam(noteKnobX);
-			addParam(scaleKnobX);
+		addParam(octaveKnobX);
+		addParam(noteKnobX);
+		addParam(scaleKnobX);
 
-			addParam(octaveKnobY);
-			addParam(noteKnobY);
-			addParam(scaleKnobY);
+		addParam(octaveKnobY);
+		addParam(noteKnobY);
+		addParam(scaleKnobY);
 
-			addParam(shadowOctaveKnobX);
-			addParam(shadowNoteKnobX);
-			addParam(shadowScaleKnobX);
+		addParam(shadowOctaveKnobX);
+		addParam(shadowNoteKnobX);
+		addParam(shadowScaleKnobX);
 
-			addParam(shadowOctaveKnobY);
-			addParam(shadowNoteKnobY);
-			addParam(shadowScaleKnobY);
+		addParam(shadowOctaveKnobY);
+		addParam(shadowNoteKnobY);
+		addParam(shadowScaleKnobY);
 
-			addParam(loopLengthKnob);
-			addParam(sideLengthKnob);
-			addParam(skipParamKnob);
+		addParam(loopLengthKnob);
+		addParam(sideLengthKnob);
+		addParam(skipParamKnob);
 
-			// Create display
-			ModuleDisplay *display = new ModuleDisplay();
-			display->module = module;
-			display->box.pos = Vec(DISPLAY_OFFSET_X, DISPLAY_OFFSET_Y);
-			display->box.size = Vec(DISPLAY_SIZE_XY, DISPLAY_SIZE_XY);
-			addChild(display);
-		}
+		// Create display
+		ModuleDisplay *display = new ModuleDisplay();
+		display->module = module;
+		display->box.pos = Vec(DISPLAY_OFFSET_X, DISPLAY_OFFSET_Y);
+		display->box.size = Vec(DISPLAY_SIZE_XY, DISPLAY_SIZE_XY);
+		addChild(display);
+
 	}
 };
 
