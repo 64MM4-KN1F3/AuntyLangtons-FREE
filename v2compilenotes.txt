@@ -1,0 +1,3 @@
+export RACK_DIR="/Users/my/Documents/Rack-SDK2"
+make dist
+make install
