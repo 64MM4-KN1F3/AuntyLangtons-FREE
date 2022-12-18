@@ -127,20 +127,24 @@ struct MusicalInstruction {
 
 struct CenteredLabel : Widget {
 	std::string text;
+	std::string fontPath = "res/DSEG7ClassicMini-Regular.ttf";
 	int fontSize;
-	std::shared_ptr<Font> font;
 
 	CenteredLabel(int _fontSize = 10) {
-		font = APP->window->loadFont(asset::plugin(pluginInstance, "res/DSEG7ClassicMini-Regular.ttf"));
-		fontSize = _fontSize;
+		//font = APP->window->loadFont(asset::plugin(pluginInstance, "res/DSEG7ClassicMini-Regular.ttf"));
+		//fontSize = _fontSize;
 		box.size.y = BND_WIDGET_HEIGHT;
 	}
 	void draw(const DrawArgs &draw) override {
-		nvgTextAlign(draw.vg, NVG_ALIGN_CENTER);
-		nvgFontFaceId(draw.vg, font->handle);
-		nvgFillColor(draw.vg, nvgRGB(0, 0, 0));
-		nvgFontSize(draw.vg, fontSize);
-		nvgText(draw.vg, box.pos.x, box.pos.y, text.c_str(), NULL );
+		std::shared_ptr<Font> font = APP->window->loadFont(fontPath);
+		fontSize = 10;
+		if(font){
+			nvgTextAlign(draw.vg, NVG_ALIGN_CENTER);
+			nvgFontFaceId(draw.vg, font->handle);
+			nvgFillColor(draw.vg, nvgRGB(0, 0, 0));
+			nvgFontSize(draw.vg, fontSize);
+			nvgText(draw.vg, box.pos.x, box.pos.y, text.c_str(), NULL );
+		}
 	}
 };
 
@@ -149,6 +153,7 @@ struct CenteredLabel : Widget {
 struct RoundSmallBlackKnobSnap : RoundSmallBlackKnob {
 	CenteredLabel* linkedLabel = NULL;
 	Module* linkedModule = NULL;
+	ParamQuantity* paramQuantity = getParamQuantity();
 
     RoundSmallBlackKnobSnap() {
     	paramQuantity = NULL;

@@ -5,7 +5,6 @@
 #include <math.h>
 using namespace std;
 #define CELLS 20736
-#define HISTORY_AMOUNT 100
 #define DISPLAY_OFFSET_X 35
 #define DISPLAY_OFFSET_Y 28
 #define DISPLAY_SIZE_XY 135
@@ -132,9 +131,9 @@ struct MusicalAnt : Module, QuantizeUtils{
 		configParam(SHADOW_ANT_ON_PARAM, 0.0f, 1.0f, 1.0f, "");
 		configParam(EFFECT_KNOB_PARAM, 0.0f, 5.0f, 0.0, "");
 		configParam(LOOPMODE_SWITCH_PARAM, 0.0f, 1.0f, 0.0f, "");
-		configParam(LOOP_LENGTH_PARAM, 0.0f, 31.0f, 0.0, "");
+		configParam(LOOP_LENGTH_PARAM, 0.0f, 64.0f, 0.0, "");
 		configParam(SIDE_LENGTH_PARAM, 0.0f, 6.0f, INITIAL_RESOLUTION_KNOB_POSITION, "");
-		configParam(SKIP_PARAM, 0.0f, 9.0f, 0.0f, "");
+		configParam(SKIP_PARAM, 0.0f, 32.0f, 0.0f, "");
 		configParam(AUNTYLANGBUTTON_PARAM, 0.0f, 1.0f, 0.0f, "");
 
 		sideLength = fibo[INITIAL_RESOLUTION_KNOB_POSITION];
@@ -747,6 +746,7 @@ struct ModuleDisplay : Widget, Logos {
 		}
 	}
 	
+	/* mousePos not available in Rack2 SDK
 	void onDragStart(const event::DragStart &e) override {
 		if(module) {
 			dragX = APP->scene->rack->mousePos.x;
@@ -761,6 +761,7 @@ struct ModuleDisplay : Widget, Logos {
 			module->setCellOnByDisplayPos(initX+(newDragX-dragX), initY+(newDragY-dragY), currentlyTurningOn);
 		}
 	}
+	*/
 
 	void draw(const DrawArgs &draw) override {
 
